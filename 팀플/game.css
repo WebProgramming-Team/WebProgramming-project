@@ -11,4 +11,45 @@ body {
 canvas {
   background: #000;
   border: 2px solid #fff;
+
+  display: none;
+}
+
+#main-menu {
+    text-align: center; 
+    background-color: white; 
+    padding: 40px;
+    width: 1024px;
+    height: 768px;
+}
+
+#level-selection {
+  display: none;
+  text-align: center; 
+  background-color: white; 
+  padding: 40px;
+  width: 1024px;
+  height: 768px;
+}
+
+h1 {
+    font-size: 80px;
+    margin-bottom: 40px;
+}
+
+button {
+    display: block; 
+    width: 200px; 
+    margin: 20px auto; 
+    padding: 15px 20px;
+    font-size: 1.2em;
+    cursor: pointer; 
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; 
+    color: white;
+}
+
+button:hover {
+    background-color: #0056b3; /* 호버 시 배경색 변경 */
 }

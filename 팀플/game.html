@@ -3,13 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>벽돌깨기 게임</title>
-  <link rel="stylesheet" href="game.css">
+  <script type="text/javascript" nonce="79eae2451adc49b294506e094d0" src="//local.adguard.org?ts=1747281954480&amp;type=content-script&amp;dmn=cdn.discordapp.com&amp;url=https%3A%2F%2Fcdn.discordapp.com%2Fattachments%2F1372424208260399236%2F1372424280347906080%2Fgame.html%3Fex%3D6826b936%26is%3D682567b6%26hm%3D53cff3689e59b01094925d73906a6a69c078b870d5f699c56cf139c786143129%26&amp;app=chrome.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script>
+<script type="text/javascript" nonce="79eae2451adc49b294506e094d0" src="//local.adguard.org?ts=1747281954480&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="stylesheet" href="game.css">
 </head>
 <body>
-  <canvas id="gameCanvas" width="480" height="320"></canvas>
+  <div id="main-menu">
+    <h1>내 게임 제목</h1>
+    <button id="start-button">게임 시작</button>
+    <button id="options-button">설정</button>
+    <button id="about-button">게임 정보</button>
+  </div>
+
+  <div id = "level-selection">
+    <h1>난이도 선택</h1>
+    <button id="easy-button" class = "game-start">쉬움</button>
+    <button id="normal-button" class = "game-start">보통</button>
+    <button id="hard-button" class = "game-start">어려움</button>
+    <button id="back-button-inlevel">뒤로</button>
+  </div>  
+
+  <canvas id="gameCanvas" width="1024" height="768"></canvas>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="game.js"></script>
-  <!-- 트랄랄레오 트랄랄라 -->
+  <script src="main.js"></script>
 </body>
 </html>

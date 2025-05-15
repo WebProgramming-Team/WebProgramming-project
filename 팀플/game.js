@@ -31,7 +31,7 @@ for (let c = 0; c < brickColumnCount; c++) {
 
 //벽돌 이미지
 const brickImage = new Image();
-brickImage.src = "bricks.jpg";
+brickImage.src = "image/bricks.jpg";
 
 //벽돌 그리기 함수
 function drawBricks() {
