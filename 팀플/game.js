@@ -6,6 +6,7 @@ let leftPressed = false;
 let isGameOver = false;
 
 let score = 0;
+//주석 테스트
 
 // 배경이미지 용 전역변수
 const imagePaths = ["images/a1.png", "images/a2.png", "images/a3.png", "https://i.pinimg.com/736x/d0/13/64/d01364ef9f3634159e0769a4dcd4fde7.jpg"];
