@@ -1,55 +1,106 @@
+/* 전체 화면 가운데 정렬 */
 body {
   margin: 0;
   padding: 0;
   background: #222;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  display: block;
+  overflow-x: auto; /* 가로 스크롤 허용 */
 }
 
-canvas {
-  background: #000;
+
+/* 게임 영역 */
+#game-area {
+  display: none;            /* 처음엔 숨김 */
+  position: relative;      /* 자식 absolute 기준 */
+  width: 1024px;
+  height: 768px;
+  background: #111;
   border: 2px solid #fff;
+  overflow: hidden;
+}
 
+/* 캔버스: 투명 위판 */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  width: 1024px;
+  height: 768px;
+  z-index: 999;
   display: none;
 }
 
-#main-menu {
-    text-align: center; 
-    background-color: white; 
-    padding: 40px;
-    width: 1024px;
-    height: 768px;
+/* 실습 태그가 로딩되는 배경 영역 */
+#labArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1024px;
+  height: 768px;
+  z-index: 1;
+  overflow: auto;
+  background: white;
 }
 
-#level-selection {
+/* 일시정지 / 재시작 버튼 */
+#game-buttons {
   display: none;
-  text-align: center; 
-  background-color: white; 
+  margin-top: 20px;
+  text-align: center;
+}
+
+#game-buttons button {
+  font-size: 16px;
+  padding: 8px 16px;
+  margin: 5px;
+}
+
+/* 다시 시작 버튼 */
+#restartBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  padding: 8px 16px;
+  font-size: 16px;
+}
+
+/* 메인 메뉴, 난이도 선택 */
+#main-menu, #level-selection {
+  text-align: center;
+  background-color: white;
   padding: 40px;
   width: 1024px;
   height: 768px;
 }
 
+
+#level-selection {
+  display: none;
+}
+
 h1 {
-    font-size: 80px;
-    margin-bottom: 40px;
+  font-size: 80px;
+  margin-bottom: 40px;
 }
 
 button {
-    display: block; 
-    width: 200px; 
-    margin: 20px auto; 
-    padding: 15px 20px;
-    font-size: 1.2em;
-    cursor: pointer; 
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff; 
-    color: white;
+  display: block;
+  width: 200px;
+  margin: 20px auto;
+  padding: 15px 20px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
 }
 
 button:hover {
-    background-color: #0056b3; /* 호버 시 배경색 변경 */
+  background-color: #0056b3;
 }
+
+
+
