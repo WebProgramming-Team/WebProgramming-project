@@ -7,6 +7,7 @@ let isGameOver = false;
 
 let score = 0;
 //주석 테스트
+// 이수현 왔다감
 var test=0;
 
 // 배경이미지 용 전역변수
@@ -99,7 +100,7 @@ function init() {
 
 //벽돌 이미지
 const brickImage = new Image();
-brickImage.src = "bricks.jpg";
+brickImage.src = "images/bricks.jpg";
 
 //벽돌 그리기 함수
 function drawBricks() {
