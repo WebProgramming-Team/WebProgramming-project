@@ -308,11 +308,8 @@ function createBricks() {
 
 //벽돌 이미지
 const brickImage = new Image();
-<<<<<<< HEAD
-brickImage.src = "image/bricks.jpg";
-=======
 brickImage.src = "images/bricks.jpg";
->>>>>>> d197862e1a8aa439864f8897ec63c39d1c5af8c7
+
 
 //벽돌 그리기 함수
 function drawBricks() {
