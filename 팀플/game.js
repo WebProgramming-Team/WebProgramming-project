@@ -214,9 +214,6 @@ $(window).ready(function() {
 
 
   $("#restartBtn").on("click", function () {
-    $(this).hide();       //버튼 숨기기
-    isGameOver = false;   //게임 상태 초기화
-    score = 0;            //점수 초기화
     init();               //게임 재시작
   });
 
@@ -277,13 +274,7 @@ function showMainMenu() {
 }
 
 function init() {
-	$("#level-selection").hide();
-  $("#main-menu").hide();             //  이것도 필요!
-  $("#game-area").show();            //  이거 반드시 있어야 함!!
-  $("#gameCanvas").show();
-  $("#game-buttons").show();
-  $("#startBtn, #pauseBtn").show();   // 재시작,일시정지 버튼 숨기기
-  $("#restartBtn, #ingame-to-menu-button").hide();     //  게임오버 재시작 버튼은 감춤
+  initShowHide();
 
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
@@ -303,9 +294,21 @@ function init() {
   rightPressed = false;
   leftPressed = false;
 
+  isGameOver = false;   //게임 상태 초기화
+  score = 0;
+
   draw();
 }
 
+function initShowHide() {
+  $(".menu-page").hide();             //  이것도 필요!
+  $("#game-area").show();            //  이거 반드시 있어야 함!!
+  $("#gameCanvas").show();
+  $("#game-buttons").show();
+  $("#startBtn, #pauseBtn").show();   // 재시작,일시정지 버튼 보이기
+  $("#restartBtn, #ingame-to-menu-button").hide();     //  게임오버 시 출력되었던 버튼 숨김
+  $("#game-over-massage").hide();
+}
 
 //태그가 연결된 벽돌 생성
 function createBricks() {
@@ -346,9 +349,7 @@ function draw() {
       dy = -dy;
     } else {
       isGameOver = true; // 다시 그리지 않도록 플래그 설정
-      alert("게임 오버! 최종점수: "+score+"\n");
-      $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
-      $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기 
+      gameOver();
       return; // draw() 탈출
     }
   }
@@ -371,6 +372,13 @@ function draw() {
   }
 
   requestAnimationFrame(draw);
+}
+
+// 게임 오버 처리
+function gameOver() {
+  $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
+  $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기
+  $("#game-over-massage").show();
 }
 
 //벽돌 그리기 함수
