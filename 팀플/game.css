@@ -89,11 +89,32 @@ canvas {
   padding: 0;
   font-size: 60px;
   text-align: center;
-  line-height: 768px;
+  line-height: 720px;
   color: white;
-  text-shadow: -1px 0px black, 0px 1px black, 1px 0px black, 0px -1px black;
+  text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
   z-index: 3;
   display: none;
+}
+
+#game-over-massage {
+  font-family: "Pixelify Sans", serif;
+  font-size: 120px;
+
+  animation-name: game-over;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes game-over {
+  0% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1.0);
+  }
 }
 
 h1 {

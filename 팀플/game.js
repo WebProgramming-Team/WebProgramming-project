@@ -1,11 +1,12 @@
 // === 전역 변수 ===
 let canvas, ctx;
-let ballX, ballY, ballRadius, dx, dy;
+let ballX, ballY, ballRadius, dx, dy, ran = 0; // v_s는 속도의 제곱, ran은 난수
 let paddleX, paddleHeight, paddleWidth;
 let rightPressed = false;
 let leftPressed = false;
 let isGameOver = false;
 let isPaused = false;   //일시정지 버튼
+const v_s = 128
 
 //점수 용 전역변수
 let score = 0;
@@ -16,6 +17,11 @@ let images = [];
 let imgCount = 0;
 let flag = 0;
 
+// 음악용
+const gameOverMusic = new Audio("musics/cd-stop.mp3");
+const uDied = new Audio("musics/u-died.mp3");
+const testBGM = new Audio("musics/main.mp3");
+testBGM.loop = true;
 
 //이 아래는 벽돌배열입니다.
 
@@ -145,7 +151,7 @@ const playjsHTML = `
 <p id="innerTest">여기를 눌러 보세요.</p>
 </div>
 <div class="lab">
-<img height="200" id="image" src="img1.jpg" width="350"/>
+<img height="200" id="image" src="projects/easy-mode/img1.jpg" width="350"/>
 <input id="imageButton" type="button" value="눌러보세요">
 </input></div>
 <div class="lab">
@@ -171,7 +177,7 @@ const playjsHTML = `
 </div>
 <div id="hangman">
 <div>
-<img alt="hangman" id="hangmanpic" src="hangman/hangman6.gif">
+<img alt="hangman" id="hangmanpic" src="projects/easy-mode/hangman/hangman6.gif">
 </img></div>
 <div id="clue">Press New Game to play!</div>
 <div>
@@ -189,7 +195,6 @@ const playjsHTML = `
 <p>Created by 202411235 강동훈</p>
 </footer>
 `;
-document.getElementById("labArea").innerHTML = playjsHTML;
 
 $(window).ready(function() {
 	// 메인 메뉴에서의 동작
@@ -239,6 +244,11 @@ $(window).ready(function() {
     alert("벽돌 이미지 로드 실패! 게임을 시작할 수 없습니다. 'bricks.jpg' 파일이 있는지 확인해주세요.");
   };
 
+  // 이건 걍 넣어본거
+  gameOverMusic.addEventListener("ended", function() {
+    uDied.play();
+  })
+
   showMainMenu();
 });
 
@@ -271,10 +281,14 @@ function showMainMenu() {
 
   $("#game-area").hide();         //게임 영역 숨김
   $("#startBtn, #pauseBtn, #restartBtn, #ingame-to-menu-button").hide();
+
+  stopMusic();
 }
 
 function init() {
   initShowHide();
+  stopMusic();
+  testBGM.play();
 
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
@@ -282,11 +296,15 @@ function init() {
   //새 게임 로드시 벽돌 다시 초기화
   createBricks();
 
+  // 뒷배경 초기화(쉬움 모드)
+  document.getElementById("labArea").innerHTML = playjsHTML;
+
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
   ballRadius = 10;
-  dx = 4;
-  dy = -4;
+  dx = Math.floor(Math.random() * 16 - 8);
+  dy = -Math.sqrt(v_s - dx*dx);
+  randomDx = 0;
 
   paddleHeight = 10;
   paddleWidth = 180;
@@ -346,7 +364,15 @@ function draw() {
     // 막대 충돌 확인
     const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
     if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
-      dy = -dy;
+      // 아래는 난수를 이용해 공이 바에 튕길때 각도를 약간 조절해주는 코드
+      ran = Math.random() * 5 - 2.5;
+      console.log("dx, ran: ", dx, ran);
+      while ((v_s - (dx+ran)*(dx+ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
+        ran = Math.random() * 5 - 2.5;
+        console.log("ran 다시: ", dx, ran);
+      }
+      dx += ran;
+      dy = -Math.sqrt(v_s - dx*dx);
     } else {
       isGameOver = true; // 다시 그리지 않도록 플래그 설정
       gameOver();
@@ -358,20 +384,22 @@ function draw() {
   ballY += dy;
 
   // 막대 이동
-  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 8;
-  else if (leftPressed && paddleX > 0) paddleX -= 8;
+  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 12;
+  else if (leftPressed && paddleX > 0) paddleX -= 12;
+
+  requestAnimationFrame(draw);
 
   //클리어 메세지
   if (checkClear()) {
     isGameOver = true;
+    testBGM.pause();
+    testBGM.currentTime = 0;
     setTimeout(() => {
       alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
       document.location.reload();
     }, 10);
     return;
   }
-
-  requestAnimationFrame(draw);
 }
 
 // 게임 오버 처리
@@ -379,6 +407,17 @@ function gameOver() {
   $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
   $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기
   $("#game-over-massage").show();
+  testBGM.pause();
+  testBGM.currentTime = 0;
+  gameOverMusic.play();
+}
+
+function stopMusic() {
+  gameOverMusic.pause();
+  uDied.pause();
+
+  gameOverMusic.currentTime = 0;
+  uDied.currentTime = 0;
 }
 
 //벽돌 그리기 함수

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+
+	<link rel="stylesheet" href="playjs.css" />
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+	<script type="text/javascript" src="playjs.js"></script>
+</head>
+<body >
+	<header>
+		<div id="title">
+			Play with JS!
+		</div>
+		<div id="ctime">
+
+		</div>
+		<nav>
+
+			<ul>
+				<li><a class="main-menu" href="#">Basic JS</a></li>
+				<li><a class="main-menu" href="#">Hangman</a></li>
+				<li><a class="main-menu" href="#">JQuery</a></li>
+				<li><a class="main-menu" href="#">Advanced JS</a></li>
+
+			</ul>
+		</nav>
+
+	</header>
+
+	<div id="content">
+		<!-- Put contents here. -->
+		<div class="lab">
+			<h3> 덧셈 계산기 </h3>
+			<form name="myform">
+				첫번째 정수:
+				<input id="x" /><br/>
+				두번째 정수:
+				<input id="y" /><br/>
+				합계:
+				<input id="sum" /><br/>
+				<input type="button" value="계산" id="addButton" />
+			</form>
+		</div>
+
+		<div class="lab">
+			<!-- 테이블 테두리는 collapse, 가운데 정렬, trtd와 관련은 반복문, 테이블 관련은 css, text align ceter같은거. -->
+			<!-- html 문서에 바로 스크립트 열고 집어넣기,trtd가 8개 -->
+			<h3>구구단 표</h3>
+			<table border="2">
+				<tr>
+					<script>
+						for(i=2;i<=9;i=i+1){
+							document.write("<th>"+i+"단"+"</th>");
+						}
+					</script>
+				</tr>
+
+				<script>
+					for(k=1;k<=9;k=k+1){
+						document.write("<tr>");
+						for(j=2;j<=9;j=j+1){
+							document.write("<td>"+j+"x"+k+"="+j*k+"</td>");
+						}
+						document.write("</tr>");
+					}
+
+
+				</script>
+			</table>
+		</div>
+
+		<div class="lab">
+			<h3>숫자 맞추기 게임</h3>
+			<p>이 게임은 컴퓨터가 생성한 숫자를 맞추는 게임입니다<br>
+			숫자는 1부터 100 사이에 있습니다.</p><br>
+			<form>
+				숫자:
+				<input type="text" id="user" size="5">
+				<input type="button" value="확인"  id="numGuess">
+				<input type="button" value="다시시작"  id="numReplay">
+				<br><br>
+				추측횟수:
+				<input type="text" id="guesses" size="5">
+				힌트: 
+				<input type="text" id="result" size="16">
+				<input type="text" id="randomNum" size="16">
+			</form>
+
+		</form>
+
+	</div>
+
+	<div class="lab">
+		<h3>단어장</h3><br>
+		<button class="wordButton"  id="addWord" >단어 추가</button>
+		<button class="wordButton"  id="showWordList" >단어 리스트 보기</button>
+		<button class="wordButton"  id="sortWord" >단어 정렬</button>
+		<button class="wordButton"  id="shuffleWord" >단어 섞기</button>
+		<br><br><p><strong>단어 리스트</strong></p><br>
+
+
+		<!-- 여기서 우리가 수행한 문자열 출력 -->
+		<div id="wordList"></div> 
+	</div>
+
+	<div class="lab">
+		<h2> innerHTML TEST </h2>
+		<p id="innerTest">여기를 눌러 보세요.</p>
+	</div>
+
+	<div class="lab">
+		<img src="img1.jpg" id="image" width="350" height="200">
+		<input type="button" id="imageButton" value="눌러보세요" />
+	</div>
+
+	<div class="lab">
+		<h3>색상 테이블 출력하기</h3>
+		<input type="button" id="ctCreate" value="출력하기"/>
+		<input type="button" id="ctRemove" value="없애기" />
+		<div id="colorTable"></div>
+	</div>
+
+	<div class="lab">
+		<div id="target">
+			This is a Text.
+		</div>
+		<button id="stopColor">중지</button>
+	</div>
+
+	<div class="lab">
+		<h3>상자 이동하기</h3>
+		<p>
+			<button id="moveBox">Click Me</button>
+		</p>
+		<div id="container">
+			<div id="animate"></div>
+		</div>
+	</div>
+
+	<div id="hangman">
+		<div>
+			<img id="hangmanpic" src="hangman/hangman6.gif" alt="hangman" />
+		</div>
+		<div id="clue">Press New Game to play!</div>
+		<div>
+			<input id="hguess" type="text" size="1" maxlength="1 /">
+			<button id="guessButton" disabled="disabled">Guess</button>
+		</div>
+		<div id="newgamearea">
+			<button id="newGame">New Game</button>
+		</div>
+		<div id="guessstr"></div>
+	</div>
+
+</div>
+
+<footer>
+	<p>Web programming, Spring 2025</p>
+	<p>Created by 202411235 강동훈</p>
+</footer>
+
+</body>
+</html>
