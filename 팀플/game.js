@@ -42,8 +42,8 @@ const destructibleElements = [
 // 벽돌 관련 설정
 const brickRowCount = 3;
 const brickColumnCount = 5;
-const brickWidth = 120;
-const brickHeight = 40;
+const brickWidth = 180;
+const brickHeight = 80;
 const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
