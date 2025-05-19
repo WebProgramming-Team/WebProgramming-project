@@ -27,7 +27,7 @@ canvas {
   background: transparent;
   width: 1024px;
   height: 768px;
-  z-index: 999;
+  z-index: 2;
   display: none;
 }
 
@@ -57,17 +57,17 @@ canvas {
 }
 
 /* 다시 시작 버튼 */
-#restartBtn {
+/*#restartBtn {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 1000;
   padding: 8px 16px;
   font-size: 16px;
-}
+}*/
 
 /* 메인 메뉴, 난이도 선택 */
-#main-menu, #level-selection {
+.menu-page {
   text-align: center;
   background-color: white;
   padding: 40px;
@@ -75,8 +75,24 @@ canvas {
   height: 768px;
 }
 
+#level-selection, #options, #guitar {
+  display: none;
+}
 
-#level-selection {
+.pop-up-massage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 60px;
+  text-align: center;
+  line-height: 768px;
+  color: white;
+  text-shadow: -1px 0px black, 0px 1px black, 1px 0px black, 0px -1px black;
+  z-index: 3;
   display: none;
 }
 

@@ -48,6 +48,9 @@ const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 
+//벽돌 이미지
+const brickImage = new Image();
+brickImage.src = "images/bricks.jpg";
 
 // bricks 초기화 시 아래처럼
 let bricks = [];
@@ -192,8 +195,11 @@ $(window).ready(function() {
 	// 메인 메뉴에서의 동작
   // 메뉴 버튼 연결
 	$("#start-button").on("click", showLevelSelectionPage);
-	$("#back-button-inlevel").on("click", showMainMenu);
+  $("#options-button").on("click", showOptions);
+  $("#guitar-button").on("click", showGuitar);
 	$(".game-start").on("click", init);
+  // 메인메뉴로 가는 버튼
+	$(".back-button").on("click", showMainMenu);
 
 	// 키보드 이벤트 연결
 	$(document).on("keydown", function (e) {
@@ -240,7 +246,6 @@ $(window).ready(function() {
 });
 
 
-
 function showLevelSelectionPage() {
 	$("#main-menu").hide();
 	$("#level-selection").show();
@@ -249,13 +254,26 @@ function showLevelSelectionPage() {
   $("#startBtn, #pauseBtn, #restartBtn").hide();  //버튼 숨김
 }
 
+function showOptions() {
+  $("#main-menu").hide();
+  $("#options").show();
+}
+
+function showGuitar() {
+  $("#main-menu").hide();
+  $("#guitar").show();
+}
+
 //==메인 메뉴로 돌아갈 때==
 function showMainMenu() {
 	$("#main-menu").show();
+
 	$("#level-selection").hide();
+  $("#options").hide();
+  $("#guitar").hide();
 
   $("#game-area").hide();         //게임 영역 숨김
-  $("#startBtn, #pauseBtn, #restartBtn").hide();
+  $("#startBtn, #pauseBtn, #restartBtn, #ingame-to-menu-button").hide();
 }
 
 function init() {
@@ -265,7 +283,7 @@ function init() {
   $("#gameCanvas").show();
   $("#game-buttons").show();
   $("#startBtn, #pauseBtn").show();   // 재시작,일시정지 버튼 숨기기
-  $("#restartBtn").hide();     //  게임오버 재시작 버튼은 감춤
+  $("#restartBtn, #ingame-to-menu-button").hide();     //  게임오버 재시작 버튼은 감춤
 
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
@@ -305,11 +323,55 @@ function createBricks() {
   }
 }
 
+//===draw 함수 시작===
+function draw() {
+	console.log("draw() 실행");
+  if (isGameOver || isPaused) return;
 
-//벽돌 이미지
-const brickImage = new Image();
-brickImage.src = "images/bricks.jpg";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);  //화면 초기화
 
+  drawBricks();  // 벽돌부터 그림
+  drawBall();  //공 그림
+  drawPaddle();  //막대 그림
+  drawScore();        // 점수 표시
+  collisionDetection();
+
+  // 벽 충돌 처리
+  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
+  if (ballY + dy < ballRadius) dy = -dy;
+  else if (ballY + dy > canvas.height - ballRadius) {
+    // 막대 충돌 확인
+    const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
+    if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
+      dy = -dy;
+    } else {
+      isGameOver = true; // 다시 그리지 않도록 플래그 설정
+      alert("게임 오버! 최종점수: "+score+"\n");
+      $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
+      $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기 
+      return; // draw() 탈출
+    }
+  }
+
+  ballX += dx;
+  ballY += dy;
+
+  // 막대 이동
+  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 8;
+  else if (leftPressed && paddleX > 0) paddleX -= 8;
+
+  //클리어 메세지
+  if (checkClear()) {
+    isGameOver = true;
+    setTimeout(() => {
+      alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
+      document.location.reload();
+    }, 10);
+    return;
+  }
+
+  requestAnimationFrame(draw);
+}
 
 //벽돌 그리기 함수
 function drawBricks() {
@@ -400,54 +462,5 @@ function drawPaddle() {
   ctx.closePath();
 }
 
-//===draw 함수 시작===
-function draw() {
-	console.log("draw() 실행");
-  if (isGameOver || isPaused) return;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);  //화면 초기화
-
-  drawBricks();  // 벽돌부터 그림
-  drawBall();  //공 그림
-  drawPaddle();  //막대 그림
-  drawScore();        // 점수 표시
-  collisionDetection();
-
-  // 벽 충돌 처리
-  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-  if (ballY + dy < ballRadius) dy = -dy;
-  else if (ballY + dy > canvas.height - ballRadius) {
-    // 막대 충돌 확인
-    const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
-    if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
-      dy = -dy;
-    } else {
-      isGameOver = true; // 다시 그리지 않도록 플래그 설정
-      alert("게임 오버! 최종점수: "+score+"\n");
-      $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
-      $("#restartBtn").show();  // 게임 오버 후 다시 시작 버튼만 보이기 
-      return; // draw() 탈출
-    }
-  }
-
-  ballX += dx;
-  ballY += dy;
-
-  // 막대 이동
-  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 8;
-  else if (leftPressed && paddleX > 0) paddleX -= 8;
-
-  //클리어 메세지
-  if (checkClear()) {
-    isGameOver = true;
-    setTimeout(() => {
-      alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
-      document.location.reload();
-    }, 10);
-    return;
-  }
-
-  requestAnimationFrame(draw);
-}
 
 
