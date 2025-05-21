@@ -6,25 +6,37 @@ let rightPressed = false;
 let leftPressed = false;
 let isGameOver = false;
 let isPaused = false;   //일시정지 버튼
-const v_s = 128
+let igIdx = 0; // 인게임 음악 인덱스
+const v_s = 128;
 
 //점수 용 전역변수
 let score = 0;
 
-// 배경이미지 용 전역변수
-const imagePaths = ["images/a1.png", "images/a2.png", "images/a3.png", "https://i.pinimg.com/736x/d0/13/64/d01364ef9f3634159e0769a4dcd4fde7.jpg"];
-let images = [];
-let imgCount = 0;
-let flag = 0;
-
 // 음악용
-const gameOverMusic = new Audio("musics/cd-stop.mp3");
-const uDied = new Audio("musics/u-died.mp3");
-const testBGM = new Audio("musics/main.mp3");
-testBGM.loop = true;
+const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
+const gameOverMusic = [];
+const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3"];
+const ingameMusic = [];
+const menuMusic = new Audio("musics/etc/main.mp3");
+
+for (let i = 0; i < gameOverMusicPath.length; i++) {
+  const goPath = gameOverMusicPath[i];
+  const igPath = ingameMusicPath[i];
+  const audio1 = new Audio(goPath);
+  const audio2 = new Audio(igPath);
+  gameOverMusic.push(audio1);
+  ingameMusic.push(audio2);
+
+  ingameMusic[i].loop = true;
+  ingameMusic[i].volume = 0.25;
+  gameOverMusic[i].volume = 0.25;
+}
+ingameMusic[1].volume = ingameMusic[1].volume*0.6;
+menuMusic.volume = 0.2;
+menuMusic.loop = true;
+
 
 //이 아래는 벽돌배열입니다.
-
 
 //벽돌에 대응되는 태그들
 const destructibleElements = [
@@ -46,10 +58,10 @@ const destructibleElements = [
 ];
 
 // 벽돌 관련 설정
-const brickRowCount = 3;
+const brickRowCount = 6;
 const brickColumnCount = 5;
 const brickWidth = 180;
-const brickHeight = 80;
+const brickHeight = 40;
 const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
@@ -218,12 +230,11 @@ $(window).ready(function() {
   });
 
 
+  // === 버튼 이벤트 연결 ===
   $("#restartBtn").on("click", function () {
     init();               //게임 재시작
   });
 
-
-  // === 버튼 이벤트 연결 ===
   $("#startBtn").on("click", function () {
     if (isPaused) {
       isPaused = false;
@@ -235,6 +246,17 @@ $(window).ready(function() {
     isPaused = true;
   });
 
+  $("#volume-bar").on("input", function() {
+    let vol = $(this).val();
+    $("#volume").html(vol);
+
+    setVolume(vol);
+  })
+
+  $("#music-select").on("input", function() {
+    igIdx = $(this).val();
+  })
+
   // 이미지 로드 확인
   brickImage.onload = () => {
     console.log("벽돌 이미지 로드 완료");
@@ -244,12 +266,14 @@ $(window).ready(function() {
     alert("벽돌 이미지 로드 실패! 게임을 시작할 수 없습니다. 'bricks.jpg' 파일이 있는지 확인해주세요.");
   };
 
-  // 이건 걍 넣어본거
-  gameOverMusic.addEventListener("ended", function() {
-    uDied.play();
+  // 음악 담당
+  gameOverMusic[0].addEventListener("ended", function() {
+    gameOverMusic[1].play();
   })
-
-  showMainMenu();
+  
+  $("#menu-music-button, #intro-to-main").on("click", function () {
+    menuMusic.play();
+  })
 });
 
 
@@ -273,22 +297,21 @@ function showGuitar() {
 
 //==메인 메뉴로 돌아갈 때==
 function showMainMenu() {
-	$("#main-menu").show();
+	$(".menu-page").hide();
 
-	$("#level-selection").hide();
-  $("#options").hide();
-  $("#guitar").hide();
+  $("#main-menu").show();
 
   $("#game-area").hide();         //게임 영역 숨김
   $("#startBtn, #pauseBtn, #restartBtn, #ingame-to-menu-button").hide();
 
   stopMusic();
+  menuMusic.play();
 }
 
 function init() {
   initShowHide();
   stopMusic();
-  testBGM.play();
+  ingameMusic[igIdx].play();
 
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
@@ -304,7 +327,7 @@ function init() {
   ballRadius = 10;
   dx = Math.floor(Math.random() * 16 - 8);
   dy = -Math.sqrt(v_s - dx*dx);
-  randomDx = 0;
+  console.log(dx, dy, dx*dx+dy*dy);
 
   paddleHeight = 10;
   paddleWidth = 180;
@@ -367,6 +390,10 @@ function draw() {
       // 아래는 난수를 이용해 공이 바에 튕길때 각도를 약간 조절해주는 코드
       ran = Math.random() * 5 - 2.5;
       console.log("dx, ran: ", dx, ran);
+      if (((dx+ran) < 2 && (dx+ran > -2)) && (Math.floor(Math.random() * 6) == 0)) {
+        dx *= 3;
+        console.log("dx *3: ", dx, ran);
+      }
       while ((v_s - (dx+ran)*(dx+ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
         ran = Math.random() * 5 - 2.5;
         console.log("ran 다시: ", dx, ran);
@@ -392,8 +419,7 @@ function draw() {
   //클리어 메세지
   if (checkClear()) {
     isGameOver = true;
-    testBGM.pause();
-    testBGM.currentTime = 0;
+    stopMusic();
     setTimeout(() => {
       alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
       document.location.reload();
@@ -407,17 +433,31 @@ function gameOver() {
   $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
   $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기
   $("#game-over-massage").show();
-  testBGM.pause();
-  testBGM.currentTime = 0;
-  gameOverMusic.play();
+  stopMusic();
+  gameOverMusic[0].play();
 }
 
 function stopMusic() {
-  gameOverMusic.pause();
-  uDied.pause();
+  for (let i = 0; i < gameOverMusic.length; i++) {
+    gameOverMusic[i].pause();
+    gameOverMusic[i].currentTime = 0;
+    ingameMusic[i].pause();
+    ingameMusic[i].currentTime = 0;
+  }
+  menuMusic.pause();
+  menuMusic.currentTime = 0;
+}
 
-  gameOverMusic.currentTime = 0;
-  uDied.currentTime = 0;
+function setVolume(vol) {
+  vol = vol / 100 * 0.5;
+  gameOverMusic.forEach(function(audio) {
+    audio.volume = vol;
+  })
+  ingameMusic.forEach(function(audio) {
+    audio.volume = vol;
+  })
+  ingameMusic[1].volume = ingameMusic[1].volume * 0.8;
+  menuMusic.volume = vol;
 }
 
 //벽돌 그리기 함수

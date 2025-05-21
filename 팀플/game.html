@@ -11,6 +11,14 @@
   <script src="projects/easy-mode/playjs.js"></script>         <!-- playjs에서 쓰는 JS -->
 </head>
 <body>
+  <div id = "intro-page" class = "menu-page">
+    <h1>벽돌 부수기</h1>
+    <div>메뉴 음악 선택</div>
+    <div>볼륨 조절</div>
+    <button id="menu-music-button">음악 재생</button>
+    <button id="intro-to-main" class = "back-button">메인 메뉴로</button>
+  </div>
+
   <div id="main-menu" class = "menu-page">
     <h1>내 게임 제목</h1>
     <button id="start-button">게임 시작</button>
@@ -23,11 +31,21 @@
     <button id="easy-button" class = "game-start">쉬움</button>
     <button id="normal-button" class = "game-start">보통</button>
     <button id="hard-button" class = "game-start">어려움</button>
-    <button id="level-to-main", class = "back-button">뒤로</button>
+    <button id="level-to-main" class = "back-button">뒤로</button>
   </div>
 
   <div id = "options" class = "menu-page">
     <h1>설정</h1>
+    <label for="music-select">음악 선택: </label>
+    <select id="music-select">
+      <option value="0">신나는 음악</option>
+      <option value="1">편안한 음악</option>
+    </select>
+    <br><br>
+    <label>볼륨 설정: </label>
+    <input type = "range" min = "0" max = "100" id = "volume-bar">
+    <div id = "volume">50</div>
+    <br>
     <button id="option-to-main" class = "back-button">뒤로</button>
   </div>
 
