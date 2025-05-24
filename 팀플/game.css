@@ -1,10 +1,10 @@
 /* 전체 화면 가운데 정렬 */
 body {
-  margin: 0;
+  width: 1104px;
+  margin: auto;
   padding: 0;
   background: #222;
   display: block;
-  overflow-x: auto; /* 가로 스크롤 허용 */
 }
 
 
@@ -81,6 +81,33 @@ canvas {
   display: block;
 }
 
+#bs-div {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+}
+
+.bs-label {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  user-select: none;
+}
+
+.bs-label.selected {
+  background-color: aqua;
+  font-weight: bold;
+}
+
+.bs-radio {
+  display: none;
+}
+
 .pop-up-massage {
   position: absolute;
   top: 0;
@@ -91,23 +118,49 @@ canvas {
   padding: 0;
   font-size: 60px;
   text-align: center;
-  line-height: 720px;
+  line-height: 620px;
   color: white;
   text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
   z-index: 3;
   display: none;
 }
 
-#game-over-massage {
-  font-family: "Pixelify Sans", serif;
-  font-size: 120px;
-
+.pop-up-massage {
   animation-name: game-over;
   animation-duration: 0.4s;
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: infinite;
   animation-direction: alternate;
+}
+
+#game-over-massage {
+  font-family: "Pixelify Sans", serif;
+  font-size: 120px;
+}
+
+#game-over-subtitle {
+  font-family: sans-serif;
+  font-size: 40px;
+  top: 90px;
+}
+
+#pause-panel {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border: 1px solid black;
+  width: 680px;
+  height: 480px;
+  z-index: 4;
+  display: none;
+}
+#pause-panel * {
+  z-index: 5;
 }
 
 @keyframes game-over {
