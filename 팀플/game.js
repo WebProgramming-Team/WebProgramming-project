@@ -9,6 +9,10 @@ let isPaused = false;   //일시정지 버튼
 let igIdx = 0; // 인게임 음악 인덱스
 const v_s = 128;
 
+//폭탄 사진
+const bombImg = new Image();
+bombImg.src = 'images/bomb.jpg';
+
 //점수 용 전역변수
 let score = 0;
 
@@ -209,18 +213,18 @@ const playjsHTML = `
 `;
 
 $(window).ready(function() {
-	// 메인 메뉴에서의 동작
+  // 메인 메뉴에서의 동작
   // 메뉴 버튼 연결
-	$("#start-button").on("click", showLevelSelectionPage);
+  $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
-	$(".game-start").on("click", init);
+  $(".game-start").on("click", init);
   // 메인메뉴로 가는 버튼
-	$(".back-button").on("click", showMainMenu);
+  $(".back-button").on("click", showMainMenu);
 
 
-	// 키보드 이벤트 연결
-	$(document).on("keydown", function (e) {
+  // 키보드 이벤트 연결
+  $(document).on("keydown", function (e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
   });
@@ -279,8 +283,8 @@ $(window).ready(function() {
 
 
 function showLevelSelectionPage() {
-	$("#main-menu").hide();
-	$("#level-selection").show();
+  $("#main-menu").hide();
+  $("#level-selection").show();
 
   $("#game-area").hide();         //게임 영역 숨김
   $("#startBtn, #pauseBtn, #restartBtn").hide();  //버튼 숨김
@@ -298,7 +302,7 @@ function showGuitar() {
 
 //==메인 메뉴로 돌아갈 때==
 function showMainMenu() {
-	$(".menu-page").hide();
+  $(".menu-page").hide();
 
   $("#main-menu").show();
 
@@ -355,11 +359,21 @@ function initShowHide() {
 //태그가 연결된 벽돌 생성
 function createBricks() {
   let index = 0;
+  const bombCount = 2;
+  const bombPositions = [];
+  while (bombPositions.length < bombCount) {
+    const c = Math.floor(Math.random() * brickColumnCount);
+    const r = Math.floor(Math.random() * brickRowCount);
+    const key = `${c}-${r}`;
+    if (!bombPositions.includes(key)) bombPositions.push(key);
+  }
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r++) {
+      const isBomb = bombPositions.includes(`${c}-${r}`);
       bricks[c][r] = {
         x: 0, y: 0, status: 1,
+        isBomb: isBomb,
         targetSelector: destructibleElements[index]?.selector,
         tagLabel: destructibleElements[index]?.label
       };
@@ -370,7 +384,7 @@ function createBricks() {
 
 //===draw 함수 시작===
 function draw() {
-	console.log("draw() 실행");
+  console.log("draw() 실행");
   if (isGameOver || isPaused) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);  //화면 초기화
@@ -479,10 +493,38 @@ function drawBricks() {
         // 태그 이름 텍스트 표시
         if (b.tagLabel) {
           ctx.font = "12px Arial";
-          ctx.fillStyle = "#fff";
-          ctx.fillText(b.tagLabel, brickX + 10, brickY + 20);
+          ctx.fillStyle = b.isBomb ? "red" : "#fff";
+          const label = b.isBomb ? "💣" : b.tagLabel;
+          ctx.fillText(label, brickX + 10, brickY + 20);
         }
+      }
+    }
+  }
+}
 
+function destroyBrick(c, r) {
+  const b = bricks[c][r];
+  if (b.status === 0) return;
+
+  b.status = 0;
+  score += 10;
+
+  const labArea = document.querySelector("#labArea");
+  const target = labArea?.querySelector(b.targetSelector);
+  if (target) target.remove();
+
+  if (b.isBomb) {
+    for (let dc = -1; dc <= 1; dc++) {
+      for (let dr = -1; dr <= 1; dr++) {
+        const nc = c + dc;
+        const nr = r + dr;
+        if (
+          nc >= 0 && nc < brickColumnCount &&
+          nr >= 0 && nr < brickRowCount &&
+          !(nc === c && nr === r)
+        ) {
+          destroyBrick(nc, nr);
+        }
       }
     }
   }
@@ -501,18 +543,16 @@ function collisionDetection() {
           ballY < b.y + brickHeight
           ) {
           dy = -dy;
-        b.status = 0;
-        score+=10;
+          destroyBrick(c, r);
 
-        //해당 태그 제거
-        const labArea = document.querySelector("#labArea");
-        const target = labArea?.querySelector(b.targetSelector);
-        if (target) target.remove();
-
+          //해당 태그 제거
+          const labArea = document.querySelector("#labArea");
+          const target = labArea?.querySelector(b.targetSelector);
+          if (target) target.remove();
+        }
       }
     }
   }
-}
 }
 
 //점수 그리기 함수
@@ -549,6 +589,3 @@ function drawPaddle() {
   ctx.fill();
   ctx.closePath();
 }
-
-
-
