@@ -50,7 +50,10 @@ function setClock() {
 		m="June";
 
 	let s=m+" "+ now.getDate()+". "+ now.getHours()+" : "+now.getMinutes()+" : "+now.getSeconds();
+	var table = document.getElementById('ctime');
+	if(table != null){
 	document.getElementById('ctime').innerHTML=s;
+	}
 	setTimeout(setClock,1000);
 }
 //setClock(); 이렇게 하면 헤드영역에서 호출

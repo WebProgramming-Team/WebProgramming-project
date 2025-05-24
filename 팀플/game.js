@@ -218,6 +218,7 @@ $(window).ready(function() {
   // 메인메뉴로 가는 버튼
 	$(".back-button").on("click", showMainMenu);
 
+
 	// 키보드 이벤트 연결
 	$(document).on("keydown", function (e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;

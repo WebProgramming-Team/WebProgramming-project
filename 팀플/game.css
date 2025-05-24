@@ -124,6 +124,7 @@ h1 {
   margin-bottom: 40px;
 }
 
+/*버튼 기본 설정*/
 button {
   display: block;
   width: 200px;
@@ -141,5 +142,77 @@ button:hover {
   background-color: #0056b3;
 }
 
+/*[폰트 정의 모음]*/
 
+/*1. inter 폰트 
+inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
 
+.inter-100 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:100;
+  font-style: normal;
+}
+.inter-300 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:300;
+  font-style: normal;
+}
+.inter-500 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:500;
+  font-style: normal;
+}
+.inter-900{
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:900;
+  font-style: normal;
+}
+
+/* [메인 메뉴 씬 css 설정 모음] */
+
+/*메인 메뉴 전체*/
+#main-menu{
+  margin: auto;
+  position: relative; 
+  top: 0;
+  left: 0;
+  width: 60vw;      
+  height: 100vh;   
+  overflow: hidden;
+}
+#main-menu-background-area{
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 70vw;       
+  height: 30vh;   
+  overflow: hidden;/*자식 자르기*/
+  margin: 0 auto;
+}
+.main-menu-background1{
+  position: absolute;
+  left: -200px;
+  right: 0;
+  top: -300px;
+  bottom:0;
+  width:130%
+ }
+.main-menu-callout-area{
+  margin:100px 100px;
+  position: absolute;
+  left: 36px;
+  right: 0;
+  top: 540px;
+  bottom:0;
+ }
+ #main-menu-button{
+  position: absolute;
+   margin:100px 100px;
+  left: 36px;
+  right: 0;
+  top: 540px;
+ }
