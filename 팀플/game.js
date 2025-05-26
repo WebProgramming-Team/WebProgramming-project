@@ -514,17 +514,22 @@ function destroyBrick(c, r) {
   if (target) target.remove();
 
   if (b.isBomb) {
-    for (let dc = -1; dc <= 1; dc++) {
-      for (let dr = -1; dr <= 1; dr++) {
-        const nc = c + dc;
-        const nr = r + dr;
-        if (
-          nc >= 0 && nc < brickColumnCount &&
-          nr >= 0 && nr < brickRowCount &&
-          !(nc === c && nr === r)
-        ) {
-          destroyBrick(nc, nr);
-        }
+    const directions = [
+      [0, -1], // 위
+      [0, 1],  // 아래
+      [-1, 0], // 왼쪽
+      [1, 0],  // 오른쪽
+    ];
+
+    for (const [dc, dr] of directions) {
+      const nc = c + dc;
+      const nr = r + dr;
+
+      if (
+        nc >= 0 && nc < brickColumnCount &&
+        nr >= 0 && nr < brickRowCount
+      ) {
+        destroyBrick(nc, nr);
       }
     }
   }
