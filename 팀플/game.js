@@ -6,7 +6,7 @@ let rightPressed = false;
 let leftPressed = false;
 let isGameOver = false;
 let isPaused = false;   //일시정지 버튼
-const v_s = 128
+const v_s = 64
 
 //점수 용 전역변수
 let score = 0;
@@ -202,12 +202,12 @@ $(window).ready(function() {
 	$("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
-	$(".game-start").on("click", init);
+  $(".game-start").on("click", init);
   // 메인메뉴로 가는 버튼
-	$(".back-button").on("click", showMainMenu);
+  $(".back-button").on("click", showMainMenu);
 
 	// 키보드 이벤트 연결
-	$(document).on("keydown", function (e) {
+  $(document).on("keydown", function (e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
   });
@@ -362,7 +362,7 @@ function draw() {
   if (ballY + dy < ballRadius) dy = -dy;
   else if (ballY + dy > canvas.height - ballRadius) {
     // 막대 충돌 확인
-    const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
+    const buffer = 15;  //판정 범위 개선(끝에 닿아도 생존)
     if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
       // 아래는 난수를 이용해 공이 바에 튕길때 각도를 약간 조절해주는 코드
       ran = Math.random() * 5 - 2.5;
