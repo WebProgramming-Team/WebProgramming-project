@@ -5,12 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>벽돌깨기 게임</title>
   <link rel="stylesheet" href="game.css">
+
+  <!-- 폰트 선언부 -->
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <!-- =========== -->
+
 
   <link rel="stylesheet" href="projects/easy-mode/playjs.css"> <!-- playjs에서 쓰는 CSS -->
-  <script src="projects/easy-mode/playjs.js"></script>         <!-- playjs에서 쓰는 JS -->
 </head>
 <body>
+
+<!-- 오프닝 화면 -->
+
   <div id = "intro-page" class = "menu-page">
     <h1>벽돌 부수기</h1>
     <label>볼륨 설정: </label>
@@ -21,19 +30,41 @@
     <button id="intro-to-main" class = "back-button">메인 메뉴로</button>
   </div>
 
-  <div id="main-menu" class = "menu-page">
-    <h1>내 게임 제목</h1>
-    <button id="start-button">게임 시작</button>
-    <button id="options-button">설정</button>
-    <button id="guitar-button">기타</button>
-  </div>
 
+
+<!-- to do(박준건, 5/24) - 여기 디자인 완성하기 -->
+<!-- 메인 메뉴 -->
+<!-- 태그 구별법 -->
+<!--
+[Class]
+menu-page : 버튼-글 나오는 양식 기본 정의
+start-page : 
+inter-weight : inter 글꼴 적용
+
+[id]
+main-menu  
+-->
+  <div id="main-menu" class = "menu-page start-page">
+    <div id = "main-menu-titleEmoji-area">
+    </div>
+    <div id = "main-menu-title-area">
+      <h1 class = "inter-900">과제를 해보자!</h1>
+    </div>
+    <div id = "main-menu-callout-area" class = "callout-600">
+      <button id="start-button" class = "inter-900 main-menu-button">게임 시작</button>
+      <button id="options-button" class = "inter-900 main-menu-button">설정</button>
+      <button id="guitar-button" class = "inter-900 main-menu-button">기타</button>
+    </div>
+  </div>
+      
+    
+<!-- ==================== -->
   <div id = "level-selection" class = "menu-page">
-    <h1>난이도 선택</h1>
-    <button id="easy-button" class = "game-start">쉬움</button>
-    <button id="normal-button" class = "game-start">보통</button>
-    <button id="hard-button" class = "game-start">어려움</button>
-    <button id="level-to-main" class = "back-button">뒤로</button>
+    <h1 class = "inter-900">난이도 선택</h1>
+    <button id="easy-button" class = "game-start inter-900">쉬움</button>
+    <button id="normal-button" class = "game-start inter-900">보통</button>
+    <button id="hard-button" class = "game-start inter-900">어려움</button>
+    <button id="level-to-main" class = "back-button inter-900">뒤로</button>
   </div>
 
   <div id = "options" class = "menu-page">
@@ -88,9 +119,8 @@
   
 
   <!-- 게임 버튼 UI를 밖으로 뺌 -->
-  <div id="game-buttons">
-    <!-- <button id="startBtn">이어하기</button>
-    <button id="pauseBtn">일시정지</button> -->
+  <div id="ps">
+    <p>'P' 또는 'E'를 눌러 일시정지/이어하기</p>
   </div>
 
 

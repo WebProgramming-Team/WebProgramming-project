@@ -44,27 +44,16 @@ canvas {
 }
 
 /* 일시정지 / 재시작 버튼 */
-#game-buttons {
+#ps {
   display: none;
   margin-top: 20px;
-  text-align: center;
 }
 
-#game-buttons button {
-  font-size: 16px;
-  padding: 8px 16px;
-  margin: 5px;
+#ps p {
+  font-size: 32px;
+  color: white;
+  padding-left: 2px;
 }
-
-/* 다시 시작 버튼 */
-/*#restartBtn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
-  padding: 8px 16px;
-  font-size: 16px;
-}*/
 
 /* 메인 메뉴, 난이도 선택 */
 .menu-page {
@@ -81,6 +70,7 @@ canvas {
   display: block;
 }
 
+/*이 아래, 설정의 공 속도 라디오 버튼 관련*/
 #bs-div {
   display: flex;
   justify-content: center;
@@ -145,6 +135,15 @@ canvas {
   top: 90px;
 }
 
+@keyframes game-over {
+  0% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1.0);
+  }
+}
+
 #pause-panel {
   position: absolute;
   margin: auto;
@@ -163,20 +162,12 @@ canvas {
   z-index: 5;
 }
 
-@keyframes game-over {
-  0% {
-    transform: scale(0.8);
-  }
-  100% {
-    transform: scale(1.0);
-  }
-}
-
 h1 {
   font-size: 80px;
   margin-bottom: 40px;
 }
 
+/*버튼 기본 설정*/
 button {
   display: block;
   width: 200px;
@@ -194,5 +185,92 @@ button:hover {
   background-color: #0056b3;
 }
 
+/*[폰트 정의 모음]*/
 
+/*1. inter 폰트 
+inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
 
+.inter-100 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:100;
+  font-style: normal;
+}
+.inter-300 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:300;
+  font-style: normal;
+}
+.inter-500 {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:500;
+  font-style: normal;
+}
+.inter-900{
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:900;
+  font-style: normal;
+}
+
+/* [메인 메뉴 씬 css 설정 모음] */
+
+/* 해결해야 하는 사항
+
+1. 메뉴 중앙정렬 안되는 문제 해결해야 함. 
+*/
+
+/*메인 메뉴 전체*/
+#main-menu{
+  margin: 0 auto;
+  position: relative; 
+  top: 0;
+  left: 0;
+  width: 1024px;
+  height: 768px;   
+  overflow: hidden;
+
+  background-image: url("images\\intro-asset\\background\\intro-background1.jpg");
+}
+#main-menu-background-area{
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 1024px;       
+  height: 768px;   
+  overflow: hidden;/*자식 자르기*/
+  margin: 0 auto;
+}
+.main-menu-background1{
+  position: absolute;
+  left: -200px;
+  right: 0;
+  top: -300px;
+  bottom:0;
+  width:130%
+ }
+ .main-menu-title-area{
+  position: absolute;
+  font-size:50px;
+  top:50rem;
+ }
+ #main-title-text{
+  position:relative;
+ }
+.main-menu-callout-area{
+  margin:100px 100px;
+  position: absolute;
+  left: 36px;
+  right: 0;
+  top: 540px;
+  bottom:0;
+ }
+ #main-menu-button{
+  position: absolute;
+   margin:100px 100px;
+  left: 36px;
+  right: 0;
+  top: 540px;
+ }

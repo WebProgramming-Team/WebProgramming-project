@@ -14,6 +14,13 @@ let v_s = v_s_fast;
 //점수 용 전역변수
 let score = 0;
 
+// 게임 오버
+let uDiedMsg;
+
+//폭탄 사진
+const bombImg = new Image();
+bombImg.src = 'images/bomb.jpg';
+
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
@@ -65,11 +72,11 @@ const destructibleElements = [
 ];
 
 // 벽돌 관련 설정
-const brickRowCount = 8;
-const brickColumnCount = 6;
-const brickWidth = 160;
-const brickHeight = 20;
-const brickPadding = 2;
+const brickRowCount = 6;
+const brickColumnCount = 5;
+const brickWidth = 180;
+const brickHeight = 40;
+const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 
@@ -216,14 +223,15 @@ const playjsHTML = `
 `;
 
 $(window).ready(function() {
-	// 메인 메뉴에서의 동작
+  // 메인 메뉴에서의 동작
   // 메뉴 버튼 연결
-	$("#start-button").on("click", showLevelSelectionPage);
+  $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
-	$(".game-start").on("click", init);
+  $(".game-start").on("click", init);
   // 메인메뉴로 가는 버튼
-	$(".back-button").on("click", showMainMenu);
+  $(".back-button").on("click", showMainMenu);
+
 
   // 설정 관련
   $(".bs-radio").on("change", function() {
@@ -232,9 +240,21 @@ $(window).ready(function() {
     $(this).parent(".bs-label").addClass("selected");
   });
 
+  $(".volume-bar").on("input", function() {
+    let vol = $(this).val();
 
-	// 키보드 이벤트 연결
-	$(document).on("keydown", function (e) {
+    $(".volume-bar").val(vol);
+    $(".volume").html(vol);
+
+    setVolume(vol);
+  });
+
+  $("#music-select").on("input", function() {
+    igIdx = $(this).val();
+  });
+
+  // 키보드 이벤트 연결
+  $(document).on("keydown", function (e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
   });
@@ -243,7 +263,7 @@ $(window).ready(function() {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
 
-    if (e.key.toLowerCase() === "p") {
+    if (e.key.toLowerCase() === "p" || e.key.toLowerCase() === "e") {
       if (isPaused) {
         isPaused = false;
         $("#pause-panel").hide();
@@ -259,6 +279,7 @@ $(window).ready(function() {
     if (e.key.toLowerCase() === "r") {
       stopMusic();
       isGameOver = true;
+      clearTimeout(uDiedMsg);
       setTimeout(function() {
         init();
       }, 10);
@@ -267,36 +288,6 @@ $(window).ready(function() {
       showMainMenu();
     }
   });
-
-
-  // === 버튼 이벤트 연결 ===
-  $("#restartBtn").on("click", function () {
-    init();               //게임 재시작
-  });
-  
-  $("#startBtn").on("click", function () {
-    if (isPaused) {
-      isPaused = false;
-      requestAnimationFrame(draw);
-    }
-  });
-
-  $("#pauseBtn").on("click", function () {
-    isPaused = true;
-  });
-
-  $(".volume-bar").on("input", function() {
-    let vol = $(this).val();
-
-    $(".volume-bar").val(vol);
-    $(".volume").html(vol);
-
-    setVolume(vol);
-  })
-
-  $("#music-select").on("input", function() {
-    igIdx = $(this).val();
-  })
 
   // 이미지 로드 확인
   brickImage.onload = () => {
@@ -319,11 +310,10 @@ $(window).ready(function() {
 
 
 function showLevelSelectionPage() {
-	$("#main-menu").hide();
-	$("#level-selection").show();
+  $("#main-menu").hide();
+  $("#level-selection").show();
 
   $("#game-area").hide();         //게임 영역 숨김
-  //$("#startBtn, #pauseBtn, #restartBtn").hide();  //버튼 숨김
 }
 
 function showOptions() {
@@ -338,12 +328,12 @@ function showGuitar() {
 
 //==메인 메뉴로 돌아갈 때==
 function showMainMenu() {
-	$(".menu-page").hide();
+  $(".menu-page").hide();
 
   $("#main-menu").show();
 
   $("#game-area").hide();         //게임 영역 숨김
-  // $("#startBtn, #pauseBtn, #restartBtn, #ingame-to-menu-button").hide();
+  $("#ps").hide();
 
   isGameOver = true;
   isPaused = false;
@@ -373,6 +363,7 @@ function init() {
   // 뒷배경 초기화(쉬움 모드)
   document.getElementById("labArea").innerHTML = playjsHTML;
 
+  // 공 속도 조절
   let ballSpeed = $(".bs-label.selected .bs-radio").val();
   if (ballSpeed == "slow") {
     v_s = v_s_slow;
@@ -399,6 +390,7 @@ function init() {
   rightPressed = false;
   leftPressed = false;
 
+  isGameOver = false;   //게임 상태 초기화
   score = 0;
 
   requestAnimationFrame(draw);
@@ -408,20 +400,28 @@ function initShowHide() {
   $(".menu-page").hide();             //  이것도 필요!
   $("#game-area").show();            //  이거 반드시 있어야 함!!
   $("#gameCanvas").show();
-  $("#game-buttons").show();
-  // $("#startBtn, #pauseBtn").show();   // 재시작,일시정지 버튼 보이기
-  // $("#restartBtn, #ingame-to-menu-button").hide();     //  게임오버 시 출력되었던 버튼 숨김
+  $("#ps").show();
   $(".pop-up-massage").hide();
 }
 
 //태그가 연결된 벽돌 생성
 function createBricks() {
   let index = 0;
+  const bombCount = 2;
+  const bombPositions = [];
+  while (bombPositions.length < bombCount) {
+    const c = Math.floor(Math.random() * brickColumnCount);
+    const r = Math.floor(Math.random() * brickRowCount);
+    const key = `${c}-${r}`;
+    if (!bombPositions.includes(key)) bombPositions.push(key);
+  }
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r++) {
+      const isBomb = bombPositions.includes(`${c}-${r}`);
       bricks[c][r] = {
         x: 0, y: 0, status: 1,
+        isBomb: isBomb,
         targetSelector: destructibleElements[index]?.selector,
         tagLabel: destructibleElements[index]?.label
       };
@@ -432,7 +432,7 @@ function createBricks() {
 
 //===draw 함수 시작===
 function draw() {
-	console.log("draw() 실행");
+  console.log("draw() 실행");
   if (isGameOver || isPaused) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);  //화면 초기화
@@ -444,43 +444,7 @@ function draw() {
   collisionDetection();
 
   // 벽 충돌 처리
-  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-  if (ballY + dy < ballRadius) dy = -dy;
-  else if (ballY + dy > canvas.height - ballRadius) {
-    // 막대 충돌 확인
-    const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
-    if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
-      // 아래는 난수를 이용해 공이 바에 튕길때 각도를 약간 조절해주는 코드
-      ran = Math.random() * 5 - 2.5;
-      console.log("dx, ran: ", dx, ran);
-      if (((dx+ran) < 3 && (dx+ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx *= 3;
-        console.log("dx *3: ", dx, ran);
-      }
-      else if (((dx+ran) > 9 || (dx+ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx /= 3;
-        console.log("dx /3: ", dx, ran);
-      }
-      let count = 0;
-      while ((v_s - (dx+ran)*(dx+ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
-        ran = Math.random() * 5 - 2.5;
-        console.log("ran 다시: ", dx, ran);
-        count++;
-        if (count == 5) {
-          dx = 0;
-          console.log("무한루프로 dx재설정: ", dx, ran);
-          break;
-        }
-      }
-      dx += ran;
-      dy = -Math.sqrt(v_s - dx*dx);
-      console.log("최종 v: ", dx, dy, dx*dx+dy*dy);
-    } else {
-      isGameOver = true; // 다시 그리지 않도록 플래그 설정
-      gameOver();
-      return; // draw() 탈출
-    }
-  }
+  bounceBall();
 
   ballX += dx;
   ballY += dy;
@@ -503,6 +467,64 @@ function draw() {
   }
 }
 
+// 공이 바에 닿았을 떄 처리
+function bounceBall() {
+  // 가로 방향 바운스
+  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
+
+  // 세로 방향 바운스
+  if (ballY + dy < ballRadius) dy = -dy;
+  else if (ballY + dy > canvas.height - ballRadius) {
+    // 막대 충돌 확인
+    const buffer = 10;  //판정 범위 개선(끝에 닿아도 생존)
+    if (ballX > paddleX-buffer && ballX < paddleX + paddleWidth+buffer) {
+      // 아래는 난수를 이용해 공이 바에 튕길때 각도를 약간 조절해주는 코드
+      ran = Math.random() * 5 - 2.5;
+      temp = dx;
+      console.log("dx, ran: ", dx, ran);
+      if (((dx+ran) < 3 && (dx+ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
+        dx *= 3;
+        console.log("dx *3: ", dx, ran);
+      }
+      else if (((dx+ran) > 9 || (dx+ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
+        dx /= 3;
+        console.log("dx /3: ", dx, ran);
+      }
+      let count = 0;
+      while ((v_s - (dx+ran)*(dx+ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
+        ran = Math.random() * 5 - 2.5;
+        console.log("ran 다시: ", dx, ran);
+        count++;
+        if (count == 5) {
+          dx = 0;
+          console.log("무한루프로 dx재설정: ", dx, ran);
+          break;
+        }
+      }
+      dx += ran;
+      if (temp*dx < 0) {
+        dx = -dx;
+        console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
+      }
+      dy = -Math.sqrt(v_s - dx*dx);
+      console.log("최종 v: ", dx, dy, dx*dx+dy*dy);
+    } else {
+      isGameOver = true; // 다시 그리지 않도록 플래그 설정
+      gameOver();
+      return; // draw() 탈출
+    }
+  }
+}
+
+// 게임 오버 처리
+function gameOver() {
+  $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
+  $("#restartBtn, #ingame-to-menu-button").show();  // 게임 오버 후 다시 시작 버튼만 보이기
+  $("#game-over-massage").show();
+  stopMusic();
+  gameOverMusic[0].play();
+}
+
 // 게임 오버 처리
 function gameOver() {
   // $("#startBtn,#pauseBtn").hide();   // 재시작,일시정지 버튼 숨기기
@@ -511,7 +533,7 @@ function gameOver() {
   gameOverMusic[0].play();
   drawBall();
 
-  setTimeout(function() {
+  uDiedMsg = setTimeout(function() {
     $(".pop-up-massage").fadeIn(200);
   }, 1000);
 }
@@ -559,10 +581,43 @@ function drawBricks() {
         // 태그 이름 텍스트 표시
         if (b.tagLabel) {
           ctx.font = "12px Arial";
-          ctx.fillStyle = "#fff";
-          ctx.fillText(b.tagLabel, brickX + 10, brickY + 20);
+          ctx.fillStyle = b.isBomb ? "red" : "#fff";
+          const label = b.isBomb ? "💣" : b.tagLabel;
+          ctx.fillText(label, brickX + 10, brickY + 20);
         }
+      }
+    }
+  }
+}
 
+function destroyBrick(c, r) {
+  const b = bricks[c][r];
+  if (b.status === 0) return;
+
+  b.status = 0;
+  score += 10;
+
+  const labArea = document.querySelector("#labArea");
+  const target = labArea?.querySelector(b.targetSelector);
+  if (target) target.remove();
+
+  if (b.isBomb) {
+    const directions = [
+      [0, -1], // 위
+      [0, 1],  // 아래
+      [-1, 0], // 왼쪽
+      [1, 0],  // 오른쪽
+    ];
+
+    for (const [dc, dr] of directions) {
+      const nc = c + dc;
+      const nr = r + dr;
+
+      if (
+        nc >= 0 && nc < brickColumnCount &&
+        nr >= 0 && nr < brickRowCount
+      ) {
+        destroyBrick(nc, nr);
       }
     }
   }
@@ -581,18 +636,16 @@ function collisionDetection() {
           ballY < b.y + brickHeight
           ) {
           dy = -dy;
-        b.status = 0;
-        score+=10;
+          destroyBrick(c, r);
 
-        //해당 태그 제거
-        const labArea = document.querySelector("#labArea");
-        const target = labArea?.querySelector(b.targetSelector);
-        if (target) target.remove();
-
+          //해당 태그 제거
+          const labArea = document.querySelector("#labArea");
+          const target = labArea?.querySelector(b.targetSelector);
+          if (target) target.remove();
+        }
       }
     }
   }
-}
 }
 
 //점수 그리기 함수
@@ -632,6 +685,3 @@ function drawPaddle() {
   ctx.fill();
   ctx.closePath();
 }
-
-
-
