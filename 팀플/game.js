@@ -221,6 +221,17 @@ const playjsHTML = `
 `;
 
 $(window).ready(function() {
+
+
+  // //==디스플레이 크기별로 body width 설정==//
+  // var displayWidth = window.innerWidth;
+  // $("body").css("width", displayWidth/70);
+  // //====================================
+
+  //이거 대체 왜 오류 생기는걸까 알 수가 없네
+
+
+
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);

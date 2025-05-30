@@ -1,6 +1,6 @@
 /* 전체 화면 가운데 정렬 */
 body {
-  width: 1104px;
+  width: 70vw;/*70%만 가져가거라~*/
   margin: auto;
   padding: 0;
   background: #222;
@@ -232,8 +232,10 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   height: 768px;   
   overflow: hidden;
 
-  background-image: url("images\\intro-asset\\background\\intro-background1.jpg");
+  /*background-image: url("images\\intro-asset\\background\\intro-background1.jpg");*/
 }
+
+/*맨 위의 백그라운드 이미지 들어가는 div 영역*/
 #main-menu-background-area{
   position: absolute; 
   top: 0;
@@ -243,7 +245,9 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   overflow: hidden;/*자식 자르기*/
   margin: 0 auto;
 }
-.main-menu-background1{
+
+/*맨 위의 백그라운드 이미지*/
+#main-menu-background-area img{
   position: absolute;
   left: -200px;
   right: 0;
