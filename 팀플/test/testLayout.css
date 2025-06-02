@@ -1,0 +1,53 @@
+body {
+  width: 70vw;
+  background: blue;
+  display: block;
+}
+
+/*메인 메뉴 전체*/
+#main-menu{
+  display:block;
+  margin: 0 auto;
+  position: relative; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: blue;
+
+  /*background-image: url("images\\intro-asset\\background\\intro-background1.jpg");*/
+}
+
+/*맨 위의 백그라운드 이미지 들어가는 div 영역*/
+#main-menu-background-area{
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;     
+  height:100%;   
+  overflow: hidden;/*자식 안 보이게 자르기 */
+  margin: 0 auto;
+  background-color: blue;
+
+}
+#main-menu-titleEmoji-area{
+  background-color: yellow;
+}
+ #main-menu-title-area{
+  position: absolute;
+  font-size:50px;
+  top:50rem;
+  background-color: darkgreen;
+ }
+
+.main-menu-callout-area{
+  margin:100px 100px;
+  position: absolute;
+  left: 36px;
+  right: 0;
+  top: 540px;
+  bottom:0;
+  background-color: black;
+ }
+ 

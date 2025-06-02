@@ -1,11 +1,10 @@
 /* 전체 화면 가운데 정렬 */
 body {
-  margin: 0 auto;
+  width: 70vw;/*70%만 가져가거라~*/
+  margin: auto;
   padding: 0;
-  width: 70vw;
   background: #222;
   display: block;
-  overflow-x: auto; /* 가로 스크롤 허용 */
 }
 
 
@@ -45,27 +44,16 @@ canvas {
 }
 
 /* 일시정지 / 재시작 버튼 */
-#game-buttons {
+#ps {
   display: none;
   margin-top: 20px;
-  text-align: center;
 }
 
-#game-buttons button {
-  font-size: 16px;
-  padding: 8px 16px;
-  margin: 5px;
+#ps p {
+  font-size: 32px;
+  color: white;
+  padding-left: 2px;
 }
-
-/* 다시 시작 버튼 */
-/*#restartBtn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
-  padding: 8px 16px;
-  font-size: 16px;
-}*/
 
 /* 메인 메뉴, 난이도 선택 */
 .menu-page {
@@ -82,6 +70,34 @@ canvas {
   display: block;
 }
 
+/*이 아래, 설정의 공 속도 라디오 버튼 관련*/
+#bs-div {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+}
+
+.bs-label {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  user-select: none;
+}
+
+.bs-label.selected {
+  background-color: aqua;
+  font-weight: bold;
+}
+
+.bs-radio {
+  display: none;
+}
+
 .pop-up-massage {
   position: absolute;
   top: 0;
@@ -92,23 +108,31 @@ canvas {
   padding: 0;
   font-size: 60px;
   text-align: center;
-  line-height: 720px;
+  line-height: 620px;
   color: white;
   text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
   z-index: 3;
   display: none;
 }
 
-#game-over-massage {
-  font-family: "Pixelify Sans", serif;
-  font-size: 120px;
-
+.pop-up-massage {
   animation-name: game-over;
   animation-duration: 0.4s;
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: infinite;
   animation-direction: alternate;
+}
+
+#game-over-massage {
+  font-family: "Pixelify Sans", serif;
+  font-size: 120px;
+}
+
+#game-over-subtitle {
+  font-family: sans-serif;
+  font-size: 40px;
+  top: 90px;
 }
 
 @keyframes game-over {
@@ -118,6 +142,24 @@ canvas {
   100% {
     transform: scale(1.0);
   }
+}
+
+#pause-panel {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border: 1px solid black;
+  width: 680px;
+  height: 480px;
+  z-index: 4;
+  display: none;
+}
+#pause-panel * {
+  z-index: 5;
 }
 
 h1 {
@@ -186,20 +228,26 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   position: relative; 
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100vh;   
+  width: 1024px;
+  height: 768px;   
   overflow: hidden;
+
+  /*background-image: url("images\\intro-asset\\background\\intro-background1.jpg");*/
 }
+
+/*맨 위의 백그라운드 이미지 들어가는 div 영역*/
 #main-menu-background-area{
   position: absolute; 
   top: 0;
   left: 0;
-  width: 100%;       
-  height: 20vh;   
+  width: 1024px;       
+  height: 768px;   
   overflow: hidden;/*자식 자르기*/
   margin: 0 auto;
 }
-.main-menu-background1{
+
+/*맨 위의 백그라운드 이미지*/
+#main-menu-background-area img{
   position: absolute;
   left: -200px;
   right: 0;

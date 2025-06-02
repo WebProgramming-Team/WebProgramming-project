@@ -1,7 +1,11 @@
 #labArea *{margin: 0; padding: 0;}
 
+<<<<<<< HEAD
 #labArea body {width: 960px;
 	margin: 0 auto;
+=======
+body {
+>>>>>>> f1cadd6bbda7a4fdd624839f6cec43ca3348fdaf
 	font-family:  "Winky Sans", sans-serif;;
 }
 
