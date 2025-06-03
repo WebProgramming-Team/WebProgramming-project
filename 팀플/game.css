@@ -278,3 +278,18 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   right: 0;
   top: 540px;
  }
+
+ #labArea {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#playjs-frame {
+  width: 90%;
+  height: 600px;
+  border: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 10px;
+}

@@ -1,18 +1,12 @@
-#labArea *{margin: 0; padding: 0;}
+ *{margin: 0; padding: 0;}
 
-<<<<<<< HEAD
-#labArea body {width: 960px;
-	margin: 0 auto;
-=======
 body {
->>>>>>> f1cadd6bbda7a4fdd624839f6cec43ca3348fdaf
 	font-family:  "Winky Sans", sans-serif;;
 }
-
-#labArea li {list-style: none;}
-#labArea a{text-decoration: none;}
-#labArea img{border: 0;}
-#labArea header {width: 960px;
+li {list-style: none;}
+a{text-decoration: none;}
+img{border: 0;}
+header {width: 960px;
 	height: 80px;
 	background-color: #f6f9d4;
 	position: fixed;
@@ -22,7 +16,7 @@ body {
 	z-index: 100;
 }
 
-#labArea #title {
+#title {
 	height: 40px;
 	text-align: center;
 	font-size: 30px;
@@ -30,8 +24,8 @@ body {
 
 }
 
-#labArea header>nav{height: 40px; overflow: hidden;}
-#labArea #ctime{
+header>nav{height: 40px; overflow: hidden;}
+#ctime{
 	width: 250px;
 	height: 36px;
 	float: right;
@@ -41,7 +35,7 @@ body {
 	line-height: 36px;
 }
 
-#labArea .main-menu{
+.main-menu{
 	display: block;
 	float: left;
 	width: 100px;
@@ -53,61 +47,61 @@ body {
 
 }
 
-#labArea #content{
+#content{
 	margin-top: 120px;
 	padding: 10px;
 }
 
-#labArea footer{
+footer{
 	padding: 20px;
 	width: 920px;
 	background-color: #d2f299;
 }
 
-#labArea footer>p{
+footer>p{
 	font-weight: bold;
 	text-align: center;
 }
 
-#labArea .lab{
+.lab{
 	padding: 10px;
 	border: 1px solid black;
 	margin-top: 10px;
 }
 
-#labArea table {
+table {
 	border-collapse: collapse ;
 	width:20px;
 	text-align: center;
 }
 
-#labArea .wordButton{
+.wordButton{
 	display: inline-block;
 	width: 150px;
 }
 
-#labArea #wordList{
+#wordList{
 	font-size: 24px;
 	font-weight: bold;
 	color: blue;
 }
 
-#labArea #hangman{
+#hangman{
 	text-align: center;
 }
 
-#labArea #newgamearea{
+#newgamearea{
 	margin-top: 2em;
 }
 
-#labArea #clue,#guessstr{
+#clue,#guessstr{
 	font-family: monospace;
 	font-size: 2em;
 	padding:1em;
 }
 
 
-#labArea #container {
+#container {
 	width: 400px;
 	height: 400px;
 	position: relative;
@@ -116,7 +110,7 @@ body {
 	z-index: 1;
 }
 
-#labArea #animate {
+#animate {
 	width: 50px;
 	height: 50px;
 	position: absolute;
