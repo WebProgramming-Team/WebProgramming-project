@@ -24,7 +24,7 @@ bombImg.src = 'images/bomb.jpg';
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
-const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/metalslug.mp3", "musics/ingame/maple.mp3"];
+const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/metalslug.mp3", "musics/ingame/acidrain.mp3"];
 const ingameMusic = [];
 const menuMusic = new Audio("musics/etc/main.mp3");
 
@@ -73,10 +73,10 @@ const destructibleElements = [
 
 // 벽돌 관련 설정
 let brickRowCount = 6;
-let brickColumnCount = 5;
-const brickWidth = 180;
+let brickColumnCount = 8;
+const brickWidth = 118;
 const brickHeight = 40;
-const brickPadding = 10;
+const brickPadding = 2;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 
@@ -381,12 +381,18 @@ function init() {
   if (intervalId) {
     clearInterval(intervalId);
   }
+  blockDownCount = 0;
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
       moveBricksDown();
       collisionDetection();
+      blockDownCount++;
     }
-  }, 1000);
+    if (blockDownCount >= 3) {
+      clearInterval(intervalId);
+    }
+  }, 5000);
+
 
   requestAnimationFrame(draw);
 }
@@ -487,7 +493,7 @@ function moveBricksDown() {
 let intervalId = setInterval(() => {
   moveBricksDown();
   collisionDetection();
-}, 1000);
+}, 5000);
 
 function draw() {
   console.log("draw() 실행");
