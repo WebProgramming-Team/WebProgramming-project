@@ -14,23 +14,21 @@
   <!-- =========== -->
 
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="game.js"></script>
   <link rel="stylesheet" href="projects/easy-mode/playjs.css"> <!-- playjs에서 쓰는 CSS -->
 </head>
 <body>
 
 <!-- 오프닝 화면 -->
 
-<div id = "intro-page" class = "menu-page">
-  <h1>벽돌 부수기</h1>
-  <label>볼륨 설정: </label>
-  <input type = "range" min = "0" max = "100" class = "volume-bar" id = "intro-bar">
-  <div class = "volume">50</div>
-  <br>
-  <button id="menu-music-button">음악 재생</button>
-  <button id="intro-to-main" class = "back-button">메인 메뉴로</button>
-</div>
+  <div id = "intro-page" class = "menu-page">
+    <h1>벽돌 부수기</h1>
+    <label>볼륨 설정: </label>
+    <input type = "range" min = "0" max = "100" class = "volume-bar" id = "intro-bar">
+    <div class = "volume">50</div>
+    <br>
+    <button id="menu-music-button">음악 재생</button>
+    <button id="intro-to-main" class = "back-button">메인 메뉴로</button>
+  </div>
 
 
 
@@ -46,101 +44,87 @@ inter-weight : inter 글꼴 적용
 [id]
 main-menu  
 -->
-<div id="main-menu" class = "menu-page start-page">
-  <div id = "main-menu-background-area">
-    <img src = "images\intro-asset\background\intro-background1.jpg" alt="백그라운드 1"> 
+  <div id="main-menu" class = "menu-page start-page">
+    <div id = "main-menu-titleEmoji-area">
+    </div>
+    <div id = "main-menu-title-area">
+      <h1 class = "inter-900">과제를 해보자!</h1>
+    </div>
+    <div id = "main-menu-callout-area" class = "callout-600">
+      <button id="start-button" class = "inter-900 main-menu-button">게임 시작</button>
+      <button id="options-button" class = "inter-900 main-menu-button">설정</button>
+      <button id="guitar-button" class = "inter-900 main-menu-button">기타</button>
+    </div>
   </div>
-  <div id = "main-menu-titleEmoji-area">
-  </div>
-  <div id = "main-menu-title-area">
-    <h1 class = "inter-900">과제를 해보자!</h1>
-  </div>
-  <div id = "main-menu-callout-area" class = "callout-600">
-    <button id="start-button" class = "inter-900 main-menu-button">게임 시작</button>
-    <button id="options-button" class = "inter-900 main-menu-button">설정</button>
-    <button id="guitar-button" class = "inter-900 main-menu-button">기타</button>
-  </div>
-</div>
-
-
-
-
-
+      
+    
 <!-- ==================== -->
-<div id = "level-selection" class = "menu-page">
-  <h1 class = "inter-900">난이도 선택</h1>
-  <button id="easy-button" class = "game-start inter-900">쉬움</button>
-  <button id="normal-button" class = "game-start inter-900">보통</button>
-  <button id="hard-button" class = "game-start inter-900">어려움</button>
-  <button id="level-to-main" class = "back-button inter-900">뒤로</button>
-</div>
-
-<div id = "options" class = "menu-page">
-  <h1>설정</h1>
-  <label for="music-select">음악 선택: </label>
-  <select id="music-select">
-    <option value="0">음악 1번</option>
-    <option value="1">음악 2번</option>
-    <option value="2">음악 3번</option>
-    <option value="3">음악 4번</option>
-  </select>
-  <br><br>
-  <label>볼륨 설정: </label>
-  <input type = "range" min = "0" max = "100" class = "volume-bar">
-  <div class = "volume">50</div>
-  <br>
-  <div id = "bs-div">
-    <label for = "slow" class = "bs-label selected">
-      <input type = "radio" id = "slow" name = "ball-speed" class = "bs-radio" value = "slow" checked="true">
-      느린 공
-    </label>
-    <label for = "fast" class = "bs-label">
-      <input type = "radio" id = "fast" name = "ball-speed" value = "fast" class = "bs-radio">
-      빠른 공
-    </label>
+  <div id = "level-selection" class = "menu-page">
+    <h1 class = "inter-900">난이도 선택</h1>
+    <button id="easy-button" class = "game-start inter-900">쉬움</button>
+    <button id="normal-button" class = "game-start inter-900">보통</button>
+    <button id="hard-button" class = "game-start inter-900">어려움</button>
+    <button id="level-to-main" class = "back-button inter-900">뒤로</button>
   </div>
-  <button id="option-to-main" class = "back-button">뒤로</button>
-</div>
 
-<div id = "guitar" class = "menu-page">
-  <h1>기타</h1>
-  <button id="option-to-main" class = "back-button">뒤로</button>
-</div>
-
-<div id="game-area">
-  <div id="labArea">
-    <!-- 여기에 playjs.html을 iframe으로 삽입 -->
-    <iframe
-    id="playjs-frame"
-    src="projects/easy-mode/playjs.html"
-    width="100%"
-    height="600"
-    style="border: none;"
-    ></iframe>
-  </div>  
-
-  <!-- 실습 내용 (playjs.html) -->
-  <canvas id="gameCanvas" width="1024" height="768"></canvas>   <!-- 벽돌 게임 -->
-  <div id = "game-over-massage" class = "pop-up-massage">
-    Game Over!
-  </div>
-  <div id = "game-over-subtitle" class = "pop-up-massage">
-    'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
-  </div>
-  <div id = "pause-panel">
-    'R'을 눌러 다시하기<br>
-    'Q'를 눌러 메인메뉴로<br>
+  <div id = "options" class = "menu-page">
+    <h1>설정</h1>
+    <label for="music-select">음악 선택: </label>
+    <select id="music-select">
+      <option value="0">음악 1번</option>
+      <option value="1">음악 2번</option>
+      <option value="2">음악 3번</option>
+      <option value="3">음악 4번</option>
+    </select>
+    <br><br>
     <label>볼륨 설정: </label>
     <input type = "range" min = "0" max = "100" class = "volume-bar">
     <div class = "volume">50</div>
+    <br>
+    <div id = "bs-div">
+      <label for = "slow" class = "bs-label selected">
+        <input type = "radio" id = "slow" name = "ball-speed" class = "bs-radio" value = "slow" checked="true">
+        느린 공
+      </label>
+      <label for = "fast" class = "bs-label">
+        <input type = "radio" id = "fast" name = "ball-speed" value = "fast" class = "bs-radio">
+        빠른 공
+      </label>
+    </div>
+    <button id="option-to-main" class = "back-button">뒤로</button>
   </div>
-</div>
+
+  <div id = "guitar" class = "menu-page">
+    <h1>기타</h1>
+    <button id="option-to-main" class = "back-button">뒤로</button>
+  </div>
+
+  <div id="game-area">
+    <div id="labArea"></div>  <!-- 실습 내용 (playjs.html) -->
+    <canvas id="gameCanvas" width="1024" height="768"></canvas>   <!-- 벽돌 게임 -->
+    <div id = "game-over-massage" class = "pop-up-massage">
+      Game Over!
+    </div>
+    <div id = "game-over-subtitle" class = "pop-up-massage">
+      'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
+    </div>
+    <div id = "pause-panel">
+      'R'을 눌러 다시하기<br>
+      'Q'를 눌러 메인메뉴로<br>
+      <label>볼륨 설정: </label>
+      <input type = "range" min = "0" max = "100" class = "volume-bar">
+      <div class = "volume">50</div>
+    </div>
+  </div>
+  
+
+  <!-- 게임 버튼 UI를 밖으로 뺌 -->
+  <div id="ps">
+    <p>'P' 또는 'E'를 눌러 일시정지/이어하기</p>
+  </div>
 
 
-<!-- 게임 버튼 UI를 밖으로 뺌 -->
-<div id="ps">
-  <p>'P' 또는 'E'를 눌러 일시정지/이어하기</p>
-</div>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="game.js"></script>
 </body>
 </html>
