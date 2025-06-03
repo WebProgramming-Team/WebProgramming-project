@@ -341,6 +341,7 @@ function showMainMenu() {
 
   $("#game-area").hide();
   $("#ps").hide();
+  $("html").css({"cursor":"default"});
 
   isGameOver = true;
   isPaused = false;
@@ -596,7 +597,7 @@ function bounceBall() {
 function gameOver() {
   stopMusic();
   gameOverMusic[0].play();
-  drawBall();
+  drawBall();  
 
   uDiedMsg = setTimeout(function() {
     $(".pop-up-massage").fadeIn(200);
