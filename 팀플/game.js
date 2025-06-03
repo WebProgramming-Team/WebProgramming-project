@@ -54,21 +54,21 @@ menuMusic.loop = true;
 
 //벽돌에 대응되는 태그들
 const destructibleElements = [
-  { selector: ".lab:nth-of-type(1)", label: "<div>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: "#wordList", label: "#wordList" },
-  { selector: "#innerTest", label: "#innerTest" },
-  { selector: "#image", label: "#image" },
-  { selector: "#colorTable", label: "#colorTable" },
-  { selector: "#target", label: "#target" },
-  { selector: "#container", label: "#container" },
-  { selector: "#hangman", label: "#hangman" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" },
-  { selector: ".lab:nth-of-type(2)", label: "<table>" }
+  { selector: ".lab:nth-of-type(1)", label: "실습을" },
+  { selector: ".lab:nth-of-type(2)", label: "부숴볼까" },
+  { selector: ".lab:nth-of-type(3)", label: "너가누르는게" },
+  { selector: ".lab:nth-of-type(1)", label: "박소영" },
+  { selector: ".lab:nth-of-type(2)", label: "교수님" },
+  { selector: ".lab:nth-of-type(3)", label: "감점은안돼요" },
+  { selector: ".lab:nth-of-type(1)", label: "상호평가를해?" },
+  { selector: ".lab:nth-of-type(2)", label: "그런일이" },
+  { selector: ".lab:nth-of-type(3)", label: "중간도못봤는데" },
+  { selector: ".lab:nth-of-type(4)", label: "안돼에" },
+  { selector: ".lab:nth-of-type(4)", label: "감점하지마" },
+  { selector: ".lab:nth-of-type(1)", label: "이것만은지켜" },
+  { selector: ".lab:nth-of-type(2)", label: "ㅠㅠ" },
+  { selector: ".lab:nth-of-type(3)", label: "사랑합니다" },
+  { selector: ".lab:nth-of-type(4)", label: "미안합니다" }
 ];
 
 // 벽돌 관련 설정
