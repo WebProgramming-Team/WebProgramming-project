@@ -224,6 +224,9 @@ const playjsHTML = `
 
 
 $(window).ready(function() {
+  canvas = $("#gameCanvas")[0];
+  ctx = canvas.getContext("2d");
+  
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
@@ -232,6 +235,12 @@ $(window).ready(function() {
 
   $(this).on("mousemove", function(e) {
     paddleX = e.pageX;
+    if (paddleX >= canvas.width - paddleWidth) {
+      paddleX = canvas.width - paddleWidth;
+    }
+    else if (paddleX <= 0) {
+      paddleX = 0;
+    }
 
   });
 
@@ -351,9 +360,6 @@ function init() {
   initShowHide();
   stopMusic();
   ingameMusic[igIdx].play();
-
-  canvas = $("#gameCanvas")[0];
-  ctx = canvas.getContext("2d");
 
   bricks = [];
   createBricks();
