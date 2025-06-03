@@ -88,138 +88,6 @@ brickImage.src = "images/bricks.jpg";
 let bricks = [];
 createBricks();
 
-const playjsHTML = `
-<header>
-<div id="title">
-      Play with JS!
-    </div>
-<div id="ctime">
-</div>
-<nav>
-<ul>
-<li><a class="main-menu" href="#">Basic JS</a></li>
-<li><a class="main-menu" href="#">Hangman</a></li>
-<li><a class="main-menu" href="#">JQuery</a></li>
-<li><a class="main-menu" href="#">Advanced JS</a></li>
-</ul>
-</nav>
-</header>
-<div id="content">
-<div class="lab">
-<h3> 덧셈 계산기 </h3>
-<form name="myform">
-        첫번째 정수:
-        <input id="x"/><br/>
-        두번째 정수:
-        <input id="y"/><br/>
-        합계:
-        <input id="sum"/><br/>
-<input id="addButton" type="button" value="계산"/>
-</form>
-</div>
-
-<div class="lab">
-<h3>구구단 표</h3>
-<table border='2'>
-<tr>
-<th>2단</th>
-<th>3단</th>
-<th>4단</th>
-<th>5단</th>
-<th>6단</th>
-<th>7단</th>
-<th>8단</th>
-<th>9단</th>
-</tr>
-<tr><td>2×1=2</td><td>3×1=3</td><td>4×1=4</td><td>5×1=5</td><td>6×1=6</td><td>7×1=7</td><td>8×1=8</td><td>9×1=9</td></tr>
-<tr><td>2×2=4</td><td>3×2=6</td><td>4×2=8</td><td>5×2=10</td><td>6×2=12</td><td>7×2=14</td><td>8×2=16</td><td>9×2=18</td></tr>
-<tr><td>2×3=6</td><td>3×3=9</td><td>4×3=12</td><td>5×3=15</td><td>6×3=18</td><td>7×3=21</td><td>8×3=24</td><td>9×3=27</td></tr>
-<tr><td>2×4=8</td><td>3×4=12</td><td>4×4=16</td><td>5×4=20</td><td>6×4=24</td><td>7×4=28</td><td>8×4=32</td><td>9×4=36</td></tr>
-<tr><td>2×5=10</td><td>3×5=15</td><td>4×5=20</td><td>5×5=25</td><td>6×5=30</td><td>7×5=35</td><td>8×5=40</td><td>9×5=45</td></tr>
-<tr><td>2×6=12</td><td>3×6=18</td><td>4×6=24</td><td>5×6=30</td><td>6×6=36</td><td>7×6=42</td><td>8×6=48</td><td>9×6=54</td></tr>
-<tr><td>2×7=14</td><td>3×7=21</td><td>4×7=28</td><td>5×7=35</td><td>6×7=42</td><td>7×7=49</td><td>8×7=56</td><td>9×7=63</td></tr>
-<tr><td>2×8=16</td><td>3×8=24</td><td>4×8=32</td><td>5×8=40</td><td>6×8=48</td><td>7×8=56</td><td>8×8=64</td><td>9×8=72</td></tr>
-<tr><td>2×9=18</td><td>3×9=27</td><td>4×9=36</td><td>5×9=45</td><td>6×9=54</td><td>7×9=63</td><td>8×9=72</td><td>9×9=81</td></tr>
-</table>
-</div>
-
-<div class="lab">
-<h3>숫자 맞추기 게임</h3>
-<p>이 게임은 컴퓨터가 생성한 숫자를 맞추는 게임입니다<br/>
-      숫자는 1부터 100 사이에 있습니다.</p><br/>
-<form>
-        숫자:
-        <input id="user" size="5" type="text"/>
-<input id="numGuess" type="button" value="확인"/>
-<input id="numReplay" type="button" value="다시시작"/>
-<br/><br/>
-        추측횟수:
-        <input id="guesses" size="5" type="text"/>
-        힌트:
-        <input id="result" size="16" type="text"/>
-<input id="randomNum" size="16" type="text"/>
-</form>
-
-</div>
-<div class="lab">
-<h3>단어장</h3><br/>
-<button class="wordButton" id="addWord">단어 추가</button>
-<button class="wordButton" id="showWordList">단어 리스트 보기</button>
-<button class="wordButton" id="sortWord">단어 정렬</button>
-<button class="wordButton" id="shuffleWord">단어 섞기</button>
-<br/><br/><p><strong>단어 리스트</strong></p><br/>
-<div id="wordList"></div>
-</div>
-<div class="lab">
-<h2> innerHTML TEST </h2>
-<p id="innerTest">여기를 눌러 보세요.</p>
-</div>
-<div class="lab">
-<img height="200" id="image" src="projects/easy-mode/img1.jpg" width="350"/>
-<input id="imageButton" type="button" value="눌러보세요">
-</input></div>
-<div class="lab">
-<h3>색상 테이블 출력하기</h3>
-<input id="ctCreate" type="button" value="출력하기">
-<input id="ctRemove" type="button" value="없애기">
-<div id="colorTable"></div>
-</input></input></div>
-<div class="lab">
-<div id="target">
-      This is a Text.
-    </div>
-<button id="stopColor">중지</button>
-</div>
-<div class="lab">
-<h3>상자 이동하기</h3>
-<p>
-<button id="moveBox">Click Me</button>
-</p>
-<div id="container">
-<div id="animate"></div>
-</div>
-</div>
-<div id="hangman">
-<div>
-<img alt="hangman" id="hangmanpic" src="projects/easy-mode/hangman/hangman6.gif">
-</img></div>
-<div id="clue">Press New Game to play!</div>
-<div>
-<input id="hguess" maxlength="1 /" size="1" type="text"/>
-<button disabled="disabled" id="guessButton">Guess</button>
-</div>
-<div id="newgamearea">
-<button id="newGame">New Game</button>
-</div>
-<div id="guessstr"></div>
-</div>
-</div>
-<footer>
-<p>Web programming, Spring 2025</p>
-<p>Created by 202411235 강동훈</p>
-</footer>
-`;
-
 $(window).ready(function() {
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
@@ -349,8 +217,6 @@ function init() {
 
   bricks = [];
   createBricks();
-
-  document.getElementById("labArea").innerHTML = playjsHTML;
 
   let ballSpeed = $(".bs-label.selected .bs-radio").val();
   if (ballSpeed == "slow") {
@@ -641,22 +507,24 @@ function destroyBrick(c, r) {
   b.status = 0;
   score += 10;
 
-  const labArea = document.querySelector("#labArea");
-  const target = labArea?.querySelector(b.targetSelector);
+  // iframe 내부 document 접근
+  const iframe = document.getElementById("labFrame");
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+  if (!iframeDoc) return;
+
+  // iframe 내부에서 selector로 대상 찾기
+  const target = iframeDoc.querySelector(b.targetSelector);
   if (target) target.remove();
 
+  // 폭탄 처리 (연쇄 파괴)
   if (b.isBomb) {
     const directions = [
-      [0, -1],
-      [0, 1],
-      [-1, 0],
-      [1, 0],
+      [0, -1], [0, 1], [-1, 0], [1, 0],
     ];
-
     for (const [dc, dr] of directions) {
       const nc = c + dc;
       const nr = r + dr;
-
       if (
         nc >= 0 && nc < brickColumnCount &&
         nr >= 0 && nr < (bricks[nc] ? bricks[nc].length : 0)
@@ -666,6 +534,7 @@ function destroyBrick(c, r) {
     }
   }
 }
+
 
 function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {

@@ -7,40 +7,50 @@ body {
   display: block;
 }
 
-
-/* 게임 영역 */
-#game-area {
-  display: none;            /* 처음엔 숨김 */
-  position: relative;      /* 자식 absolute 기준 */
-  width: 1024px;
+/* 전체 좌우 분할 */
+#game-wrapper {
+  display: flex;
+  /*width: 100%;
+  max-width: 1600px;
+  */
+  width: 1400px;
+  margin: 0 auto;
   height: 768px;
-  background: #111;
-  border: 2px solid #fff;
-  overflow: hidden;
 }
 
-/* 캔버스: 투명 위판 */
+/* 왼쪽: 실습 iframe */
+#labArea {
+  width: 40%;
+  height: 100%;
+  overflow: auto;
+  background: white;
+}
+
+#labFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 오른쪽: 게임 */
+#game-area {
+  width: 60%;
+  height: 100%;
+  position: relative;
+  background: #111;
+  border-left: 2px solid #ccc;
+}
+
+/* canvas 등은 그대로 유지 */
 canvas {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   background: transparent;
-  width: 1024px;
-  height: 768px;
   z-index: 2;
   display: none;
-}
-
-/* 실습 태그가 로딩되는 배경 영역 */
-#labArea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1024px;
-  height: 768px;
-  z-index: 1;
-  overflow: auto;
-  background: white;
 }
 
 /* 일시정지 / 재시작 버튼 */
@@ -98,6 +108,9 @@ canvas {
   display: none;
 }
 
+/* ---------------------------------
+   공통 팝업 메시지 스타일
+---------------------------------- */
 .pop-up-massage {
   position: absolute;
   top: 0;
@@ -108,33 +121,31 @@ canvas {
   padding: 0;
   font-size: 60px;
   text-align: center;
-  line-height: 620px;
+  line-height: 620px; /* 화면 세로 중앙 위치 조절 */
   color: white;
   text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
   z-index: 3;
   display: none;
+
+  /* 애니메이션 효과 */
+  animation: game-over 0.4s ease-in-out infinite alternate;
 }
 
-.pop-up-massage {
-  animation-name: game-over;
-  animation-duration: 0.4s;
-  animation-timing-function: ease-in-out;
-  animation-delay: 0s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
+/* 게임 오버 메인 텍스트 */
 #game-over-massage {
   font-family: "Pixelify Sans", serif;
-  font-size: 120px;
+  font-size: 80px;
 }
 
+/* 게임 오버 서브텍스트 */
 #game-over-subtitle {
   font-family: sans-serif;
   font-size: 40px;
-  top: 90px;
+  line-height: normal;
+  top: 90px; /* 주의: position: absolute인 부모 기준 */
 }
 
+/* 애니메이션 정의 */
 @keyframes game-over {
   0% {
     transform: scale(0.8);
@@ -144,20 +155,25 @@ canvas {
   }
 }
 
+/* ---------------------------------
+   일시정지 패널
+---------------------------------- */
 #pause-panel {
   position: absolute;
-  margin: auto;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: white;
-  border: 1px solid black;
+  margin: auto;
   width: 680px;
   height: 480px;
+  background-color: white;
+  border: 1px solid black;
   z-index: 4;
   display: none;
 }
+
+/* 내부 요소도 위에 보이도록 */
 #pause-panel * {
   z-index: 5;
 }
@@ -250,15 +266,15 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   top: -300px;
   bottom:0;
   width:130%
- }
- .main-menu-title-area{
+}
+.main-menu-title-area{
   position: absolute;
   font-size:50px;
   top:50rem;
- }
- #main-title-text{
+}
+#main-title-text{
   position:relative;
- }
+}
 .main-menu-callout-area{
   margin:100px 100px;
   position: absolute;
@@ -266,16 +282,16 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   right: 0;
   top: 540px;
   bottom:0;
- }
- #main-menu-button{
+}
+#main-menu-button{
   position: absolute;
-   margin:100px 100px;
+  margin:100px 100px;
   left: 36px;
   right: 0;
   top: 540px;
- }
+}
 
- #labArea {
+#labArea {
   width: 100%;
   display: flex;
   justify-content: center;
