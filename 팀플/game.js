@@ -88,6 +88,7 @@ brickImage.src = "images/bricks.jpg";
 let bricks = [];
 createBricks();
 
+
 const playjsHTML = `
 <header>
 <div id="title">
@@ -220,12 +221,19 @@ const playjsHTML = `
 </footer>
 `;
 
+
+
 $(window).ready(function() {
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
   $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
+
+  $(this).on("mousemove", function(e) {
+    paddleX = e.pageX;
+
+  });
 
 
   $(".bs-radio").on("change", function() {
@@ -403,6 +411,8 @@ function initShowHide() {
   $("#gameCanvas").show();
   $("#ps").show();
   $(".pop-up-massage").hide();
+
+  $("html").css({"cursor":"none"});
 }
 
 function createBricks(addRow = false) {
