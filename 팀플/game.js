@@ -415,8 +415,7 @@ function createBricks() {
     }
   }
 
-  let elements = [];
-  elements = createNormalElements(); // 이거 난이도별로 함수 만들어서 레이블 붙이
+  let elements = createElementsByDifficulty(difficulty);
 
   elements = shuffleEmt(elements);
   console.log(elements);
@@ -451,6 +450,22 @@ function createBricks() {
   console.log(createBricksStr());
 }
 
+function createElementsByDifficulty(level) {
+  let elements = [];
+
+  if (level === 0) {
+    // Easy
+    elements = [ /* 초급 전용 요소들 */ ];
+  } else if (level === 1) {
+    elements = createNormalElements(); // 기존처럼 노말
+  } else if (level === 2) {
+    elements = createHardElements();   // 하드 요소들만 따로 준비
+  }
+
+  return shuffleEmt(elements);
+}
+
+
 function createNormalElements() {
   let elements = [];
   let newEmt = desEleNormal.find(element => element.selector === "#title");
@@ -462,6 +477,21 @@ function createNormalElements() {
   for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
     let newEmt = desEleNormal.find(element => element.selector === "none");
     elements.push(newEmt);
+  }
+
+  return elements;
+}
+
+function createHardElements() {
+  let elements = [];
+
+  // 하드모드에서는 전부 calculator 블록으로만 구성
+  const calculator = desEleHard.find(el => el.selector === ".lab.calculator");
+
+  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
+
+  for (let i = 0; i < totalBrickCount; i++) {
+    elements.push(calculator);
   }
 
   return elements;
@@ -539,56 +569,6 @@ function toTheNext() {
     init();
   }, 3000);
 }
-
-// function bounceBall() {
-//   //튕김 처리
-//   if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-//   if (ballY + dy < ballRadius) dy = -dy;
-//   else if (ballY + dy > canvas.height - ballRadius) {
-//     const buffer = 10;
-
-//     if (ballX > paddleX - buffer && ballX < paddleX + paddleWidth + buffer) {
-//       // 충돌 효과!
-//       paddleHitEffect = 1.0;
-//       //랜덤 경로설정
-//       ran = Math.random() * 5 - 2.5;
-//       temp = dx;
-//       console.log("dx, ran: ", dx, ran);
-//       if (((dx + ran) < 3 && (dx + ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
-//         dx *= 3;
-//         console.log("dx *3: ", dx, ran);
-//       }
-//       else if (((dx + ran) > 9 || (dx + ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
-//         dx /= 3;
-//         console.log("dx /3: ", dx, ran);
-//       }
-//       let count = 0;
-//       while ((v_s - (dx + ran) * (dx + ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
-//         ran = Math.random() * 5 - 2.5;
-//         console.log("ran 다시: ", dx, ran);
-//         count++;
-//         if (count == 5) {
-//           dx = 0;
-//           console.log("무한루프로 dx재설정: ", dx, ran);
-//           break;
-//         }
-//       }
-//       dx += ran;
-//       if (temp * dx < 0) {
-//         dx = -dx;
-//         console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
-//       }
-//       dy = -Math.sqrt(v_s - dx * dx);
-//       console.log("최종 v: ", dx, dy, dx * dx + dy * dy);
-//     }
-
-//     else {
-//       isGameOver = true;
-//       gameOver();
-//       return;
-//     }
-//   }
-// }
 
 //개선판
 function bounceBall() {
@@ -781,18 +761,10 @@ if (!target) {
   return;
 }
 
-  // 효과에 따라 처리
-    // if (b.effect === "remove") {
-    //   target.remove();
-    //   console.log("lab 지워짐" + b.targetSelector);
-    // } else if (b.effect === "changeColor" && b.color) {
-    //  target.style.backgroundColor = b.color;
-    // }
 const handler = effectHandlers[b.effect];
 if (handler) {
     handler(target, b, iframeDoc); // 필요한 인자 전달
   }
-
 
 } //destroyBirkcs 끝
 
