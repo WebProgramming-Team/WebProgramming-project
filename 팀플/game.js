@@ -276,7 +276,7 @@ function initShowHide() {
    //실습 iframe 업데이트
   updateIframe(); 
 }
-
+//벽돌 생성 함수(태그 대응까지)
 function createBricks(addRow = false) {
   const bombCount = 2;
   const bombPositions = [];
