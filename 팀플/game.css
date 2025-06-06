@@ -7,7 +7,8 @@ html{
 
 /*전체 body 속성 */
 body {
-  width: 65vw;
+  width: 1640px;
+  /*width: 65vw;*/
 
   height: 150vh;
   background: #222;
