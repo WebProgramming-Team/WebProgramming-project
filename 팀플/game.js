@@ -10,6 +10,11 @@ let igIdx = 0;
 const v_s_fast = 128;
 const v_s_slow = 72;
 let v_s = v_s_fast;
+let difficulty; //이건 난이도를 정함
+let difficultyStr = ["easy", "normal", "hard"];
+
+// 테스트용 updateIframe에 css 쪽 보면 씀
+let testFlag = true;
 
 //점수 용 전역변수
 let score = 0;
@@ -71,17 +76,57 @@ let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 //벽돌에 대응되는 태그들
 //벽돌위에 글씨를 넣고싶다면 label: "원하는 메세지"  이렇게 추가하세요
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
-const destructibleElements = [
+const desEleNormal = [
   { selector: "#title", effect: "remove" },
-  { selector: ".lab.calculator", effect: "changeColor", color: "red" },
-  { selector: ".lab.gugudan", effect: "changeColor", color: "skyblue" },
-  { selector: ".lab.numGame", effect: "changeColor", color: "black" },
-  { selector: "none"}
+  { selector: ".lab", effect: "remove", name: "div"},
+  { selector: "none"},
 ];
 
+const desEleHard=[{ selector: ".lab.calculator", effect: "breakCalculator" }];
+
+//이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
+const effectHandlers = {
+  remove: (target) => {
+    target.remove();
+  },
+  changeColor: (target, b) => {
+    if (b.color) target.style.backgroundColor = b.color;
+  },
+  breakCalculator: (target, b, iframeDoc) => {
+    const script = iframeDoc.createElement("script");
+    script.innerHTML = `
+      const addBtn = document.getElementById("addButton");
+      if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.value = "망가짐 😵";
+      }
+      const sum = document.getElementById("sum");
+      if (sum) {
+        sum.value = "ERROR!";
+      }
+    `;
+    iframeDoc.body.appendChild(script);
+
+    // ====== 연기 효과 표시 ======
+    const rect = target.getBoundingClientRect();
+    const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+
+    const x = rect.left - iframeRect.left + rect.width / 2;
+    const y = rect.top - iframeRect.top + rect.height / 2;
+
+    showLabEffect(x, y);
+  },
+  // 앞으로 추가할 것들 계속 여기 정의
+  // "breakWordList": (target, b, iframeDoc) => {...}
+};
+
+
+
+let totalTitleNum = 1;
+let totalDivNum = 6; // 삭제할 div 개수
 
 // 벽돌 관련 전역 변수들
-let extraRow = 2;
+let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
@@ -105,7 +150,7 @@ bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 // bricks 초기화 시 아래처럼
 let bricks = [];
-createBricks();
+createNormalBricks();
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
@@ -123,9 +168,11 @@ $(window).ready(function() {
   $("#guitar-button").on("click", showGuitar);
   /*--------------------------*/
 
+  /*게임 모드 선택 버튼*/
+  $("#easy-button").on("click", startEasyPage);
+  $("#normal-button").on("click", startNormalPage);
+  $("#hard-button").on("click", startHardPage);
 
-
-  $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
 
   //변수 초기화
@@ -250,11 +297,29 @@ function showMainMenu() {
   menuMusic.play();
 }
 
+function startEasyPage() {
+  difficulty = 0;
+  init();
+}
+
+function startNormalPage() {
+  difficulty = 1;
+  init();
+}
+
+function startHardPage() {
+  difficulty = 2;
+  init();
+}
+
+
 function init() {
   if (!isGameOver) {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
     return;
   }
+  testFlag = true;
+  divCount = 0;
   isGameOver = false;
   isPaused = false;
   $("#pan").css({"background-color":"transparent"});
@@ -262,9 +327,6 @@ function init() {
   initShowHide();
   stopMusic();
   ingameMusic[igIdx].play();
-
-  bricks = [];
-  createBricks();
 
   let ballSpeed = $(".bs-label.selected .bs-radio").val();
   if (ballSpeed == "slow") {
@@ -276,6 +338,7 @@ function init() {
   } else {
     console.log("???? 속도 왜이럼");
   }
+  console.log("현재 난이도: " + difficultyStr[difficulty]);
 
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
@@ -292,20 +355,29 @@ function init() {
 
   score = 0;
 
-  if (intervalId) {
-    clearInterval(intervalId);
+  //난이도에 따른 벽돌 분기처리
+  bricks = [];
+  if (difficulty === 0) {
+    createEasyBricks();
+  } 
+
+  else if (difficulty === 1) {
+    createNormalBricks();
+  } 
+
+  else if (difficulty === 2) {
+    createHardBricks();
   }
-  blockDownCount = 0;
+
+
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
       moveBricksDown();
-      blockDownCount++;
-      console.log(blockDownCount, ", 최대", extraRow+ "번");
     }
-    if (blockDownCount >= extraRow) {
+    if (hiddenRowNum <= 0) {
       clearInterval(intervalId);
     }
-  }, 5000);
+  }, 1000);
 
 
   requestAnimationFrame(draw);
@@ -323,8 +395,13 @@ function initShowHide() {
    //실습 iframe 업데이트
   updateIframe(); 
 }
+
+function createEasyBricks() {
+  // 쉬운 모드에 맞는 블록 구성(이시헌)
+}
+
 //벽돌 생성 함수(태그 대응까지)
-function createBricks(addRow = false) {
+function createNormalBricks() {
   const bombCount = 2;
   const bombPositions = [];
   hiddenRowNum = extraRow;
@@ -332,7 +409,7 @@ function createBricks(addRow = false) {
   // 폭탄 위치 랜덤 지정
   while (bombPositions.length < bombCount) {
     const c = Math.floor(Math.random() * brickColumnCount);
-    const r = addRow ? 0 : Math.floor(Math.random() * (brickRowCount+extraRow));
+    const r = Math.floor(Math.random() * (brickRowCount+extraRow));
     const key = `${c}-${r}`;
     if (!bombPositions.includes(key)) {
       bombPositions.push(key);
@@ -340,9 +417,22 @@ function createBricks(addRow = false) {
   }
 
   let elements = [];
-  for (let i = 0; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
-    elements.push(destructibleElements[Math.floor(Math.random() * destructibleElements.length)]);
+  {
+    let newEmt = desEleNormal.find(element => element.selector === "#title");
+    elements.push(newEmt);
   }
+  for (let i = 0; i < totalDivNum; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === ".lab");
+    elements.push(newEmt);
+  }
+  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === "none");
+    elements.push(newEmt);
+  }
+
+  elements = shuffleEmt(elements);
+  console.log(elements);
+
   let eCount = 0; // elements의 원소를 하나씩 가져올거임
   let index = 0;
   for (let c = 0; c < brickColumnCount; c++) {
@@ -359,7 +449,7 @@ function createBricks(addRow = false) {
         targetSelector: element?.selector,
         // tagLabel: element?.label,
         effect: element?.effect,
-        color: element?.color
+        // color: element?.color
       };
 
       if (r < extraRow) {
@@ -373,31 +463,42 @@ function createBricks(addRow = false) {
   console.log(createBricksStr());
 }
 
+function createHardBricks() {
+  // 난이도 높음
+  // desEleHard 배열 활용
+  bricks = [];
+  let index = 0;
+
+  for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount + extraRow; r++) {
+      const isBomb = Math.random() < 0.2; // 하드모드에서 확률적으로 폭탄 더 많게?
+      const element = desEleHard[index % desEleHard.length];
+
+      bricks[c][r] = {
+        x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+        y: r * (brickHeight + brickPadding) + brickOffsetTop,
+        status: 1,
+        isBomb: isBomb,
+        targetSelector: element?.selector,
+        tagLabel: "⚠️",
+        effect: element?.effect
+      };
+
+      index++;
+    }
+  }
+
+}
+
 
 function moveBricksDown() {
-  if (isGameOver) {
+  if (isGameOver || (hiddenRowNum <= 0)) {
     return;
   }
 
-  // createBricks(true);
+  hiddenRowNum -=1;
 
-  // let currentMaxRowY = 0;
-  // for (let c = 0; c < brickColumnCount; c++) {
-  //   if (bricks[c] && bricks[c].length > 0) {
-  //     for (let r = bricks[c].length - 1; r >= 0; r--) {
-  //       const brick = bricks[c][r];
-  //       if (brick && brick.status === 1) {
-  //         currentMaxRowY = Math.max(currentMaxRowY, brick.y + brickHeight);
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
-  if (hiddenRowNum > 0) {
-    hiddenRowNum -=1;
-  }
-  let index = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount + extraRow; r++) {
       bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
@@ -407,23 +508,9 @@ function moveBricksDown() {
   for (let i = 0; i < brickColumnCount; i++) {
     bricks[i][hiddenRowNum].status = 1;
   }
-
-  // const gameOverLine = canvas.height - paddleHeight - ballRadius;
-
-  // if (currentMaxRowY >= gameOverLine) {
-  //   isGameOver = true;
-  //   clearInterval(intervalId);
-  //   gameOver();
-  //   return;
-  // }
-
-  console.log("벽돌 내려왔음");
+  console.log("벽돌 내려왔음, "+ extraRow +"번 중" + (extraRow - hiddenRowNum) + " 번");
+  
 }
-
-let intervalId = setInterval(() => {
-  moveBricksDown();
-  collisionDetection();
-}, 5000);
 
 function draw() {
   console.log("draw() 실행");
@@ -451,21 +538,35 @@ function draw() {
   if (checkClear()) {
     isGameOver = true;
     clearInterval(intervalId);
+
+    testFlag = false;
+    updateIframe();
+
     stopMusic();
-    setTimeout(() => {
-      alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
-      document.location.reload();
-    }, 10);
+    toTheNext();
     return;
   }
 
   requestAnimationFrame(draw);
 }
 
+
+function toTheNext() {
+  difficulty += 1;
+
+  if (difficulty > 2) {
+    isGameOver = true;
+    showMainMenu();
+  }
+
+  setTimeout(function() {
+    init();
+  }, 3000);
+}
+
 // function bounceBall() {
 //   //튕김 처리
 //   if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-
 //   if (ballY + dy < ballRadius) dy = -dy;
 //   else if (ballY + dy > canvas.height - ballRadius) {
 //     const buffer = 10;
@@ -693,24 +794,31 @@ function destroyBrick(c, r) {
         ) {
         destroyBrick(nc, nr);
     }
-    console.log(createBricksStr());
   }
+  console.log(createBricksStr());
 }
 
   // 대상 요소 찾기
 const target = iframeDoc.querySelector(b.targetSelector);
 if (!target) {
-  console.log("iframDoc의 타겟이 null이므로 리턴");
+  console.log("iframDoc의 타겟이 null이므로 리턴, " + b.targetSelector);
   return;
 }
 
   // 효과에 따라 처리
-if (b.effect === "remove") {
-  target.remove();
-} else if (b.effect === "changeColor" && b.color) {
-  target.style.backgroundColor = b.color;
-}
-}
+    // if (b.effect === "remove") {
+    //   target.remove();
+    //   console.log("lab 지워짐" + b.targetSelector);
+    // } else if (b.effect === "changeColor" && b.color) {
+    //  target.style.backgroundColor = b.color;
+    // }
+const handler = effectHandlers[b.effect];
+if (handler) {
+    handler(target, b, iframeDoc); // 필요한 인자 전달
+  }
+
+
+} //destroyBirkcs 끝
 
 // 디버깅용
 function createBricksStr() {
@@ -804,8 +912,8 @@ function checkClear() {
 function drawBall() {
    ctx.save(); // 현재 상태 저장
 
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+   ctx.beginPath();
+   ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
   ctx.clip(); // 이후 그리는 건 원 내부로 제한됨
 
   // 이미지 그리기 (중앙에 오도록 위치 조정)
@@ -815,7 +923,7 @@ function drawBall() {
     ballY - ballRadius,
     ballRadius * 2,
     ballRadius * 2
-  );
+    );
   ctx.restore(); 
   ctx.closePath();
 }
@@ -851,10 +959,33 @@ function drawPaddle() {
   }
 }
 
+// 벽돌에 태그 랜덤으로 먹이기용 랜덤함수
+function shuffleEmt(emts) {
+  for (let i = emts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [emts[i], emts[j]] = [emts[j], emts[i]];
+  }
+  return emts;
+}
 
-//아이프레임 영역을 업데이트
+//왼쪽 실습영역 이펙트 함수
+function showLabEffect(x, y) {
+  const labCanvas = document.getElementById("labCanvas");
+  const labCtx = canvas.getContext("2d");
+
+  labCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
+  labCtx.beginPath();
+  labCtx.arc(x, y, 40, 0, Math.PI * 2);
+  labCtx.fill();
+
+  setTimeout(() => {
+    labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
+  }, 800);
+}
+
+//아이프레임 영역을  업데이트
 function updateIframe() {
-  const htmlCode = `<header>
+  const htmlCodeN = `<header>
     <div id="title">
       Play with JS!
     </div>
@@ -1003,11 +1134,11 @@ function updateIframe() {
 </div>
 <footer>
   <p>Web programming, Spring 2025</p>
-  <p>Created by 202411235 강동훈</p>
+  <p>Created by 202412345 김아무개</p>
 </footer>`;
 
 //css 코드의 시작
-const cssCode=`*{margin: 0; padding: 0;}
+const cssCodeN=`*{margin: 0; padding: 0;}
 
 body {
   font-family:  "Winky Sans", sans-serif;
@@ -1138,7 +1269,7 @@ table {
 }`;   //css 코드의 끝
 
 //js 코드의 시작
-const jsCode=`console.log("JS 동작 중!")
+const jsCodeN=`console.log("JS 동작 중!")
 console.log("Hello from JS!");
 
 
@@ -1188,8 +1319,10 @@ console.log("Hello from JS!");
       m="April";
       else if(now.getMonth()==4)
       m="May";
-      else if(now.getMonth==5)
-      m="June";
+      else if(now.getMonth()==5)
+       m="June";
+      else if(now.getMonth()==6)
+        m="July";
 
       let s=m+" "+ now.getDate()+". "+ now.getHours()+" : "+now.getMinutes()+" : "+now.getSeconds();
       var table = document.getElementById('ctime');
@@ -1461,9 +1594,16 @@ console.log("Hello from JS!");
     }
 `;
 
+let htmlCode = htmlCodeN;
 
-const css = `<style>${cssCode}</style>`;
-const js = `<script>${jsCode}<\/script>`;
+let css;
+if (testFlag) {
+  css = `<style>${cssCodeN}</style>`;
+}
+else {
+  css = ""; 
+}
+let js = `<script>${jsCodeN}<\/script>`;
 
 const fullHTML = `
         <!DOCTYPE html>
