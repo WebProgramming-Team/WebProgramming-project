@@ -176,14 +176,6 @@ body {
   height: 900px;
 }
 
-/* 왼쪽: 실습 iframe, 중복선언되어있어 주석처리함 */
-/*#labArea {
-  width: 10%;
-  height: 60%;
-  overflow: auto;
-  background: white;
-}*/
-
 #leftArea {
   width: 750px;
 }
@@ -200,6 +192,17 @@ body {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/*랩 캔버스 이펙트*/
+#labCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 마우스 클릭 통과 */
 }
 
 /*커서 안보이게 할라고 판 씌움*/
