@@ -85,7 +85,6 @@ const desEleNormal = [
 const desEleHard=[{ selector: ".lab.calculator", effect: "breakCalculator" }];
 
 //이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
-//하드모드 전용임
 const effectHandlers = {
   remove: (target) => {
     target.remove();
@@ -105,9 +104,17 @@ const effectHandlers = {
       if (sum) {
         sum.value = "ERROR!";
       }
-      alert("덧셈 기능이 망가졌습니다.");
     `;
     iframeDoc.body.appendChild(script);
+
+    // ====== 연기 효과 표시 ======
+    const rect = target.getBoundingClientRect();
+    const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+
+    const x = rect.left - iframeRect.left + rect.width / 2;
+    const y = rect.top - iframeRect.top + rect.height / 2;
+
+    showLabEffect(x, y);
   },
   // 앞으로 추가할 것들 계속 여기 정의
   // "breakWordList": (target, b, iframeDoc) => {...}
@@ -459,6 +466,7 @@ function createNormalElements() {
 
   return elements;
 }
+
 
 function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
@@ -938,8 +946,22 @@ function shuffleEmt(emts) {
   return emts;
 }
 
-//아이프레임 영역을  업데이트
+//왼쪽 실습영역 이펙트 함수
+function showLabEffect(x, y) {
+  const labCanvas = document.getElementById("labCanvas");
+  const labCtx = canvas.getContext("2d");
 
+  labCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
+  labCtx.beginPath();
+  labCtx.arc(x, y, 40, 0, Math.PI * 2);
+  labCtx.fill();
+
+  setTimeout(() => {
+    labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
+  }, 800);
+}
+
+//아이프레임 영역을  업데이트
 function updateIframe() {
   const htmlCodeN = `<header>
     <div id="title">
