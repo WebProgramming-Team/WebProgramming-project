@@ -55,6 +55,12 @@ gameOverMusic[1].loop = true;
 const canvasWidth = 900;  //우리 코드에서는 900px
 const canvasHeight = 900;
 
+//이 아래는 막대기 관련 변수입니다.
+const paddleImage = new Image();
+paddleImage.src = "images/paddle-asset/joystickVer2.png";
+
+let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
+
 
 //이 아래는 벽돌배열입니다.
 
@@ -270,7 +276,7 @@ function init() {
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
-  paddleHeight = 20;
+  paddleHeight = 40;
   paddleWidth = 240;
   paddleX = (canvas.width - paddleWidth) / 2;
   rightPressed = false;
@@ -448,50 +454,125 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-function bounceBall() {
-  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
+// function bounceBall() {
+//   //튕김 처리
+//   if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
 
-  if (ballY + dy < ballRadius) dy = -dy;
+//   if (ballY + dy < ballRadius) dy = -dy;
+//   else if (ballY + dy > canvas.height - ballRadius) {
+//     const buffer = 10;
+
+//     if (ballX > paddleX - buffer && ballX < paddleX + paddleWidth + buffer) {
+//       // 충돌 효과!
+//       paddleHitEffect = 1.0;
+//       //랜덤 경로설정
+//       ran = Math.random() * 5 - 2.5;
+//       temp = dx;
+//       console.log("dx, ran: ", dx, ran);
+//       if (((dx + ran) < 3 && (dx + ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
+//         dx *= 3;
+//         console.log("dx *3: ", dx, ran);
+//       }
+//       else if (((dx + ran) > 9 || (dx + ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
+//         dx /= 3;
+//         console.log("dx /3: ", dx, ran);
+//       }
+//       let count = 0;
+//       while ((v_s - (dx + ran) * (dx + ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
+//         ran = Math.random() * 5 - 2.5;
+//         console.log("ran 다시: ", dx, ran);
+//         count++;
+//         if (count == 5) {
+//           dx = 0;
+//           console.log("무한루프로 dx재설정: ", dx, ran);
+//           break;
+//         }
+//       }
+//       dx += ran;
+//       if (temp * dx < 0) {
+//         dx = -dx;
+//         console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
+//       }
+//       dy = -Math.sqrt(v_s - dx * dx);
+//       console.log("최종 v: ", dx, dy, dx * dx + dy * dy);
+//     }
+
+//     else {
+//       isGameOver = true;
+//       gameOver();
+//       return;
+//     }
+//   }
+// }
+
+//개선판
+function bounceBall() {
+  //  1. 좌우 벽에 부딪히면 반사
+  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+    dx = -dx;
+  }
+
+  //  2. 위쪽 벽에 부딪히면 반사
+  if (ballY + dy < ballRadius) {
+    dy = -dy;
+  }
+
+  //  3. 아래쪽 - 패들과 충돌 체크
   else if (ballY + dy > canvas.height - ballRadius) {
-    const buffer = 10;
-    if (ballX > paddleX - buffer && ballX < paddleX + paddleWidth + buffer) {
-      ran = Math.random() * 5 - 2.5;
-      temp = dx;
-      console.log("dx, ran: ", dx, ran);
-      if (((dx + ran) < 3 && (dx + ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx *= 3;
-        console.log("dx *3: ", dx, ran);
-      }
-      else if (((dx + ran) > 9 || (dx + ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx /= 3;
-        console.log("dx /3: ", dx, ran);
-      }
+    const paddleTop = canvas.height - paddleHeight;
+    const paddleBottom = canvas.height;
+    const buffer = 10; // 약간 여유를 줌
+
+    const hitTopSurface =
+    ballY + ballRadius + dy >= paddleTop &&  // 공의 바닥이 패들 윗면에 닿음
+    ballY + ballRadius <= paddleBottom &&   // 공이 패들 아래로 완전히 들어가지 않음
+    ballX >= paddleX - buffer &&
+    ballX <= paddleX + paddleWidth + buffer;
+
+    if (hitTopSurface) {
+      //  패들 눌림 이펙트
+      paddleHitEffect = 1.0;
+
+      //  랜덤 튕김 방향 설정
+      let ran = (Math.random() - 0.5) * 0.1; // ±0.05 정도
+      let temp = dx;
+
+      // 너무 낮은 각도 방지 + 너무 가파른 각도 방지
+      let newDx = dx + ran;
       let count = 0;
-      while ((v_s - (dx + ran) * (dx + ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
-        ran = Math.random() * 5 - 2.5;
-        console.log("ran 다시: ", dx, ran);
-        count++;
-        if (count == 5) {
-          dx = 0;
-          console.log("무한루프로 dx재설정: ", dx, ran);
-          break;
-        }
+
+      while (
+        (v_s - newDx * newDx <= 0) || // 속도 계산 불가
+        (Math.abs(newDx) < 1.5)       // 너무 낮은 각도 방지
+        ) {
+        ran = (Math.random() - 0.5) * 0.1;
+      newDx = dx + ran;
+      count++;
+      if (count > 5) {
+        newDx = 0;
+        break;
       }
-      dx += ran;
-      if (temp * dx < 0) {
-        dx = -dx;
-        console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
-      }
-      dy = -Math.sqrt(v_s - dx * dx);
-      console.log("최종 v: ", dx, dy, dx * dx + dy * dy);
     }
+
+    dx = newDx;
+
+      // 방향 반전 고려
+    if (temp * dx < 0) {
+      dx = -dx;
+    }
+
+      //  수직 속도 계산
+      dy = -Math.sqrt(Math.max(1, v_s - dx * dx)); // 항상 양수 sqrt 보장
+    }
+
+    //  바닥 충돌 = 게임 오버
     else {
       isGameOver = true;
       gameOver();
-      return;
     }
   }
 }
+
 
 function gameOver() {
   stopMusic();
@@ -648,16 +729,16 @@ function collisionDetection() {
             ballY > b.y &&
             ballY < b.y + brickHeight) {
             dy = -dy;
-            destroyBrick(c, r);
+          destroyBrick(c, r);
 
-            const labArea = document.querySelector("#labArea");
-            const target = labArea?.querySelector(b.targetSelector);
-            if (target) target.remove();
-          }
+          const labArea = document.querySelector("#labArea");
+          const target = labArea?.querySelector(b.targetSelector);
+          if (target) target.remove();
         }
       }
     }
   }
+}
 }
 
 function drawScore() {
@@ -724,12 +805,36 @@ function drawBall() {
 }
 
 function drawPaddle() {
-  ctx.beginPath();
-  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#0f0";
-  ctx.fill();
-  ctx.closePath();
+  const y = canvas.height - paddleHeight;
+
+  if (paddleImage.complete) {
+    ctx.save();
+
+    // 이펙트 있을 때 어둡게 표현
+    if (paddleHitEffect > 0) {
+      ctx.filter = `brightness(${1 - paddleHitEffect * 0.5})`; // 어두워짐
+    }
+
+    ctx.drawImage(paddleImage, paddleX, y, paddleWidth, paddleHeight);
+
+    ctx.restore();
+
+    // 점점 효과 줄이기
+    if (paddleHitEffect > 0) {
+      paddleHitEffect -= 0.02;
+      if (paddleHitEffect < 0) paddleHitEffect = 0;
+    }
+  } 
+  else {
+    // 이미지 로딩 안됐을 경우 기본 막대
+    ctx.beginPath();
+    ctx.rect(paddleX, y, paddleWidth, paddleHeight);
+    ctx.fillStyle = "#0f0";
+    ctx.fill();
+    ctx.closePath();
+  }
 }
+
 
 //아이프레임 영역을 업데이트
 function updateIframe() {
