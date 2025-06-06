@@ -13,13 +13,10 @@ let v_s = v_s_fast;
 
 //점수 용 전역변수
 let score = 0;
+let scoreEffects = [];  // 여러 개 동시에 떠오르게 하기 위해 배열로
 
 // 게임 오버
 let uDiedMsg;
-
-//폭탄 사진
-const bombImg = new Image();
-bombImg.src = 'images/bomb.jpg';
 
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
@@ -50,6 +47,11 @@ menuMusic.volume = 0.2;
 menuMusic.loop = true;
 
 
+// 캔버스 크기
+const canvasWidth = 900;  //우리 코드에서는 900px
+const canvasHeight = 900;
+
+
 //이 아래는 벽돌배열입니다.
 
 //벽돌에 대응되는 태그들
@@ -61,17 +63,27 @@ const destructibleElements = [
 ];
 
 // 벽돌 관련 설정
-let brickRowCount = 6;
-let brickColumnCount = 8;
+let brickRowCount = 5;
+let brickColumnCount = 7;
 const brickWidth = 118;
-const brickHeight = 40;
+const brickHeight = 60;
 const brickPadding = 2;
-const brickOffsetTop = 30;
-const brickOffsetLeft = 30;
+
+// 벽돌 전체 너비/높이 계산
+const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
+const totalBrickHeight = brickRowCount * (brickHeight + brickPadding) - brickPadding;
+
+// 정중앙 위치 계산
+brickOffsetLeft = (canvasWidth - totalBrickWidth) / 2;
+brickOffsetTop = 50; // 위에서 50px 정도 띄우기
 
 //벽돌 이미지
 const brickImage = new Image();
-brickImage.src = "images/bricks.jpg";
+brickImage.src = "images/block-asset/bricks.png"; // 일반 벽돌
+
+const bombImage = new Image();
+bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
+
 
 // bricks 초기화 시 아래처럼
 let bricks = [];
@@ -339,11 +351,11 @@ function createBricks(addRow = false) {
       for (let r = 0; r < brickRowCount; r++) {
         const isBomb = bombPositions.includes(`${c}-${r}`);
         const element = destructibleElements[index % destructibleElements.length];
-
+        //status 1은 활성화된 벽돌을 의미함
         bricks[c][r] = {
           x: c * (brickWidth + brickPadding) + brickOffsetLeft,
           y: r * (brickHeight + brickPadding) + brickOffsetTop,
-          status: 1,
+          status: 1, 
           isBomb: isBomb,
           targetSelector: element?.selector,
           tagLabel: element?.label,
@@ -519,17 +531,16 @@ function drawBricks() {
       for (let r = 0; r < bricks[c].length; r++) {
         const b = bricks[c][r];
         if (b && b.status === 1) {
-          if (brickImage.complete) {
-            ctx.drawImage(brickImage, b.x, b.y, brickWidth, brickHeight);
+          const img = b.isBomb ? bombImage : brickImage;
+
+          if (img.complete) {
+            ctx.drawImage(img, b.x, b.y, brickWidth, brickHeight);
           }
 
           if (b.tagLabel) {
-            ctx.font = "12px Arial";
-            //ctx.textAlign = "center";
-            // ctx.textBaseline = "middle";
-            ctx.fillStyle = b.isBomb ? "red" : "#fff";
-            const label = b.isBomb ? "💣" : b.tagLabel;
-            ctx.fillText(label, b.x + 10, b.y + 20);
+            ctx.font = "12px Winky Sans, Arial";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(b.tagLabel, b.x + 10, b.y + 20);
           }
         }
       }
@@ -543,6 +554,14 @@ function destroyBrick(c, r) {
 
   b.status = 0;
   score += 10;
+
+  // 점수 애니메이션 이펙트 추가
+  scoreEffects.push({
+    x: b.x + brickWidth / 2 - 10, // 벽돌 가운데
+    y: b.y + brickHeight / 2,
+    value: "+10",
+    opacity: 1.0
+  });
 
   const iframe = document.getElementById("labFrame");
   const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -606,9 +625,23 @@ function collisionDetection() {
 }
 
 function drawScore() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#f99c05";
-  ctx.fillText("Score: " + score, 8, 20);
+  ctx.font = "16px 'Press Start 2P'";
+  ctx.fillStyle = "#fff";
+  ctx.fillText("SCORE: ", 15, 25);
+  ctx.fillText(score, 140, 25);
+
+  // 떠오르는 점수 이펙트 그리기
+  for (let i = 0; i < scoreEffects.length; i++) {
+    const fx = scoreEffects[i];
+    ctx.fillStyle = `rgba(255, 255, 0, ${fx.opacity})`;
+    ctx.fillText(fx.value, fx.x, fx.y);
+
+    fx.y -= 0.5;        // 위로 이동
+    fx.opacity -= 0.02; // 천천히 사라짐
+  }
+
+  // 사라진 것들 제거
+  scoreEffects = scoreEffects.filter(fx => fx.opacity > 0);
 }
 
 function checkClear() {
