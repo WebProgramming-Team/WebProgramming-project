@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>테스트 레이아웃</title>
+	 <link rel="stylesheet" href="testLayout_optional.css">
+	 	 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	 <script src = "testLayout_optional.js"></script>
+
+</head>
+<body>
+	<div id="options-menu" class = "menu-page option-page">
+	    <div id = "options-menu-background-area">
+	    	<img src = "images\intro-asset\background\options-background1.jpg" alt = "메인 메뉴/스타트페이지/옵션백그라운드사진1">
+	    </div>
+	    <div id = "options-menu-titleEmoji-area">
+	    	<p>⚙️</p>
+ 	    </div>
+	    <div id = "options-menu-title-area">
+	    	<p>설정</p>
+	    </div>
+	    <div id = "options-menu-callout-area1" class = "callout-60">
+	    	<div class = "options-callout-area-titlearea">
+	    		<p>🖥️ 배경화면 모드 설정</p>
+	    	</div>
+	    	<div id="options-menu-callout-area1-section1" class="optional-callout-ara1-sections">
+			  <img src="images\temp\backgroundOp1.jpg" alt="Background-Option 1" class="option-image" />
+			  <div class="radio-container">
+			    <input type="radio" name="background-option" value="1" /> White Mode
+			  </div>
+			</div>
+
+			<div id="options-menu-callout-area1-section2" class="optional-callout-ara1-sections">
+			  <img src="images\temp\backgroundOp2.jpg" alt="background-Option 2" class="option-image" />
+			  <div class="radio-container">
+			    <input type="radio" name="background-option" value="2" /> Dark Mode
+			  </div>
+			</div>
+
+			<div id="options-menu-callout-area1-section3" class="optional-callout-ara1-sections">
+			  <img src="images\temp\backgroundOp3.jpg" alt="background-Option 3" class="option-image" />
+			  <div class="radio-container">
+			    <input type="radio" name="background-option" value="3" /> ????????
+			  </div>
+			</div>
+	    
+	    </div>
+	    <div id = "options-menu-callout-area2" class = "callout-60">
+	    	<div class = "options-callout-area-titlearea">
+	    		<p>⚽ 공 설정</p>
+	    	</div>
+	    	<div id = "ball-image-container">
+		      <img src = "images\temp-ball\DeleteBall.png" class = "ball-container-img">
+		      <img src = "images\temp-ball\EraserBall.png" class = "ball-container-img">
+		      <img src = "images\temp-ball\GradeFBall.png" class = "ball-container-img">
+		      <img src = "images\temp-ball\KonkukBall.png" class = "ball-container-img">
+		      <img src = "images\temp-ball\GyosuYouCheatMeBall.png" class = "ball-container-img">
+		    </div>
+
+		    <div id="ball-image-selector">
+		      <span id="left-arrow" onclick="rotateLeft()" class = "arrow selector">&lt;</span>
+		      <span id="ball-select-button" onclick="showSelectedIndex()" class = "selector"></span>
+		      <span id="right-arrow" onclick="rotateRight()" class = "arrow selector">&gt;</span>
+		    </div>
+	    </div>
+
+
+	    <div id = "options-menu-callout-area3" class = "callout-60">
+	    	<div class = "options-callout-area-titlearea">
+	    		<p>🎵 음악 설정</p>
+	    	</div>
+
+	    	
+	    </div>
+   </div>
+
+</body>
+
+</html>
