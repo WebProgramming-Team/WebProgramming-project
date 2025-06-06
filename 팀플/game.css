@@ -14,6 +14,7 @@ body {
   background: #222;
   display: block;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 /* [메인 메뉴 씬 css 설정 모음] */
@@ -183,12 +184,12 @@ body {
 }*/
 
 #leftArea {
-  width: 700px;
+  width: 750px;
 }
 
 #labArea {
-  width: 700px;
-  height: 50%;
+  width: 100%;
+  height: 60%;
   display: flex;
   justify-content: center;
   position: relative;
@@ -214,7 +215,7 @@ body {
 
 #ps {
   display: none;
-  height: 50%;
+  height: 40%;
 
   background-color: aqua;
 }
@@ -227,11 +228,16 @@ body {
 
 /* 오른쪽: 게임 */
 #game-area {
-  width: 900px;
+  width: 850px;
   height: 900px;
   position: relative;
   background: #111;
   border-left: 2px solid #ccc;
+}
+
+#gameCanvas {
+  width: 850px;
+  height: 900px;
 }
 
 /* canvas 등은 그대로 유지 */

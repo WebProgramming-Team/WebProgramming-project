@@ -45,6 +45,7 @@ for (let i = 0; i < gameOverMusicPath.length; i++) {
 ingameMusic[1].volume = ingameMusic[1].volume * 0.6;
 menuMusic.volume = 0.2;
 menuMusic.loop = true;
+gameOverMusic[1].loop = true;
 
 
 // 캔버스 크기
@@ -59,23 +60,25 @@ const destructibleElements = [
   { selector: "#title", label: "타이틀 제거", effect: "remove" },
   { selector: ".lab.calculator", label: "계산기 색상", effect: "changeColor", color: "red" },
   { selector: ".lab.gugudan", label: "구구단 강조", effect: "changeColor", color: "skyblue" },
-  { selector: ".lab.numGame", label: "숫자맞추기", effect: "changeColor", color: "black" }
+  { selector: ".lab.numGame", label: "숫자맞추기", effect: "changeColor", color: "black" },
+  { selector: "none", label: "none"}
 ];
 
-// 벽돌 관련 설정
-let brickRowCount = 5;
-let brickColumnCount = 7;
-const brickWidth = 118;
-const brickHeight = 60;
+
+// 벽돌 관련 전역 변수들
+let extraRow = 2;
+let hiddenRowNum;
+let brickRowCount = 2;
+let brickColumnCount = 4;
+const brickHeight = 36;
 const brickPadding = 2;
+const brickOffsetTop = 50;
+const brickOffsetLeft = 5;
+const brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
 
 // 벽돌 전체 너비/높이 계산
 const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
 const totalBrickHeight = brickRowCount * (brickHeight + brickPadding) - brickPadding;
-
-// 정중앙 위치 계산
-brickOffsetLeft = (canvasWidth - totalBrickWidth) / 2;
-brickOffsetTop = 50; // 위에서 50px 정도 띄우기
 
 //벽돌 이미지
 const brickImage = new Image();
@@ -277,10 +280,10 @@ function init() {
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
       moveBricksDown();
-      collisionDetection();
       blockDownCount++;
+      console.log(blockDownCount, ", 최대", extraRow+ "번");
     }
-    if (blockDownCount >= 3) {
+    if (blockDownCount >= extraRow) {
       clearInterval(intervalId);
     }
   }, 5000);
@@ -305,34 +308,33 @@ function initShowHide() {
 function createBricks(addRow = false) {
   const bombCount = 2;
   const bombPositions = [];
+  hiddenRowNum = extraRow;
 
   // 폭탄 위치 랜덤 지정
   while (bombPositions.length < bombCount) {
     const c = Math.floor(Math.random() * brickColumnCount);
-    const r = addRow ? 0 : Math.floor(Math.random() * brickRowCount);
+    const r = addRow ? 0 : Math.floor(Math.random() * (brickRowCount+extraRow));
     const key = `${c}-${r}`;
     if (!bombPositions.includes(key)) {
       bombPositions.push(key);
     }
   }
 
-  // 벽돌 행 추가 모드
-  if (addRow) {
-    for (let c = 0; c < brickColumnCount; c++) {
-      if (!bricks[c]) bricks[c] = [];
+  let elements = [];
+  for (let i = 0; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
+    elements.push(destructibleElements[Math.floor(Math.random() * destructibleElements.length)]);
+  }
+  let eCount = 0; // elements의 원소를 하나씩 가져올거임
+  let index = 0;
+  for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount + extraRow; r++) {
+      const isBomb = bombPositions.includes(`${c}-${r}`);
+      let element = elements[eCount++];
 
-      // 한 칸씩 아래로 밀기
-      for (let r = bricks[c].length - 1; r >= 0; r--) {
-        bricks[c][r + 1] = { ...bricks[c][r] };
-        bricks[c][r + 1].y += brickHeight + brickPadding;
-      }
-
-      const isBomb = bombPositions.includes(`${c}-0`);
-      const element = destructibleElements[Math.floor(Math.random() * destructibleElements.length)];
-
-      bricks[c][0] = {
+      bricks[c][r] = {
         x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-        y: brickOffsetTop,
+        y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
         status: 1,
         isBomb: isBomb,
         targetSelector: element?.selector,
@@ -340,33 +342,16 @@ function createBricks(addRow = false) {
         effect: element?.effect,
         color: element?.color
       };
-    }
-  }
 
-  // 처음부터 전체 벽돌 만들기
-  else {
-    let index = 0;
-    for (let c = 0; c < brickColumnCount; c++) {
-      bricks[c] = [];
-      for (let r = 0; r < brickRowCount; r++) {
-        const isBomb = bombPositions.includes(`${c}-${r}`);
-        const element = destructibleElements[index % destructibleElements.length];
-        //status 1은 활성화된 벽돌을 의미함
-        bricks[c][r] = {
-          x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-          y: r * (brickHeight + brickPadding) + brickOffsetTop,
-          status: 1, 
-          isBomb: isBomb,
-          targetSelector: element?.selector,
-          tagLabel: element?.label,
-          effect: element?.effect,
-          color: element?.color
-        };
-
-        index++;
+      if (r < extraRow) {
+        bricks[c][r].status = 0;
       }
+
+      index++;
     }
   }
+
+  console.log(createBricksStr());
 }
 
 
@@ -375,19 +360,33 @@ function moveBricksDown() {
     return;
   }
 
-  createBricks(true);
+  // createBricks(true);
 
-  let currentMaxRowY = 0;
+  // let currentMaxRowY = 0;
+  // for (let c = 0; c < brickColumnCount; c++) {
+  //   if (bricks[c] && bricks[c].length > 0) {
+  //     for (let r = bricks[c].length - 1; r >= 0; r--) {
+  //       const brick = bricks[c][r];
+  //       if (brick && brick.status === 1) {
+  //         currentMaxRowY = Math.max(currentMaxRowY, brick.y + brickHeight);
+  //         break;
+  //       }
+  //     }
+  //   }
+  // }
+
+  if (hiddenRowNum > 0) {
+    hiddenRowNum -=1;
+  }
+  let index = 0;
   for (let c = 0; c < brickColumnCount; c++) {
-    if (bricks[c] && bricks[c].length > 0) {
-      for (let r = bricks[c].length - 1; r >= 0; r--) {
-        const brick = bricks[c][r];
-        if (brick && brick.status === 1) {
-          currentMaxRowY = Math.max(currentMaxRowY, brick.y + brickHeight);
-          break;
-        }
-      }
+    for (let r = 0; r < brickRowCount + extraRow; r++) {
+      bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
     }
+  }
+
+  for (let i = 0; i < brickColumnCount; i++) {
+    bricks[i][hiddenRowNum].status = 1;
   }
 
   const gameOverLine = canvas.height - paddleHeight - ballRadius;
@@ -399,7 +398,7 @@ function moveBricksDown() {
     return;
   }
 
-  console.log("벽돌 내려옴");
+  console.log("벽돌 내려왔음");
 }
 
 let intervalId = setInterval(() => {
@@ -528,7 +527,7 @@ function setVolume(vol) {
 function drawBricks() {
   for (let c = 0; c < brickColumnCount; c++) {
     if (bricks[c]) {
-      for (let r = 0; r < bricks[c].length; r++) {
+      for (let r = hiddenRowNum; r < bricks[c].length; r++) {
         const b = bricks[c][r];
         if (b && b.status === 1) {
           const img = b.isBomb ? bombImage : brickImage;
@@ -549,8 +548,12 @@ function drawBricks() {
 }
 
 function destroyBrick(c, r) {
+  console.log("벽돌 파괴 함수 호출");
   const b = bricks[c][r];
-  if (b.status === 0) return;
+  if (b.status === 0) {
+    console.log("b.status == 0 이므로 리턴");
+    return;
+  }
 
   b.status = 0;
   score += 10;
@@ -566,19 +569,12 @@ function destroyBrick(c, r) {
   const iframe = document.getElementById("labFrame");
   const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-  if (!iframeDoc) return;
-
-  // 대상 요소 찾기
-  const target = iframeDoc.querySelector(b.targetSelector);
-  if (!target) return;
-
-  // 효과에 따라 처리
-  if (b.effect === "remove") {
-    target.remove();
-  } else if (b.effect === "changeColor" && b.color) {
-    target.style.backgroundColor = b.color;
+  if (!iframeDoc) {
+    console.log("ifameDoc == null 이므로 리턴");
+    return;
   }
 
+  console.log("블럭 파괴:", c, r, "폭탄임?", b.isBomb);
   // 폭탄이면 주변도 연쇄 파괴
   if (b.isBomb) {
     const directions = [
@@ -589,14 +585,41 @@ function destroyBrick(c, r) {
       const nr = r + dr;
       if (
         nc >= 0 && nc < brickColumnCount &&
-        nr >= 0 && nr < (bricks[nc] ? bricks[nc].length : 0)
+        bricks[nc] &&
+        nr >= 0 && nr < (bricks[nc].length)
         ) {
         destroyBrick(nc, nr);
     }
+    console.log(createBricksStr());
   }
+}
+
+  // 대상 요소 찾기
+const target = iframeDoc.querySelector(b.targetSelector);
+if (!target) {
+  console.log("iframDoc의 타겟이 null이므로 리턴");
+  return;
+}
+
+  // 효과에 따라 처리
+if (b.effect === "remove") {
+  target.remove();
+} else if (b.effect === "changeColor" && b.color) {
+  target.style.backgroundColor = b.color;
 }
 }
 
+// 디버깅용
+function createBricksStr() {
+  bricksStr = "폭탄 위치(1이면 폭탄): \n";
+  for (let j = 0; j < bricks[0].length; j++) {
+    for (let i = 0; i < bricks.length; i++) {
+      bricksStr += (bricks[i][j].isBomb) ? "1 " : "0 ";
+    }
+    bricksStr += "\n";
+  }
+  return bricksStr;
+}
 
 
 function collisionDetection() {
