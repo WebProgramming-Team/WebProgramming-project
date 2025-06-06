@@ -143,7 +143,7 @@ bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 // bricks 초기화 시 아래처럼
 let bricks = [];
-createNormalBricks();
+createBricks();
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
@@ -351,17 +351,20 @@ function init() {
   //난이도에 따른 벽돌 분기처리
   bricks = [];
   if (difficulty === 0) {
-    createEasyBricks();
+    extraRow = 2;
+    brickRowCount = 2;
   } 
 
   else if (difficulty === 1) {
-    createNormalBricks();
+    extraRow = 3;
+    brickRowCount = 3;
   } 
 
   else if (difficulty === 2) {
-    createHardBricks();
+    extraRow = 4;
+    brickRowCount = 4;
   }
-
+  createBricks();
 
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
@@ -389,12 +392,8 @@ function initShowHide() {
   updateIframe(); 
 }
 
-function createEasyBricks() {
-  // 쉬운 모드에 맞는 블록 구성(이시헌)
-}
-
 //벽돌 생성 함수(태그 대응까지)
-function createNormalBricks() {
+function createBricks() {
   const bombCount = 2;
   const bombPositions = [];
   hiddenRowNum = extraRow;
@@ -410,18 +409,7 @@ function createNormalBricks() {
   }
 
   let elements = [];
-  {
-    let newEmt = desEleNormal.find(element => element.selector === "#title");
-    elements.push(newEmt);
-  }
-  for (let i = 0; i < totalDivNum; i++) {
-    let newEmt = desEleNormal.find(element => element.selector === ".lab");
-    elements.push(newEmt);
-  }
-  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
-    let newEmt = desEleNormal.find(element => element.selector === "none");
-    elements.push(newEmt);
-  }
+  elements = createNormalElements(); // 이거 난이도별로 함수 만들어서 레이블 붙이
 
   elements = shuffleEmt(elements);
   console.log(elements);
@@ -456,9 +444,20 @@ function createNormalBricks() {
   console.log(createBricksStr());
 }
 
-function createHardBricks() {
-  // 난이도 높음
-  // desEleHard 배열 활용
+function createNormalElements() {
+  let elements = [];
+  let newEmt = desEleNormal.find(element => element.selector === "#title");
+  elements.push(newEmt);
+  for (let i = 0; i < totalDivNum; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === ".lab");
+    elements.push(newEmt);
+  }
+  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === "none");
+    elements.push(newEmt);
+  }
+
+  return elements;
 }
 
 function moveBricksDown() {
@@ -514,7 +513,7 @@ function draw() {
     stopMusic();
     toTheNext();
     return;
-  }
+  } 
 
   requestAnimationFrame(draw);
 }
@@ -831,6 +830,8 @@ function drawScore() {
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
+
+  $("#scoreBoard").text("Score: "+score);
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
