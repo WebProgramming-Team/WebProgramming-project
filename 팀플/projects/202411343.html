@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		* {
+			font-family: "맑은 고딕", Gothic, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		a {text-decoration: none;}
+		li {list-style: none;}
+		body {
+			background-color: #FFE4E1;
+			width: 960px;
+			margin: 0 auto;
+		}
+		article {
+			padding: 0 10px 20px 10px;
+			border-bottom: 1px solid #C9C9C9;
+		}
+
+		#wrapper {
+			background-color: white;
+			padding: 10px 20px;
+			margin-top: 40px;
+		}
+		#header {
+			padding: 40px 50px;
+		}
+		#navigation {
+			margin-bottom: 20px;
+			border-top: 1px solid #C9C9C9;
+			border-bottom: 1px solid #C9C9C9;
+			height: 40px;
+		}
+		#main-section {
+			width: 710px;
+			float: left;
+		}
+		#main-aside {
+			width: 200px;
+			float: right;
+		}
+		#content {
+			overflow: hidden;
+		}
+		#footer {
+			background-color: #FF9D6E;
+			height: 50px;
+		}
+		.title {
+			font-size: 30px;
+			color: #191919;
+		}
+		.subtitle {
+			font-size: 15px;
+			color: #383838;
+		}
+		.outer-menu-item {
+			display: block;
+			height: 30px;
+			width: 80px;
+			padding: 5px 20px;
+			text-align: center;
+			line-height: 30px;
+			float: left;
+		}
+		.outer-menu-item:hover {
+			background-color: #FF9D6E;
+			color: #282828;
+			font-weight: bold;
+		}
+		.pull-left {
+			height: 40px;
+			float: left;
+		}
+		.pull-right {
+			height: 26px;
+			padding: 7px 7px;
+			float: right;
+		}
+		.input-search {
+			display: block;
+			height: 24px;
+			width: 120px;
+			padding-left: 10px;
+			border: 1px solid #CCCCCC;
+			border-radius: 15px 0 0 15px;
+			float: left;
+		}
+		.input-search:focus {
+			background-color: yellow;
+			outline: 0;
+		}
+		.input-search-submit {
+			display: block;
+			height: 26px;
+			width: 50px;
+			border: 1px solid #CCCCCC;
+			border-radius: 0 15px 15px 0;
+			float: 	left;
+		}
+		.article-header {
+			padding: 20px 0;
+		}
+		.article-title {font-size: 25px;}
+		.article-date {font-size: 13px;}
+		.article-body {font-size: 14px;}
+
+		.aside-list li a {
+			font-size: 13px;
+			color: orange;
+		}
+		.aside-list > h3 {
+			font-size: 15px;
+			color: blue;
+		}
+		#footer > a {
+			display: block;
+			font-size: 20px;
+			color: #282828;
+			font-weight: bold;
+			line-height: 50px;
+			text-align: center;
+		}
+	</style>
+	<title>
+		HTML5 Basic Page
+	</title>
+</head> 
+<body>
+	<div id = "wrapper">
+		<header id = "header">
+			<h1 class = "title">
+				웹 프로그래밍 완전 정복
+			</h1>
+			<h2 class = "subtitle">
+				건국대학교 컴퓨터공학부
+			</h2>
+		</header>
+		<nav id = "navigation">
+			<div class = "pull-left">
+				<ul class = "outer-menu">
+					<li class = "outer-menu-item">HTML5</li>
+					<li class = "outer-menu-item">CSS3</li>
+					<li class = "outer-menu-item">JavaScript</li>
+				</ul>
+			</div>
+			<div class = "pull-right">
+				<form>
+				<input type = "text" class = "input-search">
+				<input type = "submit" value = "검색" class = "input-search-submit">
+				</form>
+			</div>
+		</nav>
+		<div id = "content">
+			<section id = "main-section">
+				<article>
+					<div class = "article-header">
+						<h1 class = "article-title">HTML5 개요와 활용</h1>
+						<p class = "article-date">2025년 03월 13일</p>
+					</div>
+					<div class = "article-body">
+						<img src = "https://placehold.co/430x280">
+						<p>sd fsdf sdfsdfsdfsd fsdsfsdfssdfsd dsfsdfdsfsdfsdfsdfdsfsd fdssdfsfsfsdfdsfdsfds fdsdsfdsf
+						dsfssdsdfdsfdsf dsfdsfds fdsfdsf sd fds fds fds dsfsdfds fds fdsfdsf dsfdsfdsfsdfds fsdfsdfsdfds fdssd fdsf dsf ds fdsf dsf dsf df sf sd ds fsd fds f df sdf ds fsd sda sdasda das dsa sda asd ad das d das dsa das das as sdasdasddsasddas asdasddassdaasdasdas dsadasdsda dasdsaasdsaddsadasdsadsad sda ds asd  das das ads dsa dsa dsa ads dsa dsa das das d s</p>
+					</div>
+				</article>
+				<article>
+					<div class = "article-header">
+						<h1 class = "article-title">HTML5 개요와 활용</h1>
+						<p class = "article-date">2025년 03월 13일</p>
+					</div>
+					<div class = "article-body">
+						<img src = "https://placehold.co/430x280">
+						<p>sd fsdf sdfsdfsdfsd fsdsfsdfssdfsd dsfsdfdsfsdfsdfsdfdsfsd fdssdfsfsfsdfdsfdsfds fdsdsfdsf 
+						dsfssdsdfdsfdsf dsfdsfds fdsfdsf sd fds fds fds dsfsdfds fds fdsfdsf dsfdsfdsfsdfds fsdfsdfsdfds fdssd fdsf dsf ds fdsf dsf dsf df sf sd ds fsd fds f df sdf ds fsd sda sdasda das dsa sda asd ad das d das dsa das das as sdasdasddsasddas asdasddassdaasdasdas dsadasdsda dasdsaasdsaddsadasdsadsad sda ds asd  das das ads dsa dsa dsa ads dsa dsa das das d s</p>
+					</div>
+				</article>
+			</section>
+			<section id = "main-aside">
+				<div class = "aside-list">
+					<h3>카테고리</h3>
+					<ul>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+					</ul>
+				</div>
+				<div class = "aside-list">
+					<h3>최근 글</h3>
+					<ul>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+						<li><a href = "#">데이터</a></li>
+					</ul>
+				</div>
+			</section>
+		</div>
+		<footer id = "footer">
+			<a href = "#">Created By Soohyun Lee</a>
+		</footer>
+	</div>
+</body>
+</html>

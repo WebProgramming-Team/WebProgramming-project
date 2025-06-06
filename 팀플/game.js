@@ -79,12 +79,22 @@ createBricks();
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
+  /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
+  /*--------------*/ 
+
   $("#game-wrapper").hide();
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+
+
   $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
 
