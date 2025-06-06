@@ -15,6 +15,9 @@ let v_s = v_s_fast;
 let score = 0;
 let scoreEffects = [];  // 여러 개 동시에 떠오르게 하기 위해 배열로
 
+//경고 효과
+let warningEffect = null;
+
 // 게임 오버
 let uDiedMsg;
 
@@ -55,11 +58,13 @@ const canvasHeight = 900;
 //이 아래는 벽돌배열입니다.
 
 //벽돌에 대응되는 태그들
+//벽돌위에 글씨를 넣고싶다면 label: "원하는 메세지"  이렇게 추가하세요
+//{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
 const destructibleElements = [
-  { selector: "#title", label: "타이틀 제거", effect: "remove" },
-  { selector: ".lab.calculator", label: "계산기 색상", effect: "changeColor", color: "red" },
-  { selector: ".lab.gugudan", label: "구구단 강조", effect: "changeColor", color: "skyblue" },
-  { selector: ".lab.numGame", label: "숫자맞추기", effect: "changeColor", color: "black" }
+  { selector: "#title", effect: "remove" },
+  { selector: ".lab.calculator", effect: "changeColor", color: "red" },
+  { selector: ".lab.gugudan", effect: "changeColor", color: "skyblue" },
+  { selector: ".lab.numGame", effect: "changeColor", color: "black" }
 ];
 
 // 벽돌 관련 설정
@@ -336,7 +341,7 @@ function createBricks(addRow = false) {
         status: 1,
         isBomb: isBomb,
         targetSelector: element?.selector,
-        tagLabel: element?.label,
+        // tagLabel: element?.label,
         effect: element?.effect,
         color: element?.color
       };
@@ -358,7 +363,7 @@ function createBricks(addRow = false) {
           status: 1, 
           isBomb: isBomb,
           targetSelector: element?.selector,
-          tagLabel: element?.label,
+          // tagLabel: element?.label,
           effect: element?.effect,
           color: element?.color
         };
@@ -563,6 +568,15 @@ function destroyBrick(c, r) {
     opacity: 1.0
   });
 
+  if (score >= 50 && !warningEffect) {
+    warningEffect = {
+      text: "Lab Destroyed! Waring!",
+      opacity: 1.0,
+      y: canvas.height / 2,
+      scale: 1.0
+    };
+  }
+
   const iframe = document.getElementById("labFrame");
   const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
@@ -642,6 +656,27 @@ function drawScore() {
 
   // 사라진 것들 제거
   scoreEffects = scoreEffects.filter(fx => fx.opacity > 0);
+
+  if (warningEffect) {
+    ctx.save();
+    ctx.font = `bold ${30 * warningEffect.scale}px 'Press Start 2P', Arial`;
+    ctx.fillStyle = `rgba(255, 50, 50, ${warningEffect.opacity})`;
+    ctx.textAlign = "center";
+    ctx.shadowColor = "red";
+    ctx.shadowBlur = 10;
+    ctx.fillText(warningEffect.text, canvas.width / 2, warningEffect.y);
+    ctx.restore();
+
+  // 애니메이션 처리
+    warningEffect.opacity -= 0.01;
+    warningEffect.scale += 0.01;
+    warningEffect.y -= 0.3;
+
+    if (warningEffect.opacity <= 0) {
+    warningEffect = null; // 효과 끝나면 제거
+  }
+}
+
 }
 
 function checkClear() {
