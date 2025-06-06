@@ -166,11 +166,12 @@ body {
 
 /* 전체 좌우 분할 */
 #game-wrapper {
+  position: relative;
   display: flex;
   /*width: 100%;
   max-width: 1600px;
   */
-  width: 1640px;
+  width: 1600px;
   margin: 0 auto;
   height: 900px;
 }
@@ -323,14 +324,14 @@ canvas {
 /* 게임 오버 메인 텍스트 */
 #game-over-massage {
   font-family: "Pixelify Sans", serif;
-  font-size: 120px;
+  font-size: 144px;
   top: 36%;
 }
 
 /* 게임 오버 서브텍스트 */
 #game-over-subtitle {
   font-family: sans-serif;
-  font-size: 38px;
+  font-size: 48px;
   line-height: normal;
   top: 48%; /* 주의: position: absolute인 부모 기준 */
 }
