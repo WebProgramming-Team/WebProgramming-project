@@ -1,11 +1,166 @@
-/* 전체 화면 가운데 정렬 */
+/*반응형 구현 위한 html 태그 내부 픽셀*/
+html{
+  /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
+  /*window width, height 1521x799 기준 16px*/
+  font-size:62.5%;
+ }
+
+/*전체 body 속성 */
 body {
-  width: 1104px;
-  margin: auto;
-  padding: 0;
+  width: 65vw;
+
+  height: 150vh;
   background: #222;
   display: block;
+  margin: 0 auto;
 }
+
+/* [메인 메뉴 씬 css 설정 모음] */
+
+/* 해결해야 하는 사항
+*/
+
+/*메인 메뉴 전체*/
+#main-menu{
+  margin: 0 auto;
+  position: relative; 
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: white;
+}
+
+
+/*맨 위의 백그라운드 이미지 들어가는 div 영역*/
+#main-menu-background-area{
+  position: relative; 
+  width: 100%;     
+  height:15%;   
+  overflow: hidden;
+  margin: 0 auto 5% auto;
+  background-color: blue;
+
+}
+
+/*최상단 백그라운드 이미지 1*/
+#main-menu-background-area img{
+  width:1600px;
+  height:900px;/*사진 기본 크기*/
+
+  position:absolute;
+  top:-450px;
+  left:-400px;
+  /*top, left값 향후 조정 예정*/
+
+}
+/*타이틀에 손 모양 이모지 들어가는 공간*/
+#main-menu-titleEmoji-area{
+  position: absolute;
+  top:9% ;
+  left:10%;
+  aspect-ratio: 1/1; /* 비율 설정 */
+  width:10%;
+}
+
+#main-menu-titleEmoji-area p{
+  position:relative;
+  margin:auto;
+  aspect-ratio: 1/1;
+  width: 100%;
+  font-size:9rem; /*1rem : 10px */
+}
+
+/*제목(과제를 해보자!) 들어가는 공간*/
+ #main-menu-title-area{
+  margin: 3% auto 2% 10%;
+  position: relative;
+  display:inline-block;
+  font-size:5rem; /*1rem : 10px */
+  width:40%;
+  height:6%;
+ }
+
+ #main-menu-title-area p{
+  margin:auto;
+  font-weight: bold;
+}
+
+/*콜아웃(게임 시작 버튼 들어가는 영역)에 해당하는 애들*/
+
+/* 첫 번쨰 콜아웃*/
+#main-menu-callout-area1{
+  margin:1% auto 1.5% 10%;;
+  position: relative;
+  font-size:1.8rem;
+  width:80%;
+  height: 6rem; /* 대승적 결단 - rem 쓰기 */
+  background-color: #F8F8F7;
+ }
+
+/* 콜아웃 텍스트 영역*/
+#main-menu-callout-area1 p{
+  display: block;
+  position: relative;
+  left:3%;
+  height: 100%;
+  line-height: 6rem;
+  
+  white-space: nowrap;/*줄바꿈 없게*/
+
+ }
+
+/* 두 번째 콜아웃*/
+ #main-menu-callout-area2{
+  margin:2% auto 1.5% 10%;;
+  position: relative;
+  font-size:1.8rem;
+  width:80%;
+  height: 70rem; /* 대승적 결단 - rem 쓰기 */
+  background-color: #F8F8F7;
+ }
+
+ /*두번쨰 콜아웃 타이틀 텍스트 부분*/
+#callout-area2-titlearea{
+  margin-top:1em;
+  margin-bottom:0.5em;
+}
+#callout-area2-titlearea p{
+  margin:auto;
+  display: block;
+  position: relative;
+  left:3%;
+  height: 100%;
+  line-height: 6rem;
+  white-space: nowrap;/*줄바꿈 없게*/
+}
+
+/*두 번째 콜아웃 게임 시작을 위한 버튼 텍스트 영역*/
+.callout-area2-subarea{
+  margin:0.5em auto 3.2em auto;
+}
+/*가장 큰 텍스트*/ 
+.callout-area2-subarea .callout-area2-subarea-titleText{
+  margin:auto;
+  font-size: 2.8rem;
+  font-weight: bold;
+  display: block;
+  position: relative;
+  left:3%;
+  height: 100%;
+  line-height: 6rem;
+  white-space: nowrap;/*줄바꿈 없게*/
+ }
+
+/* 설명 */
+ .callout-area2-subarea .callout-area2-subarea-contentText{
+    position: relative;
+    left:9%;
+    margin:auto;
+
+ }
+
+
+
 
 /* 전체 좌우 분할 */
 #game-wrapper {
@@ -13,17 +168,29 @@ body {
   /*width: 100%;
   max-width: 1600px;
   */
-  width: 1400px;
+  width: 1640px;
   margin: 0 auto;
-  height: 768px;
+  height: 900px;
 }
 
-/* 왼쪽: 실습 iframe */
-#labArea {
+/* 왼쪽: 실습 iframe, 중복선언되어있어 주석처리함 */
+/*#labArea {
   width: 10%;
-  height: 100%;
+  height: 60%;
   overflow: auto;
   background: white;
+}*/
+
+#leftArea {
+  width: 700px;
+}
+
+#labArea {
+  width: 700px;
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  position: relative;
 }
 
 #labFrame {
@@ -32,10 +199,35 @@ body {
   border: none;
 }
 
+/*커서 안보이게 할라고 판 씌움*/
+#pan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  z-index: 3;
+  opacity: 30%;
+}
+
+#ps {
+  display: none;
+  height: 50%;
+
+  background-color: aqua;
+}
+
+#ps p {
+  font-size: 32px;
+  color: black;
+  margin: 0;
+}
+
 /* 오른쪽: 게임 */
 #game-area {
-  width: 90%;
-  height: 100%;
+  width: 900px;
+  height: 900px;
   position: relative;
   background: #111;
   border-left: 2px solid #ccc;
@@ -53,25 +245,15 @@ canvas {
   display: none;
 }
 
-/* 일시정지 / 재시작 버튼 */
-#ps {
-  display: none;
-  margin-top: 20px;
-}
 
-#ps p {
-  font-size: 32px;
-  color: white;
-  padding-left: 2px;
-}
-
-/* 메인 메뉴, 난이도 선택 */
+/* 난이도 선택 */
 .menu-page {
   text-align: center;
   background-color: white;
   padding: 40px;
   width: 1024px;
   height: 768px;
+  margin: auto;
 
   display: none;
 }
@@ -120,8 +302,8 @@ canvas {
   margin: 0;
   padding: 0;
   font-size: 60px;
+  line-height: 50%;
   text-align: center;
-  line-height: 620px; /* 화면 세로 중앙 위치 조절 */
   color: white;
   text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
   z-index: 3;
@@ -134,15 +316,16 @@ canvas {
 /* 게임 오버 메인 텍스트 */
 #game-over-massage {
   font-family: "Pixelify Sans", serif;
-  font-size: 80px;
+  font-size: 120px;
+  top: 36%;
 }
 
 /* 게임 오버 서브텍스트 */
 #game-over-subtitle {
   font-family: sans-serif;
-  font-size: 40px;
+  font-size: 38px;
   line-height: normal;
-  top: 90px; /* 주의: position: absolute인 부모 기준 */
+  top: 48%; /* 주의: position: absolute인 부모 기준 */
 }
 
 /* 애니메이션 정의 */
@@ -231,72 +414,8 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   font-style: normal;
 }
 
-/* [메인 메뉴 씬 css 설정 모음] */
 
-/* 해결해야 하는 사항
 
-1. 메뉴 중앙정렬 안되는 문제 해결해야 함. 
-*/
-
-/*메인 메뉴 전체*/
-#main-menu{
-  margin: 0 auto;
-  position: relative; 
-  top: 0;
-  left: 0;
-  width: 1024px;
-  height: 768px;   
-  overflow: hidden;
-
-  background-image: url("images\\intro-asset\\background\\intro-background1.jpg");
-}
-#main-menu-background-area{
-  position: absolute; 
-  top: 0;
-  left: 0;
-  width: 1024px;       
-  height: 768px;   
-  overflow: hidden;/*자식 자르기*/
-  margin: 0 auto;
-}
-.main-menu-background1{
-  position: absolute;
-  left: -200px;
-  right: 0;
-  top: -300px;
-  bottom:0;
-  width:130%
-}
-.main-menu-title-area{
-  position: absolute;
-  font-size:50px;
-  top:50rem;
-}
-#main-title-text{
-  position:relative;
-}
-.main-menu-callout-area{
-  margin:100px 100px;
-  position: absolute;
-  left: 36px;
-  right: 0;
-  top: 540px;
-  bottom:0;
-}
-#main-menu-button{
-  position: absolute;
-  margin:100px 100px;
-  left: 36px;
-  right: 0;
-  top: 540px;
-}
-
-#labArea {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
 
 #playjs-frame {
   width: 90%;

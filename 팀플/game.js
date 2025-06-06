@@ -7,7 +7,7 @@ let leftPressed = false;
 let isGameOver = true;
 let isPaused = false;
 let igIdx = 0;
-const v_s_fast = 200;
+const v_s_fast = 128;
 const v_s_slow = 72;
 let v_s = v_s_fast;
 
@@ -24,7 +24,7 @@ bombImg.src = 'images/bomb.jpg';
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
-const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/metalslug.mp3", "musics/ingame/acidrain.mp3"];
+const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/acidrain.mp3"];
 const ingameMusic = [];
 const menuMusic = new Audio("musics/etc/main.mp3");
 
@@ -79,12 +79,22 @@ createBricks();
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
+  /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
+  /*--------------*/ 
+
   $("#game-wrapper").hide();
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
   $("#start-button").on("click", showLevelSelectionPage);
   $("#options-button").on("click", showOptions);
   $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+
+
   $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
 
@@ -132,11 +142,13 @@ $(window).ready(function() {
       if (isPaused) {
         isPaused = false;
         $("#pause-panel").hide();
+        $("html").css({"cursor":"none"});
         requestAnimationFrame(draw);
       }
       else {
         isPaused = true;
         $("#pause-panel").show();
+        $("html").css({"cursor":"default"});
       }
       console.log("isPaused is ", isPaused);
     }
@@ -211,7 +223,7 @@ function init() {
   }
   isGameOver = false;
   isPaused = false;
-  $("#pause-panel").hide();
+  $("#pan").css({"background-color":"transparent"});
 
   initShowHide();
   stopMusic();
@@ -271,6 +283,7 @@ function initShowHide() {
   $("#gameCanvas").show();
   $("#ps").show();
   $(".pop-up-massage").hide();
+  $("#pause-panel").hide();
 
   $("html").css({"cursor":"none"});
    //실습 iframe 업데이트
@@ -467,7 +480,8 @@ function bounceBall() {
 function gameOver() {
   stopMusic();
   gameOverMusic[0].play();
-  drawBall();  
+  drawBall();
+  $("#pan").css({"background-color":"red"});
 
   uDiedMsg = setTimeout(function() {
     $(".pop-up-massage").fadeIn(200);
