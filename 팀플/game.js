@@ -267,8 +267,8 @@ function init() {
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
-  paddleHeight = 10;
-  paddleWidth = 180;
+  paddleHeight = 20;
+  paddleWidth = 240;
   paddleX = (canvas.width - paddleWidth) / 2;
   rightPressed = false;
   leftPressed = false;
