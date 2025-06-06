@@ -21,6 +21,10 @@ let warningEffect = null;
 // 게임 오버
 let uDiedMsg;
 
+//설정에서 바꿀 수 있는 것들
+
+//공 이미지
+var ballImage = new Image();
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
@@ -123,6 +127,10 @@ $(window).ready(function() {
 
   $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
+
+  //변수 초기화
+  ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
+  //===============//
 
   $(this).on("mousemove", function(e) {
     paddleX = e.pageX;
@@ -794,13 +802,21 @@ function checkClear() {
 }
 
 function drawBall() {
+   ctx.save(); // 현재 상태 저장
+
   ctx.beginPath();
   ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "#26a6d8";
-  if (isGameOver) {
-    ctx.fillStyle = "red";
-  }
-  ctx.fill();
+  ctx.clip(); // 이후 그리는 건 원 내부로 제한됨
+
+  // 이미지 그리기 (중앙에 오도록 위치 조정)
+  ctx.drawImage(
+    ballImage,
+    ballX - ballRadius,
+    ballY - ballRadius,
+    ballRadius * 2,
+    ballRadius * 2
+  );
+  ctx.restore(); 
   ctx.closePath();
 }
 

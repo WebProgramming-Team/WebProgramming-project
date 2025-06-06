@@ -9,7 +9,7 @@ html{
 /*전체 body 속성 */
 body {
   width: 65vw;
-  height: 150vh;
+  height: 100vh;
   background: #222;
   display: block;
   margin: 0 auto;
@@ -17,21 +17,21 @@ body {
 
 
 /*메인 메뉴 전체*/
-#main-menu{
+#options-menu{
   margin: 0 auto;
   position: relative; 
   width: 100%;
-  height: 100%;
+  height: 220%;
   overflow: hidden;
   background-color: white;
 }
 
 
 /*맨 위의 백그라운드 이미지 들어가는 div 영역*/
-#main-menu-background-area{
+#options-menu-background-area{
   position: relative; 
   width: 100%;     
-  height:15%;   
+  height:10%;   
   overflow: hidden;
   margin: 0 auto 5% auto;
   background-color: blue;
@@ -39,7 +39,7 @@ body {
 }
 
 /*최상단 백그라운드 이미지 1*/
-#main-menu-background-area img{
+#options-menu-background-area img{
   width:1600px;
   height:900px;/*사진 기본 크기*/
 
@@ -51,16 +51,16 @@ body {
 }
 
 
-/*타이틀에 손 모양 이모지 들어가는 공간*/
-#main-menu-titleEmoji-area{
+/*타이틀에 설정 모양 이모지 들어가는 공간*/
+#options-menu-titleEmoji-area{
   position: absolute;
-  top:9% ;
+  top:7% ;
   left:10%;
   aspect-ratio: 1/1; /* 비율 설정 */
   width:10%;
 }
 
-#main-menu-titleEmoji-area p{
+#options-menu-titleEmoji-area p{
   position:relative;
   margin:auto;
   aspect-ratio: 1/1;
@@ -68,9 +68,9 @@ body {
   font-size:9rem; /*1rem : 10px */
 }
 
-/*제목(과제를 해보자!) 들어가는 공간*/
- #main-menu-title-area{
-  margin: 3% auto 2% 10%;
+/*타이틀 텍스트 들어가는 공간*/
+ #options-menu-title-area{
+  margin: 3% auto auto 10%;
   position: relative;
   display:inline-block;
   font-size:5rem; /*1rem : 10px */
@@ -78,51 +78,32 @@ body {
   height:6%;
  }
 
- #main-menu-title-area p{
+ #options-menu-title-area p{
   margin:auto;
   font-weight: bold;
 }
 
 /*콜아웃(게임 시작 버튼 들어가는 영역)에 해당하는 애들*/
 
-/* 첫 번쨰 콜아웃*/
-#main-menu-callout-area1{
-  margin:1% auto 1.5% 10%;;
-  position: relative;
+.callout-60{
+  margin:1% auto 1.5% 10%;
   font-size:1.8rem;
   width:80%;
-  height: 6rem; /* 대승적 결단 - rem 쓰기 */
+  height: 40rem; /* 대승적 결단 - rem 쓰기 */
   background-color: #F8F8F7;
- }
+}
 
-/* 콜아웃 텍스트 영역*/
-#main-menu-callout-area1 p{
-  display: block;
+ #options-menu-callout-area1{
+  margin:auto auto 1.5% 10%;
   position: relative;
-  left:3%;
-  height: 100%;
-  line-height: 6rem;
-  
-  white-space: nowrap;/*줄바꿈 없게*/
-
- }
-
-/* 두 번째 콜아웃*/
- #main-menu-callout-area2{
-  margin:2% auto 1.5% 10%;;
-  position: relative;
-  font-size:1.8rem;
-  width:80%;
-  height: 70rem; /* 대승적 결단 - rem 쓰기 */
-  background-color: #F8F8F7;
  }
 
  /*두번쨰 콜아웃 타이틀 텍스트 부분*/
-#callout-area2-titlearea{
+.callout-area1-titlearea{
   margin-top:1em;
   margin-bottom:0.5em;
 }
-#callout-area2-titlearea p{
+.callout-area1-titlearea p{
   margin:auto;
   display: block;
   position: relative;
@@ -133,7 +114,7 @@ body {
 }
 
 /*두 번째 콜아웃 게임 시작을 위한 버튼 텍스트 영역*/
-.callout-area2-subarea{
+.callout-area1-subarea{
   margin:0.5em auto 3.2em auto;
 }
 /*가장 큰 텍스트*/ 
