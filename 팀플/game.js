@@ -13,6 +13,9 @@ let v_s = v_s_fast;
 let difficulty; //이건 난이도를 정함
 let difficultyStr = ["easy", "normal", "hard"];
 
+// 테스트용 updateIframe에 css 쪽 보면 씀
+let testFlag = true;
+
 //점수 용 전역변수
 let score = 0;
 let scoreEffects = [];  // 여러 개 동시에 떠오르게 하기 위해 배열로
@@ -80,7 +83,7 @@ const destructibleElements = [
 ];
 
 let totalTitleNum = 1;
-let totalDivNum = 3; // 삭제할 div 개수
+let totalDivNum = 6; // 삭제할 div 개수
 
 // 벽돌 관련 전역 변수들
 let extraRow = 0;
@@ -275,6 +278,7 @@ function init() {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
     return;
   }
+  testFlag = true;
   divCount = 0;
   isGameOver = false;
   isPaused = false;
@@ -315,8 +319,8 @@ function init() {
     extraRow = 2;
     brickRowCount = 2;
   } else if (difficulty == 1) {
-    extraRow = 3;
-    brickRowCount = 3;
+    extraRow = 1;
+    brickRowCount = 1;
   } else {
     extraRow = 4;
     brickRowCount = 6;
@@ -461,6 +465,10 @@ function draw() {
   if (checkClear()) {
     isGameOver = true;
     clearInterval(intervalId);
+
+    testFlag = false;
+    updateIframe();
+
     stopMusic();
     toTheNext();
     return;
@@ -480,7 +488,7 @@ function toTheNext() {
 
   setTimeout(function() {
     init();
-  }, 10);
+  }, 3000);
 }
 
 // function bounceBall() {
@@ -884,7 +892,7 @@ function shuffleEmt(emts) {
 //아이프레임 영역을  업데이트
 
 function updateIframe() {
-  const htmlCode = `<header>
+  const htmlCodeN = `<header>
     <div id="title">
       Play with JS!
     </div>
@@ -1033,11 +1041,11 @@ function updateIframe() {
 </div>
 <footer>
   <p>Web programming, Spring 2025</p>
-  <p>Created by 202411235 강동훈</p>
+  <p>Created by 202412345 김아무개</p>
 </footer>`;
 
 //css 코드의 시작
-const cssCode=`*{margin: 0; padding: 0;}
+const cssCodeN=`*{margin: 0; padding: 0;}
 
 body {
   font-family:  "Winky Sans", sans-serif;
@@ -1168,7 +1176,7 @@ table {
 }`;   //css 코드의 끝
 
 //js 코드의 시작
-const jsCode=`console.log("JS 동작 중!")
+const jsCodeN=`console.log("JS 동작 중!")
 console.log("Hello from JS!");
 
 
@@ -1491,9 +1499,16 @@ console.log("Hello from JS!");
     }
 `;
 
+let htmlCode = htmlCodeN;
 
-const css = `<style>${cssCode}</style>`;
-const js = `<script>${jsCode}<\/script>`;
+let css;
+if (testFlag) {
+  css = `<style>${cssCodeN}</style>`;
+}
+else {
+  css = ""; 
+}
+let js = `<script>${jsCodeN}<\/script>`;
 
 const fullHTML = `
         <!DOCTYPE html>
