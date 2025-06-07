@@ -44,6 +44,10 @@ let warningEffect = null;
 // 게임 오버
 let uDiedMsg;
 
+// 기타
+let intervalId;
+let lastMouseX = -1;
+
 //설정에서 바꿀 수 있는 것들
 
 //공 이미지
@@ -183,62 +187,38 @@ const bombImage = new Image();
 bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 
-
-
 //브라우저 로딩시 실행.
 $(window).ready(function() {
+
+
+
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
   /*--------------*/ 
 
-  $("#game-wrapper").hide();
 
-
-  /*main-menu 버튼 - 함수 바인딩*/
-  $("#start-button").on("click", showLevelSelectionPage);
-  $("#options-button").on("click", showOptions);
-  $("#guitar-button").on("click", showGuitar);
-  /*--------------------------*/
-
-  /*게임 모드 선택 버튼*/
-  $("#easy-button").on("click", startEasyPage);
-  $("#normal-button").on("click", startNormalPage);
-  $("#hard-button").on("click", startHardPage);
-
-  $(".back-button").on("click", showMainMenu);
-
-  //난이도별 모드 설정 및 리셋
-  $("#easy-button").on("click", function () {
-    difficulty = 0;
-    init();
-  });
-
-  $("#normal-button").on("click", function () {
-    difficulty = 1;
-    init();
-  });
-
-  $("#hard-button").on("click", function () {
-    difficulty = 2;
-    init();
-  });
+  StartGameHome(); // 게임을 홈 화면으로 세팅함. 
 
   //변수 초기화
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
-  //시작 게임 화면 구성
-  $(".start-page").show();
 
   $(this).on("mousemove", function(e) {
-    paddleX = e.pageX;
+    if (lastMouseX == -1) {
+      lastMouseX = e.pageX;
+      return;
+    }
+    let mouseDx = (e.pageX - lastMouseX);
+    paddleX += mouseDx;
+
     if (paddleX >= canvas.width - paddleWidth) {
       paddleX = canvas.width - paddleWidth;
     }
     else if (paddleX <= 0) {
       paddleX = 0;
     }
-
+    lastMouseX = e.pageX;
   });
 
 
@@ -316,6 +296,36 @@ $(window).ready(function() {
   })
 });
 
+
+
+function StartGameHome(){
+  //게임을 홈으로 리셋함. 
+  //menu-page 전부 hide하고 start-page만 시작하는 함수임. 
+
+  //게임 화면 가리기
+ $("#game-wrapper").hide();
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
+ $("#start-button").on("click", showLevelSelectionPage);
+ $("#options-button").on("click", showOptions);
+ $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+  /*게임 모드 선택 버튼 바인딩*/
+ $("#easy-button").on("click", startEasyPage);
+ $("#normal-button").on("click", startNormalPage);
+ $("#hard-button").on("click", startHardPage);
+
+ $(".back-button").on("click", showMainMenu);
+
+  //start.page 켜지면서 시작
+  $(".menu-page").hide();//모든 메뉴 페이지 가리기
+  $(".start-page").show();//스타트 페이지 시작하기.
+}
+
+
+
 //이지 노말 하드 선택 부분
 function showLevelSelectionPage() {
   $("#main-menu").hide();
@@ -349,74 +359,60 @@ function showMainMenu() {
 }
 
 
+
+
+
 //Easy 시작
 function startEasyPage() {
   //$(#Game-start-stroy).show
   difficulty = 0;
   init();
-  initEasyGame();
 }
 
 function startNormalPage() {
   difficulty = 1;
   init();
-  initNormalGame();
 }
 
 function startHardPage() {
   difficulty = 2;
   init();
-  initHardGame();
 }
 
-function initEasyGame(){
-  //게임 초기화
-
-}
-function initNormalGame(){
-  //노멀 게임 초기화
-
-}
-function initHardGame(){
-  //하드 게임 초기화
-
-}
-
-function playGame(){
-  //init에서 초기화한 변수 가지고 게임 돌리도록 여기서 조정
-  //매번 checkGameClear, checkGameOver 확인해야 함
-}
 function checkGameClear(Mode){
   //Mode별 게임 클리어 조건 확인
 
-  // //만약 클리어했을 경우
-  // if(Mode == 0)
-  //   // $(".EasyClear-story").show
-  //   //initEasyGame
-  //   else if(Mode == 1)
-  //   // $(".NormalClear-story").show
-  //   //initHareGame()
-  //     else if(Mode == 2)
-  //   //하드 난이도일 때
-  //   //$(".GameClear-story").show
-  //       else{
-  //   //???? 넌 누구임
-  //       }
 
-  //     }
 
-    function checkGameOver(Mode){
+
+  //만약 클리어했을 경우
+  if(Mode == 0){}
+// $(".EasyClear-story").show
+    //initEasyGame
+    else if(Mode == 1){}
+    // $(".NormalClear-story").show
+    //initHareGame()
+      else if(Mode == 2){}
+    //하드 난이도일 때
+    //$(".GameClear-story").show
+        else{
+    //???? 넌 누구임
+        }
+
+      }
+
+      function checkGameOver(Mode){
 
   //Mode(난이도) 별 게임 클리어 조건 확인
 
 
       }
-
       function init() {
         if (!isGameOver) {
           console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
           return;
         }
+        clearInterval(intervalId);
         testFlag = true;
         divCount = 0;
         isGameOver = false;
@@ -455,6 +451,7 @@ function checkGameClear(Mode){
   ballY = canvas.height - 30;
   ballRadius = 10;
   dx = Math.floor(Math.random() * 16    - 8);
+  if (dx == 0) dx = 1;
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
@@ -494,6 +491,7 @@ intervalId = setInterval(() => {
     clearInterval(intervalId);
   }
 }, 5000);
+
 
 requestAnimationFrame(draw);
 }
@@ -1974,7 +1972,6 @@ case 2: {
   tempJs = jsCodeN;
 }
 }
-
 css = `<style>${tempCss}</style>`;
 js = `<script>${tempJs}<\/script>`;
 
