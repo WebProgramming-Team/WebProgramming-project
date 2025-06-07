@@ -44,6 +44,10 @@ let warningEffect = null;
 // 게임 오버
 let uDiedMsg;
 
+// 기타
+let intervalId;
+let lastMouseX = -1;
+
 //설정에서 바꿀 수 있는 것들
 
 //공 이미지
@@ -231,14 +235,20 @@ $(window).ready(function() {
   $(".start-page").show();
 
   $(this).on("mousemove", function(e) {
-    paddleX = e.pageX;
+    if (lastMouseX == -1) {
+      lastMouseX = e.pageX;
+      return;
+    }
+    let mouseDx = (e.pageX - lastMouseX);
+    paddleX += mouseDx;
+
     if (paddleX >= canvas.width - paddleWidth) {
       paddleX = canvas.width - paddleWidth;
     }
     else if (paddleX <= 0) {
       paddleX = 0;
     }
-
+    lastMouseX = e.pageX;
   });
 
 
@@ -354,52 +364,32 @@ function startEasyPage() {
   //$(#Game-start-stroy).show
   difficulty = 0;
   init();
-  initEasyGame();
 }
 
 function startNormalPage() {
   difficulty = 1;
   init();
-  initNormalGame();
 }
 
 function startHardPage() {
   difficulty = 2;
   init();
-  initHardGame();
 }
 
-function initEasyGame(){
-  //게임 초기화
-
-}
-function initNormalGame(){
-  //노멀 게임 초기화
-
-}
-function initHardGame(){
-  //하드 게임 초기화
-
-}
-
-function playGame(){
-  //init에서 초기화한 변수 가지고 게임 돌리도록 여기서 조정
-  //매번 checkGameClear, checkGameOver 확인해야 함
-}
-function checkGameClear(var Mode){
+function checkGameClear(Mode){
   //Mode별 게임 클리어 조건 확인
 
 
 
 
   //만약 클리어했을 경우
-  if(Mode == 0)
+  if(Mode == 0){}
 // $(".EasyClear-story").show
     //initEasyGame
-  else if(Mode == 1)
+  else if(Mode == 1){}
     // $(".NormalClear-story").show
     //initHareGame()
-  else if(Mode == 2)
+  else if(Mode == 2){}
     //하드 난이도일 때
     //$(".GameClear-story").show
   else{
@@ -408,7 +398,7 @@ function checkGameClear(var Mode){
 
 }
 
-function checkGameOver(var Mode){
+function checkGameOver(Mode){
 
   //Mode(난이도) 별 게임 클리어 조건 확인
 
@@ -419,6 +409,7 @@ function init() {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
     return;
   }
+  clearInterval(intervalId);
   testFlag = true;
   divCount = 0;
   isGameOver = false;
@@ -457,6 +448,7 @@ function init() {
   ballY = canvas.height - 30;
   ballRadius = 10;
   dx = Math.floor(Math.random() * 16    - 8);
+  if (dx == 0) dx = 1;
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
