@@ -7,6 +7,10 @@ html{
 
 /*전체 body 속성 */
 body {
+<<<<<<< HEAD
+=======
+  /*width: 65vw;*/
+>>>>>>> 1c7fd146c72103c71e5252e8f1d17bf87f5acc30
   width: 1640px;
 
   height: 150vx;
@@ -45,7 +49,7 @@ body {
 
 /*최상단 백그라운드 이미지 1*/
 #main-menu-background-area img{
-  width:1600px;
+  width:1640px;
   height:900px;/*사진 기본 크기*/
 
   position:absolute;
@@ -389,8 +393,15 @@ body {
 
 .volume-bar{
   width: 60%;
+<<<<<<< HEAD
   heigh:50%;
 }
+=======
+  height:50%; /*원래 heigh 였는데 오타인 것 같아 바꿔놈*/
+}
+
+ /*－－－－－－－*/
+>>>>>>> 1c7fd146c72103c71e5252e8f1d17bf87f5acc30
 
 
 /* 전체 좌우 분할 */
@@ -448,6 +459,7 @@ body {
 
 #ps {
   display: none;
+  width: 100%;
   height: 30%;
 
   background-color: aqua;
@@ -465,7 +477,7 @@ body {
   height: 900px;
   position: relative;
   background: #111;
-  border-left: 2px solid #ccc;
+  /*border-left: 2px solid #ccc;*/
 }
 
 #gameCanvas {
