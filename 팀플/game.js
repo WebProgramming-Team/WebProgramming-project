@@ -187,52 +187,22 @@ const bombImage = new Image();
 bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 
-
-
 //브라우저 로딩시 실행.
 $(window).ready(function() {
+
+
+
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
   /*--------------*/ 
 
-  $("#game-wrapper").hide();
 
-
-  /*main-menu 버튼 - 함수 바인딩*/
-  $("#start-button").on("click", showLevelSelectionPage);
-  $("#options-button").on("click", showOptions);
-  $("#guitar-button").on("click", showGuitar);
-  /*--------------------------*/
-
-  /*게임 모드 선택 버튼*/
-  $("#easy-button").on("click", startEasyPage);
-  $("#normal-button").on("click", startNormalPage);
-  $("#hard-button").on("click", startHardPage);
-
-  $(".back-button").on("click", showMainMenu);
-
-  //난이도별 모드 설정 및 리셋
-  $("#easy-button").on("click", function () {
-    difficulty = 0;
-    init();
-  });
-
-  $("#normal-button").on("click", function () {
-    difficulty = 1;
-    init();
-  });
-
-  $("#hard-button").on("click", function () {
-    difficulty = 2;
-    init();
-  });
+  StartGameHome(); // 게임을 홈 화면으로 세팅함. 
 
   //변수 초기화
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
-  //시작 게임 화면 구성
-  $(".start-page").show();
 
   $(this).on("mousemove", function(e) {
     if (lastMouseX == -1) {
@@ -357,6 +327,46 @@ function showMainMenu() {
   stopMusic();
   menuMusic.play();
 }
+
+function StartGameHome(){
+   $("#game-wrapper").hide();//가리기
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
+  $("#start-button").on("click", showLevelSelectionPage);
+  $("#options-button").on("click", showOptions);
+  $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+  /*게임 모드 선택 버튼*/
+  $("#easy-button").on("click", startEasyPage);
+  $("#normal-button").on("click", startNormalPage);
+  $("#hard-button").on("click", startHardPage);
+
+  $(".back-button").on("click", showMainMenu);
+
+  //난이도별 모드 설정 및 리셋
+  $("#easy-button").on("click", function () {
+    difficulty = 0;
+    init();
+  });
+
+  $("#normal-button").on("click", function () {
+    difficulty = 1;
+    init();
+  });
+
+  $("#hard-button").on("click", function () {
+    difficulty = 2;
+    init();
+  });
+
+  //start.page 켜지면서 시작
+  $(".menu-page").hide();//모든 메뉴 페이지 가리기
+  $(".start-page").show();//스타트 페이지 시작하기.
+}
+
+
 
 
 //Easy 시작
