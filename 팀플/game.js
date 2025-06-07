@@ -150,7 +150,7 @@ bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 // bricks 초기화 시 아래처럼
 let bricks = [];
-createNormalBricks();
+createBricks();
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
@@ -362,17 +362,20 @@ function init() {
   //난이도에 따른 벽돌 분기처리
   bricks = [];
   if (difficulty === 0) {
-    createEasyBricks();
+    extraRow = 2;
+    brickRowCount = 2;
   } 
 
   else if (difficulty === 1) {
-    createNormalBricks();
+    extraRow = 3;
+    brickRowCount = 3;
   } 
 
   else if (difficulty === 2) {
-    createHardBricks();
+    extraRow = 4;
+    brickRowCount = 4;
   }
-
+  createBricks();
 
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
@@ -400,12 +403,8 @@ function initShowHide() {
   updateIframe(); 
 }
 
-function createEasyBricks() {
-  // 쉬운 모드에 맞는 블록 구성(이시헌)
-}
-
 //벽돌 생성 함수(태그 대응까지)
-function createNormalBricks() {
+function createBricks() {
   const bombCount = 2;
   const bombPositions = [];
   hiddenRowNum = extraRow;
@@ -420,19 +419,7 @@ function createNormalBricks() {
     }
   }
 
-  let elements = [];
-  {
-    let newEmt = desEleNormal.find(element => element.selector === "#title");
-    elements.push(newEmt);
-  }
-  for (let i = 0; i < totalDivNum; i++) {
-    let newEmt = desEleNormal.find(element => element.selector === ".lab");
-    elements.push(newEmt);
-  }
-  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
-    let newEmt = desEleNormal.find(element => element.selector === "none");
-    elements.push(newEmt);
-  }
+  let elements = createElementsByDifficulty(difficulty);
 
   elements = shuffleEmt(elements);
   console.log(elements);
@@ -467,32 +454,51 @@ function createNormalBricks() {
   console.log(createBricksStr());
 }
 
-function createHardBricks() {
-  // 난이도 높음
-  // desEleHard 배열 활용
-  bricks = [];
-  let index = 0;
+function createElementsByDifficulty(level) {
+  let elements = [];
 
-  for (let c = 0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for (let r = 0; r < brickRowCount + extraRow; r++) {
-      const isBomb = Math.random() < 0.2; // 하드모드에서 확률적으로 폭탄 더 많게?
-      const element = desEleHard[index % desEleHard.length];
-
-      bricks[c][r] = {
-        x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-        y: r * (brickHeight + brickPadding) + brickOffsetTop,
-        status: 1,
-        isBomb: isBomb,
-        targetSelector: element?.selector,
-        tagLabel: "⚠️",
-        effect: element?.effect
-      };
-
-      index++;
-    }
+  if (level === 0) {
+    // Easy
+    elements = [ /* 초급 전용 요소들 */ ];
+  } else if (level === 1) {
+    elements = createNormalElements(); // 기존처럼 노말
+  } else if (level === 2) {
+    elements = createHardElements();   // 하드 요소들만 따로 준비
   }
 
+  return shuffleEmt(elements);
+}
+
+
+function createNormalElements() {
+  let elements = [];
+  let newEmt = desEleNormal.find(element => element.selector === "#title");
+  elements.push(newEmt);
+  for (let i = 0; i < totalDivNum; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === ".lab");
+    elements.push(newEmt);
+  }
+  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === "none");
+    elements.push(newEmt);
+  }
+
+  return elements;
+}
+
+function createHardElements() {
+  let elements = [];
+
+  // 하드모드에서는 전부 calculator 블록으로만 구성
+  const calculator = desEleHard.find(el => el.selector === ".lab.calculator");
+
+  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
+
+  for (let i = 0; i < totalBrickCount; i++) {
+    elements.push(calculator);
+  }
+
+  return elements;
 }
 
 
@@ -549,7 +555,7 @@ function draw() {
     stopMusic();
     toTheNext();
     return;
-  }
+  } 
 
   requestAnimationFrame(draw);
 }
@@ -567,56 +573,6 @@ function toTheNext() {
     init();
   }, 3000);
 }
-
-// function bounceBall() {
-//   //튕김 처리
-//   if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
-//   if (ballY + dy < ballRadius) dy = -dy;
-//   else if (ballY + dy > canvas.height - ballRadius) {
-//     const buffer = 10;
-
-//     if (ballX > paddleX - buffer && ballX < paddleX + paddleWidth + buffer) {
-//       // 충돌 효과!
-//       paddleHitEffect = 1.0;
-//       //랜덤 경로설정
-//       ran = Math.random() * 5 - 2.5;
-//       temp = dx;
-//       console.log("dx, ran: ", dx, ran);
-//       if (((dx + ran) < 3 && (dx + ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
-//         dx *= 3;
-//         console.log("dx *3: ", dx, ran);
-//       }
-//       else if (((dx + ran) > 9 || (dx + ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
-//         dx /= 3;
-//         console.log("dx /3: ", dx, ran);
-//       }
-//       let count = 0;
-//       while ((v_s - (dx + ran) * (dx + ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
-//         ran = Math.random() * 5 - 2.5;
-//         console.log("ran 다시: ", dx, ran);
-//         count++;
-//         if (count == 5) {
-//           dx = 0;
-//           console.log("무한루프로 dx재설정: ", dx, ran);
-//           break;
-//         }
-//       }
-//       dx += ran;
-//       if (temp * dx < 0) {
-//         dx = -dx;
-//         console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
-//       }
-//       dy = -Math.sqrt(v_s - dx * dx);
-//       console.log("최종 v: ", dx, dy, dx * dx + dy * dy);
-//     }
-
-//     else {
-//       isGameOver = true;
-//       gameOver();
-//       return;
-//     }
-//   }
-// }
 
 //개선판
 function bounceBall() {
@@ -809,18 +765,10 @@ if (!target) {
   return;
 }
 
-  // 효과에 따라 처리
-    // if (b.effect === "remove") {
-    //   target.remove();
-    //   console.log("lab 지워짐" + b.targetSelector);
-    // } else if (b.effect === "changeColor" && b.color) {
-    //  target.style.backgroundColor = b.color;
-    // }
 const handler = effectHandlers[b.effect];
 if (handler) {
     handler(target, b, iframeDoc); // 필요한 인자 전달
   }
-
 
 } //destroyBirkcs 끝
 
@@ -866,6 +814,8 @@ function drawScore() {
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
+
+  $("#scoreBoard").text("Score: "+score);
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
