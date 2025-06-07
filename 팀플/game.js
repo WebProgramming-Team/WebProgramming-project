@@ -389,26 +389,23 @@ function playGame(){
 function checkGameClear(Mode){
   //Mode별 게임 클리어 조건 확인
 
+  // //만약 클리어했을 경우
+  // if(Mode == 0)
+  //   // $(".EasyClear-story").show
+  //   //initEasyGame
+  //   else if(Mode == 1)
+  //   // $(".NormalClear-story").show
+  //   //initHareGame()
+  //     else if(Mode == 2)
+  //   //하드 난이도일 때
+  //   //$(".GameClear-story").show
+  //       else{
+  //   //???? 넌 누구임
+  //       }
 
+  //     }
 
-
-  //만약 클리어했을 경우
-  if(Mode == 0)
-// $(".EasyClear-story").show
-    //initEasyGame
-    else if(Mode == 1)
-    // $(".NormalClear-story").show
-    //initHareGame()
-      else if(Mode == 2)
-    //하드 난이도일 때
-    //$(".GameClear-story").show
-        else{
-    //???? 넌 누구임
-        }
-
-      }
-
-      function checkGameOver(Mode){
+    function checkGameOver(Mode){
 
   //Mode(난이도) 별 게임 클리어 조건 확인
 
