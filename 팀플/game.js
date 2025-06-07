@@ -12,7 +12,7 @@ const v_s_slow = 72;
 let v_s = v_s_fast;
 
 //기본 난이도 전역변수
-let currentMode = "easy";
+let difficulty = 0;
 
 //하드모드 시간제한 변수
 let hardModeTimer = null;
@@ -101,9 +101,7 @@ const bombImage = new Image();
 bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 
-// bricks 초기화 시 아래처럼
-let bricks = [];
-createBricks();
+
 
 //브라우저 로딩시 실행.
 $(window).ready(function() {
@@ -128,17 +126,17 @@ $(window).ready(function() {
 
   //난이도별 모드 설정 및 리셋
   $("#easy-button").on("click", function () {
-    currentMode = "easy";
+    difficulty = 0;
     init();
   });
 
   $("#normal-button").on("click", function () {
-    currentMode = "normal";
+    difficulty = 1;
     init();
   });
 
   $("#hard-button").on("click", function () {
-    currentMode = "hard";
+    difficulty = 2;
     init();
   });
 
@@ -281,7 +279,7 @@ function init() {
   bricks = [];
     createBricks(); // 난이도에 상관없이 일단 생성
 
-    if (currentMode === "hard") {
+    if (difficulty == 2) {
         startHardModeTimer(); // 하드 모드일 때만 타이머 시작
     }
 
@@ -367,22 +365,30 @@ function createBricks(addRow = false) {
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount + extraRow; r++) {
-      const isBomb = bombPositions.includes(`${c}-${r}`);
-      if(currentMode !== 'easy'){
-        let isSecure = (Math.random() < 0.2);
-      }
       let element = elements[eCount++];
+      const isBomb = bombPositions.includes(`${c}-${r}`);
+
+      let isSecure = false;
+      let secureState = false;
+      let hp = null;
+
+      if (difficulty != 0) {
+        isSecure = Math.random() < 0.2;
+        secureState = isSecure;
+        if (isSecure) hp = 3;
+      }
 
       bricks[c][r] = {
         x: c * (brickWidth + brickPadding) + brickOffsetLeft,
         y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
-        status: 1,
+        status: r < extraRow ? 0 : 1,
         isBomb: isBomb,
         targetSelector: element?.selector,
-        // tagLabel: element?.label,
         effect: element?.effect,
         color: element?.color,
-        secureState: (currentMode !== 'easy') ? true : false
+        isSecure: isSecure,
+        secureState: secureState,
+        hp: hp
       };
 
       if (r < extraRow) {
@@ -416,9 +422,6 @@ function toggleSecureBricks() {
   }
   drawBricks();
 }
-
-// 2초마다 토글 타이머 시작
-setInterval(toggleSecureBricks, 2000);
 
 function moveBricksDown() {
   if (isGameOver) {
@@ -506,6 +509,7 @@ function draw() {
   }
 
   requestAnimationFrame(draw);
+   drawSecureIndicator();
 }
 
 function bounceBall() {
@@ -603,17 +607,13 @@ function drawBricks() {
 
           if (b.isSecure) {
             ctx.save();
-            if (b.secureState) {
-            ctx.fillStyle = "rgba(255, 0, 0, 0.5)"; // 빨간색 반투명
-            } else {
-            ctx.fillStyle = "rgba(0, 0, 255, 0.5)"; // 파란색 반투명
-            }
+            ctx.fillStyle = b.secureState ? "rgba(255, 0, 0, 0.5)" : "rgba(0, 0, 255, 0.5)";
             ctx.fillRect(b.x, b.y, brickWidth, brickHeight);
             ctx.font = "16px Arial";
             ctx.fillStyle = "#fff";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(`🔒${b.hp}`, b.x + brickWidth / 2, b.y + brickHeight / 2);
+            ctx.fillText(`🔒${b.hp ?? '?'}`, b.x + brickWidth / 2, b.y + brickHeight / 2);
             ctx.restore();
           }
 
@@ -637,8 +637,10 @@ function destroyBrick(c, r) {
   }
 
   if (b.isSecure) {
+    if (typeof b.hp === "number") {
       b.hp--;
       if (b.hp > 0) return;
+    }
   }
 
   b.status = 0;
@@ -1448,13 +1450,22 @@ doc.write(fullHTML);
 doc.close();
 }
 
+let secureToggleInterval = null;
+
 function startHardModeTimer() {
   if (hardModeTimer) {
     clearInterval(hardModeTimer);
-    hardModeTimer = null;
   }
+  if (secureToggleInterval) {
+    clearInterval(secureToggleInterval);
+  }
+  secureToggleInterval = setInterval(() => {
+    if (!isPaused && !isGameOver && difficulty == 2) {
+      toggleSecureBricks();
+    }
+  }, 2000);
   if (timerDisplay) {
-        timerDisplay.remove(); // 기존 타이머 디스플레이가 있다면 제거
+        timerDisplay.remove();
         timerDisplay = null;
     }
 
@@ -1476,6 +1487,7 @@ function startHardModeTimer() {
     updateTimerDisplay();
     if (remainingTime <= 0) {
       clearInterval(hardModeTimer);
+      gameOverDueToTime();
       if (!isWordListBroken()) {
         gameOverDueToTime();
       }
@@ -1506,15 +1518,29 @@ function gameOverDueToTime() {
   $("#game-over-massage").text("시간 초과!").show();
   stopMusic();
   gameOverMusic[0].play();
+  drawBall();
+  $("#pan").css({"background-color":"red"});
+
+  uDiedMsg = setTimeout(function() {
+    $(".pop-up-massage").fadeIn(200);
+  }, 1000);
 }
 
-function createSecureBlock(x, y, width, height) {
-    return {
-        x: x,
-        y: y,
-        width: width,
-        height: height,
-        hp: 3,
-        isSecure: true
-    };
+// function createSecureBlock(x, y, width, height) {
+//     return {
+//         x: x,
+//         y: y,
+//         width: width,
+//         height: height,
+//         hp: 3,
+//         isSecure: true
+//     };
+// }
+
+function drawSecureIndicator() {
+  if (isSecure) {
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "yellow";
+    ctx.fillText("SECURE MODE", canvas.width - 150, 30);
+  }
 }
