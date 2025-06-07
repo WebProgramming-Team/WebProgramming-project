@@ -11,6 +11,14 @@ const v_s_fast = 128;
 const v_s_slow = 72;
 let v_s = v_s_fast;
 
+//기본 난이도 전역변수
+let currentMode = "easy";
+
+//하드모드 시간제한 변수
+let hardModeTimer = null;
+let timerDisplay = null;
+let remainingTime = 60;
+
 //점수 용 전역변수
 let score = 0;
 let scoreEffects = [];  // 여러 개 동시에 떠오르게 하기 위해 배열로
@@ -117,6 +125,22 @@ $(window).ready(function() {
 
   $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
+
+  //난이도별 모드 설정 및 리셋
+  $("#easy-button").on("click", function () {
+    currentMode = "easy";
+    init();
+  });
+
+  $("#normal-button").on("click", function () {
+    currentMode = "normal";
+    init();
+  });
+
+  $("#hard-button").on("click", function () {
+    currentMode = "hard";
+    init();
+  });
 
   $(this).on("mousemove", function(e) {
     paddleX = e.pageX;
@@ -242,7 +266,12 @@ function init() {
     return;
   }
   isGameOver = false;
+  remainingTime = 60;
   isPaused = false;
+  if (timerDisplay) {
+    timerDisplay.remove();
+    timerDisplay = null;
+  }
   $("#pan").css({"background-color":"transparent"});
 
   initShowHide();
@@ -250,7 +279,11 @@ function init() {
   ingameMusic[igIdx].play();
 
   bricks = [];
-  createBricks();
+    createBricks(); // 난이도에 상관없이 일단 생성
+
+    if (currentMode === "hard") {
+        startHardModeTimer(); // 하드 모드일 때만 타이머 시작
+    }
 
   let ballSpeed = $(".bs-label.selected .bs-radio").val();
   if (ballSpeed == "slow") {
@@ -335,6 +368,9 @@ function createBricks(addRow = false) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount + extraRow; r++) {
       const isBomb = bombPositions.includes(`${c}-${r}`);
+      if(currentMode !== 'easy'){
+        let isSecure = (Math.random() < 0.2);
+      }
       let element = elements[eCount++];
 
       bricks[c][r] = {
@@ -345,7 +381,8 @@ function createBricks(addRow = false) {
         targetSelector: element?.selector,
         // tagLabel: element?.label,
         effect: element?.effect,
-        color: element?.color
+        color: element?.color,
+        secureState: (currentMode !== 'easy') ? true : false
       };
 
       if (r < extraRow) {
@@ -359,6 +396,29 @@ function createBricks(addRow = false) {
   console.log(createBricksStr());
 }
 
+// 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
+function toggleSecureBricks() {
+  for (let c = 0; c < bricks.length; c++) {
+    for (let r = 0; r < bricks[c].length; r++) {
+      const brick = bricks[c][r];
+      if (brick && brick.isSecure) {
+        // secureState를 반전시켜 이미지/색 변경
+        brick.secureState = !brick.secureState;
+        if (brick.secureState) {
+          brick.color = 'red';
+        } else {
+          // 원래 색상 복원
+          const element = destructibleElements.find(e => e.selector === brick.targetSelector);
+          brick.color = element?.color || 'gray';
+        }
+      }
+    }
+  }
+  drawBricks();
+}
+
+// 2초마다 토글 타이머 시작
+setInterval(toggleSecureBricks, 2000);
 
 function moveBricksDown() {
   if (isGameOver) {
@@ -541,6 +601,22 @@ function drawBricks() {
             ctx.drawImage(img, b.x, b.y, brickWidth, brickHeight);
           }
 
+          if (b.isSecure) {
+            ctx.save();
+            if (b.secureState) {
+            ctx.fillStyle = "rgba(255, 0, 0, 0.5)"; // 빨간색 반투명
+            } else {
+            ctx.fillStyle = "rgba(0, 0, 255, 0.5)"; // 파란색 반투명
+            }
+            ctx.fillRect(b.x, b.y, brickWidth, brickHeight);
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`🔒${b.hp}`, b.x + brickWidth / 2, b.y + brickHeight / 2);
+            ctx.restore();
+          }
+
           if (b.tagLabel) {
             ctx.font = "12px Winky Sans, Arial";
             ctx.fillStyle = "#fff";
@@ -558,6 +634,11 @@ function destroyBrick(c, r) {
   if (b.status === 0) {
     console.log("b.status == 0 이므로 리턴");
     return;
+  }
+
+  if (b.isSecure) {
+      b.hp--;
+      if (b.hp > 0) return;
   }
 
   b.status = 0;
@@ -698,7 +779,6 @@ function drawScore() {
     warningEffect = null; // 효과 끝나면 제거
   }
 }
-
 }
 
 function checkClear() {
@@ -1366,4 +1446,75 @@ const doc = iframe.contentDocument || iframe.contentWindow.document;
 doc.open();
 doc.write(fullHTML);
 doc.close();
+}
+
+function startHardModeTimer() {
+  if (hardModeTimer) {
+    clearInterval(hardModeTimer);
+    hardModeTimer = null;
+  }
+  if (timerDisplay) {
+        timerDisplay.remove(); // 기존 타이머 디스플레이가 있다면 제거
+        timerDisplay = null;
+    }
+
+  timerDisplay = document.createElement("div");
+  timerDisplay.style.position = "absolute";
+  timerDisplay.style.top = "10px";
+  timerDisplay.style.right = "30px";
+  timerDisplay.style.color = "red";
+  timerDisplay.style.fontSize = "32px";
+  timerDisplay.style.fontFamily = "monospace";
+  timerDisplay.style.zIndex = "10";
+  document.getElementById("game-area").appendChild(timerDisplay);
+
+  updateTimerDisplay();
+
+  hardModeTimer = setInterval(() => {
+    if (isGameOver || isPaused) return;
+    remainingTime--;
+    updateTimerDisplay();
+    if (remainingTime <= 0) {
+      clearInterval(hardModeTimer);
+      if (!isWordListBroken()) {
+        gameOverDueToTime();
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(remainingTime / 60).toString().padStart(2, '0');
+  const sec = (remainingTime % 60).toString().padStart(2, '0');
+  timerDisplay.textContent = `⏱ ${min}:${sec}`;
+}
+
+function isWordListBroken() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount; r++) {
+      const b = bricks[c][r];
+      if (b.status === 1 && b.targetSelector === "#footer") return false;
+    }
+  }
+  return true;
+}
+
+function gameOverDueToTime() {
+  isGameOver = true;
+  $("#startBtn,#pauseBtn").hide();
+  $("#restartBtn, #ingame-to-menu-button").show();
+  $("#game-over-massage").text("시간 초과!").show();
+  stopMusic();
+  gameOverMusic[0].play();
+}
+
+function createSecureBlock(x, y, width, height) {
+    return {
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        hp: 3,
+        isSecure: true
+    };
 }
