@@ -497,15 +497,6 @@ canvas {
 }
 
 
-/* 모든 메뉴 페이지에 */
-/*.menu-page {
-  display: none;
-}*/
-
-#intro-page {
-  display: block;
-}
-
 /*이 아래, 설정의 공 속도 라디오 버튼 관련*/
 #bs-div {
   display: flex;

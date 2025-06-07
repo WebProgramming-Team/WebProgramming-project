@@ -197,13 +197,15 @@ $(window).ready(function() {
   ctx = canvas.getContext("2d");
   /*--------------*/ 
 
-
+  defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   StartGameHome(); // 게임을 홈 화면으로 세팅함. 
+  //변수 초기화 -> 나중에 defienGameVarDefault 쪽으로 넘겨줄거. 
 
-  //변수 초기화
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
 
+
+  //아래는 함수 바인딩
   $(this).on("mousemove", function(e) {
     if (lastMouseX == -1) {
       lastMouseX = e.pageX;
@@ -222,25 +224,29 @@ $(window).ready(function() {
   });
 
 
-  $(".bs-radio").on("change", function() {
-    $(".bs-label").removeClass("selected");
+//option 쪽으로 넘겨줄 것들
+  // $(".bs-radio").on("change", function() {
+  //   $(".bs-label").removeClass("selected");
 
-    $(this).parent(".bs-label").addClass("selected");
-  });
+  //   $(this).parent(".bs-label").addClass("selected");
+  // });
 
-  $(".volume-bar").on("input", function() {
-    let vol = $(this).val();
+  // $(".volume-bar").on("input", function() {
+  //   let vol = $(this).val();
 
-    $(".volume-bar").val(vol);
-    $(".volume").html(vol);
+  //   $(".volume-bar").val(vol);
+  //   $(".volume").html(vol);
 
-    setVolume(vol);
-  });
+  //   setVolume(vol);
+  // });
 
-  $("#music-select").on("input", function() {
-    igIdx = $(this).val();
-  });
+  // $("#music-select").on("input", function() {
+  //   igIdx = $(this).val();
+  // });
 
+
+
+//기본 키 바인딩
   $(document).on("keydown", function(e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
@@ -279,6 +285,40 @@ $(window).ready(function() {
     }
   });
 
+  //기본 변수 로딩
+});
+
+///===========================================
+//여기부터 ~번까지는 전부 메인 화면 관련)
+function allHide(){
+  //전부 다 hide하는 함수
+    $(".menu-page").hide();//메뉴 페이지 hide
+    $("#game-wrapper").hide();//game hide
+}
+
+//홈 화면 시작
+function StartGameHome(){
+  //게임을 홈으로 리셋함. 
+
+  allHide();//전부 다 리셋
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
+  $("#start-button").on("click", showLevelSelectionPage);
+  //레벨 선택 쪽으로 이동하게 만듬.
+  $("#options-button").on("click", showOptions);
+  $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+  $(".back-button").on("click", showMainMenu);
+
+  $(".start-page").show();//스타트 페이지 시작하기.
+}
+
+//홈 화면 관련 변수 초기화 부분
+function defineGameVarDefault(){
+  //음악 초기화(기본)
+  //볼 초기화(기본)
   brickImage.onload = () => {
     console.log("벽돌 이미지 로드 완료");
   };
@@ -294,48 +334,26 @@ $(window).ready(function() {
   $("#menu-music-button, #intro-to-main").on("click", function() {
     menuMusic.play();
   })
-});
 
 
+}
 
-function StartGameHome(){
-  //게임을 홈으로 리셋함. 
-  //menu-page 전부 hide하고 start-page만 시작하는 함수임. 
-
-  //게임 화면 가리기
-   $("#game-wrapper").hide();
-
-
-  /*main-menu 버튼 - 함수 바인딩*/
-  $("#start-button").on("click", showLevelSelectionPage);
-  $("#options-button").on("click", showOptions);
-  $("#guitar-button").on("click", showGuitar);
-  /*--------------------------*/
-
-  /*게임 모드 선택 버튼 바인딩*/
+//레벨 선택 부분 시작
+function showLevelSelectionPage() {
+  allHide();
+  //바인딩 과정
   $("#easy-button").on("click", startEasyPage);
   $("#normal-button").on("click", startNormalPage);
   $("#hard-button").on("click", startHardPage);
-
-  $(".back-button").on("click", showMainMenu);
-
-  //start.page 켜지면서 시작
-  $(".menu-page").hide();//모든 메뉴 페이지 가리기
-  $(".start-page").show();//스타트 페이지 시작하기.
-}
-
-
-
-//이지 노말 하드 선택 부분
-function showLevelSelectionPage() {
-  $("#main-menu").hide();
-  $("#level-selection").show();
-  $("#game-wrapper").hide();
+  $(".level-selction-page").show(); 
 }
 
 function showOptions() {
-  $(".menu-page").hide();
-  $("#options-menu").show();
+  allHide();
+  $(".option-page").show();
+  //옵션 관련 추가 
+
+
 }
 
 function showGuitar() {
@@ -344,23 +362,32 @@ function showGuitar() {
 }
 
 function showMainMenu() {
-  $(".menu-page").hide();
-
-  $("#main-menu").show();
-
-  $("#game-wrapper").hide();
+  //???
   $("#ps").hide();
   $("html").css({"cursor":"default"});
 
-  isGameOver = true;
+  isGameOver = true; // 게임 오버 다시 true로 만들고
   isPaused = false;
   stopMusic();
   menuMusic.play();
+  StartGameHome();
 }
 
 
 
+//옵션 관련 함수들 
 
+function selectBackground(){
+  //추가
+}
+function selectBall(){
+  //추가
+}
+
+function selectMusic(){
+
+  //추가
+}
 
 //Easy 시작
 function startEasyPage() {
