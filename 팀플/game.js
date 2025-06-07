@@ -121,7 +121,13 @@ const desEleNormal = [
   { selector: "none"},
 ];
 
-const desEleHard=[{ selector: ".lab.calculator", effect: "breakCalculator" }];
+const desEleHard = [
+  { selector: ".lab.calculator", effect: "breakCalculator" },
+  { selector: ".lab.gugudan", effect: "breakGugudan" },
+  { selector: ".lab.numGame", effect: "breakNumGame" },
+  { selector: ".lab.wordBook", effect: "breakWordBook" }
+];
+
 
 //이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
 const effectHandlers = {
@@ -155,6 +161,56 @@ const effectHandlers = {
 
     showLabEffect(x, y);
   },
+
+  breakGugudan: (target, b, iframeDoc) => {
+  const tables = target.querySelectorAll("table");
+  tables.forEach(table => {
+    table.innerHTML = "<tr><td style='color:red;'>ERROR: 구구단이 파괴됨</td></tr>";
+    table.style.backgroundColor = "black";
+  });
+
+  // 연기 효과 추가
+  const rect = target.getBoundingClientRect();
+  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+  const x = rect.left - iframeRect.left + rect.width / 2;
+  const y = rect.top - iframeRect.top + rect.height / 2;
+  showLabEffect(x, y);
+  },
+
+  breakNumGame: (target, b, iframeDoc) => {
+  const guessBtn = iframeDoc.getElementById("numGuess");
+  const input = iframeDoc.getElementById("user");
+  if (guessBtn) {
+    guessBtn.disabled = true;
+    guessBtn.value = "망가짐 😵";
+  }
+  if (input) {
+    input.value = "추측 불가!";
+  }
+
+  const rect = target.getBoundingClientRect();
+  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+  const x = rect.left - iframeRect.left + rect.width / 2;
+  const y = rect.top - iframeRect.top + rect.height / 2;
+  showLabEffect(x, y);
+},
+
+breakWordBook: (target, b, iframeDoc) => {
+  const buttons = target.querySelectorAll("button");
+  buttons.forEach(btn => btn.disabled = true);
+
+  const list = iframeDoc.getElementById("wordList");
+  if (list) {
+    list.innerText = "🔥 단어장 손상됨!";
+    list.style.color = "red";
+  }
+
+  const rect = target.getBoundingClientRect();
+  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+  const x = rect.left - iframeRect.left + rect.width / 2;
+  const y = rect.top - iframeRect.top + rect.height / 2;
+  showLabEffect(x, y);
+}
   // 앞으로 추가할 것들 계속 여기 정의
   // "breakWordList": (target, b, iframeDoc) => {...}
 };
@@ -170,6 +226,9 @@ const allEffectHandlers = {
   },
   2: { // Hard
     breakCalculator: effectHandlers.breakCalculator,
+    breakGugudan: effectHandlers.breakGugudan,
+    breakNumGame: effectHandlers.breakNumGame,
+    breakWordBook: effectHandlers.breakWordBook,
     remove: effectHandlers.remove  // 하드에서도 remove 가능
   }
 };
@@ -661,18 +720,23 @@ function createNormalElements() {
 }
 
 function createHardElements() {
-  let elements = [];
-
-  // 하드모드에서는 전부 calculator 블록으로만 구성
-  const calculator = desEleHard.find(el => el.selector === ".lab.calculator");
-
   const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
+  const hardTargets = [
+    desEleHard.find(el => el.selector === ".lab.calculator"),
+    desEleHard.find(el => el.selector === ".lab.gugudan"),
+    desEleHard.find(el => el.selector === ".lab.numGame"),
+    desEleHard.find(el => el.selector === ".lab.wordBook")
+  ].filter(Boolean); // null 제거
 
-  for (let i = 0; i < totalBrickCount; i++) {
-    elements.push(calculator);
+  const elements = [];
+
+  // 골고루 섞이도록 반복
+  while (elements.length < totalBrickCount) {
+    elements.push(...hardTargets);
   }
 
-  return elements;
+  // 개수 맞게 자르기
+  return shuffleEmt(elements.slice(0, totalBrickCount));
 }
 
 function moveBricksDown() {
