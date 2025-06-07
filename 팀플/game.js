@@ -152,65 +152,66 @@ const effectHandlers = {
     `;
     iframeDoc.body.appendChild(script);
 
-    // ====== 연기 효과 표시 ======
-    const rect = target.getBoundingClientRect();
-    const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
-
-    const x = rect.left - iframeRect.left + rect.width / 2;
-    const y = rect.top - iframeRect.top + rect.height / 2;
-
-    showLabEffect(x, y);
+    // 이펙트 한 줄로
+    shakeIframe();
+    blackout();
+    showHackingProgress();
+    scrollToTarget(target);
+    fadeOutElement(target, 10000);
+    triggerLabEffectOnTarget(target);
   },
 
   breakGugudan: (target, b, iframeDoc) => {
-  const tables = target.querySelectorAll("table");
-  tables.forEach(table => {
-    table.innerHTML = "<tr><td style='color:red;'>ERROR: 구구단이 파괴됨</td></tr>";
-    table.style.backgroundColor = "black";
-  });
+    const tables = target.querySelectorAll("table");
+    tables.forEach(table => {
+      table.innerHTML = "<tr><td style='color:red;'>ERROR: 구구단이 파괴됨</td></tr>";
+      table.style.backgroundColor = "black";
+    });
 
-  // 연기 효과 추가
-  const rect = target.getBoundingClientRect();
-  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
-  const x = rect.left - iframeRect.left + rect.width / 2;
-  const y = rect.top - iframeRect.top + rect.height / 2;
-  showLabEffect(x, y);
+    shakeIframe();
+    blackout();
+    showHackingProgress();
+    scrollToTarget(target);
+    fadeOutElement(target, 10000);
+    triggerLabEffectOnTarget(target);
   },
 
   breakNumGame: (target, b, iframeDoc) => {
-  const guessBtn = iframeDoc.getElementById("numGuess");
-  const input = iframeDoc.getElementById("user");
-  if (guessBtn) {
-    guessBtn.disabled = true;
-    guessBtn.value = "망가짐 😵";
+    const guessBtn = iframeDoc.getElementById("numGuess");
+    const input = iframeDoc.getElementById("user");
+    if (guessBtn) {
+      guessBtn.disabled = true;
+      guessBtn.value = "망가짐 😵";
+    }
+    if (input) {
+      input.value = "추측 불가!";
+    }
+
+    shakeIframe();
+    blackout();
+    showHackingProgress();
+    scrollToTarget(target);
+    fadeOutElement(target, 10000);
+    triggerLabEffectOnTarget(target);
+  },
+
+  breakWordBook: (target, b, iframeDoc) => {
+    const buttons = target.querySelectorAll("button");
+    buttons.forEach(btn => btn.disabled = true);
+
+    const list = iframeDoc.getElementById("wordList");
+    if (list) {
+      list.innerText = "🔥 단어장 손상됨!";
+      list.style.color = "red";
+    }
+
+    shakeIframe();
+    blackout();
+    showHackingProgress();
+    scrollToTarget(target);
+    fadeOutElement(target, 10000);
+    triggerLabEffectOnTarget(target);
   }
-  if (input) {
-    input.value = "추측 불가!";
-  }
-
-  const rect = target.getBoundingClientRect();
-  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
-  const x = rect.left - iframeRect.left + rect.width / 2;
-  const y = rect.top - iframeRect.top + rect.height / 2;
-  showLabEffect(x, y);
-},
-
-breakWordBook: (target, b, iframeDoc) => {
-  const buttons = target.querySelectorAll("button");
-  buttons.forEach(btn => btn.disabled = true);
-
-  const list = iframeDoc.getElementById("wordList");
-  if (list) {
-    list.innerText = "🔥 단어장 손상됨!";
-    list.style.color = "red";
-  }
-
-  const rect = target.getBoundingClientRect();
-  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
-  const x = rect.left - iframeRect.left + rect.width / 2;
-  const y = rect.top - iframeRect.top + rect.height / 2;
-  showLabEffect(x, y);
-}
   // 앞으로 추가할 것들 계속 여기 정의
   // "breakWordList": (target, b, iframeDoc) => {...}
 };
@@ -561,21 +562,21 @@ function configureDifficultySettings(mode) {
   //init 규칙
   //블럭 개수 관련 설정 -> 
   switch (mode) {
-    case 0:
+  case 0:
       //블럭 설정
-      extraRow = 1;
-      brickRowCount = 1;
-      break;
-    case 1:
-      extraRow = 3;
-      brickRowCount = 3;
-      break;
-    case 2:
-      extraRow = 4;
-      brickRowCount = 4;
-      break;
-    default:
-      console.warn("정의되지 않은 난이도:", mode);
+    extraRow = 1;
+    brickRowCount = 1;
+    break;
+  case 1:
+    extraRow = 3;
+    brickRowCount = 3;
+    break;
+  case 2:
+    extraRow = 4;
+    brickRowCount = 4;
+    break;
+  default:
+    console.warn("정의되지 않은 난이도:", mode);
   }
 }
 
@@ -767,86 +768,86 @@ function startBrickMoveTimer(difficulty) {
     case 1: intervalTime = 5000; break; // Normal
     case 2: intervalTime = 4000; break; // Hard
     default: intervalTime = 5000;
-  }
-
-  intervalId = setInterval(() => {
-    if (!isPaused && !isGameOver) {
-      moveBricksDown();
     }
 
-    if (hiddenRowNum <= 0) {
-      clearInterval(intervalId);
-    }
-  }, intervalTime);
-}
+    intervalId = setInterval(() => {
+      if (!isPaused && !isGameOver) {
+        moveBricksDown();
+      }
 
-
-function draw() {
-  console.log("draw() 실행");
-  if (isGameOver || isPaused) {
-    return;
+      if (hiddenRowNum <= 0) {
+        clearInterval(intervalId);
+      }
+    }, intervalTime);
   }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawBricks();
-  drawBall();
-  drawPaddle();
-  drawScore();
-  collisionDetection();
-  bounceBall();
+  function draw() {
+    console.log("draw() 실행");
+    if (isGameOver || isPaused) {
+      return;
+    }
 
-  ballX += dx;
-  ballY += dy;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 12;
-  else if (leftPressed && paddleX > 0) paddleX -= 12;
+    drawBricks();
+    drawBall();
+    drawPaddle();
+    drawScore();
+    collisionDetection();
+    bounceBall();
 
-  if (checkClear()) {
-    isGameOver = true;
+    ballX += dx;
+    ballY += dy;
+
+    if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 12;
+    else if (leftPressed && paddleX > 0) paddleX -= 12;
+
+    if (checkClear()) {
+      isGameOver = true;
     // clearInterval(intervalId);
 
-    testFlag = false;
-    updateIframe();
-    stopMusic();
-    toTheNext();
-    return;
-  } 
+      testFlag = false;
+      updateIframe();
+      stopMusic();
+      toTheNext();
+      return;
+    } 
 
-  requestAnimationFrame(draw);
-}
-
-function toTheNext() {
-  difficulty += 1;
-
-  if (difficulty > 2) {
-    isGameOver = true;
-    showMainMenu();
-    return;
+    requestAnimationFrame(draw);
   }
-  clearInterval(intervalId);
 
-  setTimeout(function() {
-    init();
-  }, 3000);
-}
+  function toTheNext() {
+    difficulty += 1;
+
+    if (difficulty > 2) {
+      isGameOver = true;
+      showMainMenu();
+      return;
+    }
+    clearInterval(intervalId);
+
+    setTimeout(function() {
+      init();
+    }, 3000);
+  }
 
 //개선판
-function bounceBall() {
+  function bounceBall() {
   //  1. 좌우 벽에 부딪히면 반사
-  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
-    dx = -dx;
-  }
+    if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+      dx = -dx;
+    }
 
   //  2. 위쪽 벽에 부딪히면 반사
-  if (ballY + dy < ballRadius) {
-    dy = -dy;
-  }
+    if (ballY + dy < ballRadius) {
+      dy = -dy;
+    }
 
   //  3. 아래쪽 - 패들과 충돌 체크
-  else if (ballY + dy > canvas.height - ballRadius) {
-    const paddleTop = canvas.height - paddleHeight;
-    const paddleBottom = canvas.height;
+    else if (ballY + dy > canvas.height - ballRadius) {
+      const paddleTop = canvas.height - paddleHeight;
+      const paddleBottom = canvas.height;
     const buffer = 10; // 약간 여유를 줌
 
     const hitTopSurface =
@@ -1071,10 +1072,10 @@ function triggerBombChain(c, r) {
     if (
       nc >= 0 && nc < brickColumnCount &&
       nr >= 0 && nr < bricks[nc]?.length
-    ) {
+      ) {
       destroyBrick(nc, nr);
-    }
   }
+}
 }
 
 
@@ -2187,3 +2188,89 @@ function gameOverDueToTime() {
     $(".pop-up-massage").fadeIn(200);
   }, 1000);
 }
+
+/*이 아래는 특수효과들*/
+//흔들림 효과
+function shakeIframe(duration = 500) {
+  const iframe = document.getElementById("labFrame");
+  iframe.style.transition = "transform 0.1s";
+  let count = 0;
+
+  const interval = setInterval(() => {
+    const x = Math.random() * 10 - 5;
+    const y = Math.random() * 10 - 5;
+    iframe.style.transform = `translate(${x}px, ${y}px)`;
+
+    count += 1;
+    if (count > 5) {
+      clearInterval(interval);
+      iframe.style.transform = "none";
+    }
+  }, 50);
+}
+//암전 효과
+function blackout(duration = 800) {
+  const blackoutDiv = document.createElement("div");
+  blackoutDiv.style.position = "absolute";
+  blackoutDiv.style.top = 0;
+  blackoutDiv.style.left = 0;
+  blackoutDiv.style.width = "100%";
+  blackoutDiv.style.height = "100%";
+  blackoutDiv.style.backgroundColor = "black";
+  blackoutDiv.style.opacity = 0;
+  blackoutDiv.style.zIndex = 999;
+  blackoutDiv.style.transition = "opacity 0.3s";
+  document.body.appendChild(blackoutDiv);
+
+  requestAnimationFrame(() => {
+    blackoutDiv.style.opacity = 0.8;
+  });
+
+  setTimeout(() => {
+    blackoutDiv.style.opacity = 0;
+    setTimeout(() => blackoutDiv.remove(), 300);
+  }, duration);
+}
+
+//"해킹 게이지" 같은 UI 요소
+function showHackingProgress() {
+  const bar = document.getElementById("hackingBar");
+  const fill = document.getElementById("hackingFill");
+  bar.style.display = "block";
+  fill.style.width = "0%";
+
+  let percent = 0;
+  const interval = setInterval(() => {
+    percent += 5;
+    fill.style.width = `${percent}%`;
+    if (percent >= 100) {
+      clearInterval(interval);
+      setTimeout(() => {
+        bar.style.display = "none";
+      }, 500);
+    }
+  }, 100);
+}
+//타겟 태그 자동 스크롤로 이동
+function scrollToTarget(target) {
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+//10초 후 태그 천천히 사라짐
+function fadeOutElement(target, delay = 10000) {
+  setTimeout(() => {
+    target.style.transition = "opacity 1.5s";
+    target.style.opacity = 0;
+    setTimeout(() => target.remove(), 1500);
+  }, delay);
+}
+
+//부숴지고 번쩍효과
+function triggerLabEffectOnTarget(target) {
+  const rect = target.getBoundingClientRect();
+  const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+  const x = rect.left - iframeRect.left + rect.width / 2;
+  const y = rect.top - iframeRect.top + rect.height / 2;
+  showLabEffect(x, y);
+}
+

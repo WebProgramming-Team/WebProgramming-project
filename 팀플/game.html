@@ -194,32 +194,38 @@
       <p id = "scoreBoard"></p>
       <p>'P' 또는 'E': 일시정지/재개</p>
       <p>'R': 다시하기, 'Q': 메인메뉴로</p>
+      <div id="hackingBar" style="
+      position: absolute; top: 20px; right: 20px;
+      width: 150px; height: 10px;
+      background: gray; overflow: hidden; display: none; z-index: 999;">
+      <div id="hackingFill" style="width: 0; height: 100%; background: lime;"></div>
     </div>
   </div>
+</div>
 
-  <div id="game-area">
-    <!-- 벽돌깨기 게임 영역 -->
-    <canvas id="gameCanvas" width="850" height="900"></canvas>  
-    <!-- 게임 오버 메시지 -->
-  </div>
+<div id="game-area">
+  <!-- 벽돌깨기 게임 영역 -->
+  <canvas id="gameCanvas" width="850" height="900"></canvas>  
+  <!-- 게임 오버 메시지 -->
+</div>
 
-  <div id = "game-over-massage" class = "pop-up-massage">
-    Game Over!
-  </div>
-  <div id = "game-over-subtitle" class = "pop-up-massage">
-    'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
-  </div>
-  <!-- 일시정지 메뉴 -->
-  <div id = "pause-panel">
-    'R'을 눌러 다시하기<br>
-    'Q'를 눌러 메인메뉴로<br>
-    <label>볼륨 설정: </label>
-    <input type = "range" min = "0" max = "100" class = "volume-bar">
-    <div class = "volume">50</div>
-  </div>
-  <!-- 스테이지 클리어 후 클리어 메시지 메뉴 -->
-  <div id = "clear-panel">
-  </div>
+<div id = "game-over-massage" class = "pop-up-massage">
+  Game Over!
+</div>
+<div id = "game-over-subtitle" class = "pop-up-massage">
+  'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
+</div>
+<!-- 일시정지 메뉴 -->
+<div id = "pause-panel">
+  'R'을 눌러 다시하기<br>
+  'Q'를 눌러 메인메뉴로<br>
+  <label>볼륨 설정: </label>
+  <input type = "range" min = "0" max = "100" class = "volume-bar">
+  <div class = "volume">50</div>
+</div>
+<!-- 스테이지 클리어 후 클리어 메시지 메뉴 -->
+<div id = "clear-panel">
+</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
