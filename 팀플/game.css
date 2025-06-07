@@ -7,10 +7,10 @@ html{
 
 /*전체 body 속성 */
 body {
-  width: 65vw;
+  width: 1640px;
 
-  height: 150vh;
-  background: #222;
+  height: 150vx;
+  background: white;
   display: block;
   margin: 0 auto;
   overflow-x: hidden;
@@ -390,9 +390,7 @@ body {
 .volume-bar{
   width: 60%;
   heigh:50%;
- }
-
- /*－－－－－－－*/ }
+}
 
 
 /* 전체 좌우 분할 */

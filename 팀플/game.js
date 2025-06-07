@@ -17,7 +17,7 @@ let difficultyStr = ["easy", "normal", "hard"];
 let testFlag = true;
 
 //기본 난이도 전역변수
-let difficulty = 0;
+//let difficulty = 0;
 
 //하드모드 시간제한 변수
 let hardModeTimer = null;
@@ -84,6 +84,16 @@ let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 //벽돌에 대응되는 태그들
 //벽돌위에 글씨를 넣고싶다면 label: "원하는 메세지"  이렇게 추가하세요
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
+const desEleEasy = [
+  {selector: "#header", effect: "remove"},
+  {selector: "main-aside", effect: "remove"},
+  {selector: "footer", effect: "remove"},
+  {selector: "article-title", effect: ""},
+  {selector: "article-date", effect: ""},
+  {selector: "article-header", effect: ""},
+  {selector: "article-body", effect: ""}
+];
+
 const desEleNormal = [
   { selector: "#title", effect: "remove" },
   { selector: ".lab", effect: "remove", name: "div"},
@@ -481,14 +491,10 @@ function createBricks() {
         isBomb: isBomb,
         targetSelector: element?.selector,
         effect: element?.effect,
-<<<<<<< HEAD
         color: element?.color,
         isSecure: isSecure,
         secureState: secureState,
         hp: hp
-=======
-        // color: element?.color
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
       };
 
       if (r < extraRow) {
@@ -502,7 +508,6 @@ function createBricks() {
   console.log(createBricksStr());
 }
 
-<<<<<<< HEAD
 // 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
 function toggleSecureBricks() {
   for (let c = 0; c < bricks.length; c++) {
@@ -513,23 +518,18 @@ function toggleSecureBricks() {
         brick.secureState = !brick.secureState;
         if (brick.secureState) {
           brick.color = 'red';
-        } else {
-          // 원래 색상 복원
-          const element = destructibleElements.find(e => e.selector === brick.targetSelector);
-          brick.color = element?.color || 'gray';
         }
       }
     }
   }
   drawBricks();
 }
-=======
+
 function createElementsByDifficulty(level) {
   let elements = [];
 
   if (level === 0) {
-    // Easy
-    elements = [ /* 초급 전용 요소들 */ ];
+    elements = createEasyElements();
   } else if (level === 1) {
     elements = createNormalElements(); // 기존처럼 노말
   } else if (level === 2) {
@@ -539,6 +539,13 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
+function createEasyElements() {
+  let elements = [];
+  let newEmt = desEleEasy.find(element => element.selector === "#header");
+  elements.push(newEmt);
+
+  return elements;
+}
 
 function createNormalElements() {
   let elements = [];
@@ -570,8 +577,6 @@ function createHardElements() {
 
   return elements;
 }
-
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
 
 function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
@@ -629,7 +634,6 @@ function draw() {
   } 
 
   requestAnimationFrame(draw);
-   drawSecureIndicator();
 }
 
 
@@ -1747,23 +1751,4 @@ function gameOverDueToTime() {
   uDiedMsg = setTimeout(function() {
     $(".pop-up-massage").fadeIn(200);
   }, 1000);
-}
-
-// function createSecureBlock(x, y, width, height) {
-//     return {
-//         x: x,
-//         y: y,
-//         width: width,
-//         height: height,
-//         hp: 3,
-//         isSecure: true
-//     };
-// }
-
-function drawSecureIndicator() {
-  if (isSecure) {
-    ctx.font = "20px Arial";
-    ctx.fillStyle = "yellow";
-    ctx.fillText("SECURE MODE", canvas.width - 150, 30);
-  }
 }
