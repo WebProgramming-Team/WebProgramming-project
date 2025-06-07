@@ -83,12 +83,11 @@ let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
 const desEleEasy = [
   {selector: "#header", effect: "remove"},
-  {selector: "main-aside", effect: "remove"},
-  {selector: "footer", effect: "remove"},
-  {selector: "article-title", effect: ""},
-  {selector: "article-date", effect: ""},
-  {selector: "article-header", effect: ""},
-  {selector: "article-body", effect: ""}
+  {selector: ".pull-left", effect: "remove"},
+  {selector: ".pull-right", effect: "remove"},
+  {selector: ".article-header", effect: "remove"},
+  {selector: "#main-aside", effect: "remove"},
+  {selector: "#footer", effect: "remove"}
 ];
 
 const desEleNormal = [
@@ -559,8 +558,20 @@ function createElementsByDifficulty(level) {
 
 function createEasyElements() {
   let elements = [];
-  let newEmt = desEleEasy.find(element => element.selector === "#header");
-  elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === "#header");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
+  // elements.push(newEmt);
+  // for (let i = 0; i < 2; i++) {
+  //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
+  //   elements.push(newEmt);
+  // }
+  // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === "#footer");
+  // elements.push(newEmt);
 
   return elements;
 }
