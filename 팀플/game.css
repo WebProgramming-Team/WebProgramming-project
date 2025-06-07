@@ -389,11 +389,8 @@ body {
 
 .volume-bar{
   width: 60%;
-  height: 50%;
+  height:50%;
 }
-
- /*－－－－－－－*/
-
 
 
 /* 전체 좌우 분할 */
@@ -501,9 +498,9 @@ canvas {
 
 
 /* 모든 메뉴 페이지에 */
-.menu-page {
+/*.menu-page {
   display: none;
-}
+}*/
 
 #intro-page {
   display: block;
