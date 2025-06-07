@@ -115,11 +115,6 @@ const desEleEasy = [
   {selector: "#footer", effect: "remove"}
 ];
 
-
-//name, countFunction, effect
-// -> 
-
-// 
 const desEleNormal = [
   { selector: "#title", effect: "remove" },
   { selector: ".lab", effect: "remove", name: "div"},
@@ -164,20 +159,28 @@ const effectHandlers = {
   // "breakWordList": (target, b, iframeDoc) => {...}
 };
 
+//난이도 별로 핸들러 세트
+const allEffectHandlers = {
+  0: { // Easy
+    remove: effectHandlers.remove
+  },
+  1: { // Normal
+    remove: effectHandlers.remove,
+    changeColor: effectHandlers.changeColor
+  },
+  2: { // Hard
+    breakCalculator: effectHandlers.breakCalculator,
+    remove: effectHandlers.remove  // 하드에서도 remove 가능
+  }
+};
+
 
 
 let totalTitleNum = 1;
 let totalDivNum = 6; // 삭제할 div 개수
 
 // 벽돌 관련 전역 변수들
-
-//게임 초기화 관련 전역 변수들
-let currentBombAmount = 0; // 현재 스테이지 bomb 개수
-let extraRow = 0; // 전체 벽돌 개수
-
-
-
-
+let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
@@ -215,7 +218,6 @@ $(window).ready(function() {
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
 
-
 //option 쪽으로 넘겨줄 것들
   // $(".bs-radio").on("change", function() {
   //   $(".bs-label").removeClass("selected");
@@ -235,9 +237,6 @@ $(window).ready(function() {
   // $("#music-select").on("input", function() {
   //   igIdx = $(this).val();
   // });
-
-
-
 });
 
 
@@ -369,8 +368,6 @@ function showOptions() {
   allHide();
   $(".option-page").show();
   //옵션 관련 추가 
-
-
 }
 
 function showGuitar() {
@@ -389,8 +386,6 @@ function showMainMenu() {
   menuMusic.play();
   StartGameHome();
 }
-
-
 
 //옵션 관련 함수들 
 
@@ -459,61 +454,41 @@ function init() {
   if (!isGameOver) return;
 
   clearInterval(intervalId);//interval 쪽 변경
-
-
   configureDifficultySettings(difficulty); // 게임 변수 리셋
-
- 
-  resetGameState();  //게임 리셋 -> 문제 없음
-
-
+  resetGameState();  //게임 리셋
   createBricks(); // 블럭 만들기
 
   if (difficulty === 2) {
     startHardModeTimer(); // 하드 모드면 타이머 시작하기
   }
 
-
   startBrickMoveTimer(difficulty); // brick move timer 시작
-
   requestAnimationFrame(draw); // draw 시작
 }
 
 //게임 초기화
 function resetGameState() {
   testFlag = true;
-
-
   isGameOver = false; // 게임 오버 false
-
   isPaused = false; // 퍼즈 false
 
   score = 0; // score = 0점
 
   hiddenRowNum = extraRow; 
   bricks = [];
-
   $("#pan").css({"background-color":"transparent"}); // ??
-
   initShowHide(); // 게임 화면 가리고
-
   stopMusic(); // 음악 멈추기
-
   ingameMusic[igIdx].play();//선택된 뮤직 시작.
-
 
   // const ballSpeed = $(".bs-label.selected .bs-radio").val();
   v_s = v_s_slow; // slow한 버전으로 구현
 
-
-
-//볼 초기 상태 설정
   ballX = canvas.width / 2;
   ballY = canvas.height - 80;
 
-
   ballRadius = 30;
-//
+
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
@@ -524,7 +499,6 @@ function resetGameState() {
 
 //난이도 별 설정 분리
 function configureDifficultySettings(mode) {
-
   //init 규칙
   //블럭 개수 관련 설정 -> 
   switch (mode) {
@@ -705,9 +679,7 @@ function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
     return;
   }
-
   hiddenRowNum -=1;
-
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount + extraRow; r++) {
       bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
@@ -757,9 +729,7 @@ function draw() {
   drawBall();
   drawPaddle();
   drawScore();
-
   collisionDetection();
-
   bounceBall();
 
   ballX += dx;
@@ -781,7 +751,6 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
-
 
 function toTheNext() {
   difficulty += 1;
@@ -959,33 +928,46 @@ function drawBricks() {
   }
 }
 
+//한 벽돌이 맞았을 때 처리 전체를 관리하는 중심 함수
 function destroyBrick(c, r) {
   console.log("벽돌 파괴 함수 호출");
   const b = bricks[c][r];
-  if (b.status === 0) {
-    console.log("b.status == 0 이므로 리턴");
-    return;
-  }
+  if (!b || b.status === 0) return;
 
-  if (b.isSecure) {
-    if (typeof b.hp === "number") {
-      b.hp--;
-      if (b.hp > 0) return;
-    }
-  }
+  if (handleSecureBlock(b)) return;
 
   b.status = 0;
-  score += 10;
 
-  // 점수 애니메이션 이펙트 추가
+  handleScoreEffect(b);
+  handleWarning(score);
+
+  if (!processIframeEffect(b, c, r)) return;
+
+  if (b.isBomb) {
+    triggerBombChain(c, r);
+  }
+}
+//보조 1. 보안 벽돌(isSecure)일 경우 HP를 차감하고, 아직 안 부서졌으면 true 반환하여 파괴 중단
+function handleSecureBlock(b) {
+  if (b.isSecure && typeof b.hp === "number") {
+    b.hp--;
+    return b.hp > 0;
+  }
+  return false;
+}
+//보조 2. 점수 +10 반영 및 점수 애니메이션 효과(scoreEffects) 추가
+function handleScoreEffect(b) {
+  score += 10;
   scoreEffects.push({
-    x: b.x + brickWidth / 2 - 10, // 벽돌 가운데
+    x: b.x + brickWidth / 2 - 10,
     y: b.y + brickHeight / 2,
     value: "+10",
     opacity: 1.0
   });
-
-  if (score >= 50 && !warningEffect) {
+}
+//보조 3. 점수가 50점 이상 되었을 때 경고 이펙트(warningEffect) 시작
+function handleWarning(currentScore) {
+  if (currentScore >= 50 && !warningEffect) {
     warningEffect = {
       text: "Lab Destroyed! Waring!",
       opacity: 1.0,
@@ -993,48 +975,45 @@ function destroyBrick(c, r) {
       scale: 1.0
     };
   }
-
+}
+//보조 4. iframe 내부 문서에서 해당 b.targetSelector 요소를 찾아
+//효과 종류에 맞는 핸들러(effectHandlers) 실행
+//요소가 없으면 아무 작업도 하지 않음
+function processIframeEffect(b, c, r) {
   const iframe = document.getElementById("labFrame");
-  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+  const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document;
+  if (!iframeDoc) return false;
 
-  if (!iframeDoc) {
-    console.log("ifameDoc == null 이므로 리턴");
-    return;
+  const target = iframeDoc.querySelector(b.targetSelector);
+  if (!target) return false;
+
+  const currentHandlers = allEffectHandlers[difficulty];
+  const handler = currentHandlers[b.effect];
+
+  if (handler) {
+    handler(target, b, iframeDoc);
   }
 
-  console.log("블럭 파괴:", c, r, "폭탄임?", b.isBomb);
-  // 폭탄이면 주변도 연쇄 파괴
-  if (b.isBomb) {
-    const directions = [
-      [0, -1], [0, 1], [-1, 0], [1, 0],
-    ];
-    for (const [dc, dr] of directions) {
-      const nc = c + dc;
-      const nr = r + dr;
-      if (
-        nc >= 0 && nc < brickColumnCount &&
-        bricks[nc] &&
-        nr >= 0 && nr < (bricks[nc].length)
-        ) {
-        destroyBrick(nc, nr);
+  return true;
+}
+//보조 5. 벽돌이 폭탄(isBomb)일 경우, 상하좌우 주변 벽돌을 연쇄적으로 destroyBrick 호출
+function triggerBombChain(c, r) {
+  const directions = [
+    [0, -1], [0, 1], [-1, 0], [1, 0],
+  ];
+  for (const [dc, dr] of directions) {
+    const nc = c + dc;
+    const nr = r + dr;
+    if (
+      nc >= 0 && nc < brickColumnCount &&
+      nr >= 0 && nr < bricks[nc]?.length
+    ) {
+      destroyBrick(nc, nr);
     }
   }
-  console.log(createBricksStr());
 }
 
-  // 대상 요소 찾기
-const target = iframeDoc.querySelector(b.targetSelector);
-if (!target) {
-  console.log("iframDoc의 타겟이 null이므로 리턴, " + b.targetSelector);
-  return;
-}
 
-const handler = effectHandlers[b.effect];
-if (handler) {
-    handler(target, b, iframeDoc); // 필요한 인자 전달
-  }
-
-} //destroyBirkcs 끝
 
 // 디버깅용
 function createBricksStr() {
