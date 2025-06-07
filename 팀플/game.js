@@ -1,16 +1,29 @@
 // === 전역 변수 ===
-let canvas, ctx;
-let ballX, ballY, ballRadius, dx, dy, ran = 0;
-let paddleX, paddleHeight, paddleWidth;
+
+//테크니컬한 쪽
+let canvas, ctx; // 캔버스 쪽
+
+//키 입력 관련
 let rightPressed = false;
 let leftPressed = false;
 let isGameOver = true;
 let isPaused = false;
-let igIdx = 0;
-const v_s_fast = 128;
-const v_s_slow = 72;
-let v_s = v_s_slow;
-let difficulty; //이건 난이도를 정함
+
+//공 크기 관련
+let ballX, ballY, ballRadius, dx, dy, ran = 0;
+
+//아래의 블럭 바 관련
+let paddleX, paddleHeight, paddleWidth;
+const paddleImage = new Image();
+paddleImage.src = "images/paddle-asset/joystickVer2.png";
+
+
+//공 속도 관련
+const v_s_fast = 128;//빠름일때 공 속도
+const v_s_slow = 72;//느림일때 공 속도
+let v_s = v_s_slow;//기본 속도 = 느림
+//난이도 관련
+let difficulty; //이건 난이도를 정함 -> Select-Mode에서 결정 후 넘겨받음
 let difficultyStr = ["easy", "normal", "hard"];
 
 // 테스트용 updateIframe에 css 쪽 보면 씀
@@ -35,13 +48,17 @@ let uDiedMsg;
 
 //공 이미지
 var ballImage = new Image();
+
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
 const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/acidrain.mp3"];
 const ingameMusic = [];
 const menuMusic = new Audio("musics/etc/main.mp3");
+let igIdx = 0;//인게임 뮤직 변수에서 어떤 값을 플레이할 것인가? -> setting 쪽에서 넘겨받음
 
+
+//인게임 음악 바인딩
 for (let i = 0; i < ingameMusicPath.length; i++) {
   const igPath = ingameMusicPath[i];
   const audio2 = new Audio(igPath);
@@ -51,6 +68,10 @@ for (let i = 0; i < ingameMusicPath.length; i++) {
   ingameMusic[i].loop = true;
   ingameMusic[i].volume = 0.25;
 }
+
+
+//게임오버 뮤직 바인딩
+
 for (let i = 0; i < gameOverMusicPath.length; i++) {
   const goPath = gameOverMusicPath[i];
   const audio1 = new Audio(goPath);
@@ -69,12 +90,8 @@ gameOverMusic[1].loop = true;
 const canvasWidth = 900;  //우리 코드에서는 900px
 const canvasHeight = 900;
 
-//이 아래는 막대기 관련 변수입니다.
-const paddleImage = new Image();
-paddleImage.src = "images/paddle-asset/joystickVer2.png";
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
-
 
 //이 아래는 벽돌배열입니다.
 
@@ -295,11 +312,10 @@ $(window).ready(function() {
   })
 });
 
-
+//이지 노말 하드 선택 부분
 function showLevelSelectionPage() {
   $("#main-menu").hide();
   $("#level-selection").show();
-
   $("#game-wrapper").hide();
 }
 
@@ -328,22 +344,72 @@ function showMainMenu() {
   menuMusic.play();
 }
 
+
+//Easy 시작
 function startEasyPage() {
+  //$(#Game-start-stroy).show
   difficulty = 0;
   init();
+  initEasyGame();
 }
 
 function startNormalPage() {
   difficulty = 1;
   init();
+  initNormalGame();
 }
 
 function startHardPage() {
   difficulty = 2;
   init();
+  initHardGame();
 }
 
+function initEasyGame(){
+  //게임 초기화
 
+}
+function initNormalGame(){
+  //노멀 게임 초기화
+
+}
+function initHardGame(){
+  //하드 게임 초기화
+
+}
+
+function playGame(){
+  //init에서 초기화한 변수 가지고 게임 돌리도록 여기서 조정
+  //매번 checkGameClear, checkGameOver 확인해야 함
+}
+function checkGameClear(var Mode){
+  //Mode별 게임 클리어 조건 확인
+
+
+
+
+  //만약 클리어했을 경우
+  if(Mode == 0)
+// $(".EasyClear-story").show
+    //initEasyGame
+  else if(Mode == 1)
+    // $(".NormalClear-story").show
+    //initHareGame()
+  else if(Mode == 2)
+    //하드 난이도일 때
+    //$(".GameClear-story").show
+  else{
+    //???? 넌 누구임
+  }
+
+}
+
+function checkGameOver(var Mode){
+
+  //Mode(난이도) 별 게임 클리어 조건 확인
+
+
+}
 function init() {
   if (!isGameOver) {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
@@ -416,22 +482,6 @@ function init() {
       brickRowCount = 4;
     };
   }
-
-  // if (difficulty === 0) {
-  //   extraRow = 2;
-  //   brickRowCount = 2;
-  // } 
-
-  // else if (difficulty === 1) {
-  //   extraRow = 3;
-  //   brickRowCount = 3;
-  // } 
-
-  // else if (difficulty === 2) {
-  //   extraRow = 4;
-  //   brickRowCount = 4;
-  // }
-
   createBricks();
 
   intervalId = setInterval(() => {
@@ -455,7 +505,6 @@ function initShowHide() {
   $(".pop-up-massage").hide();
   $("#pause-panel").hide();
 
-  $("html").css({"cursor":"none"});
    //실습 iframe 업데이트
   updateIframe(); 
 }
@@ -956,12 +1005,23 @@ function collisionDetection() {
 }
 
 function drawScore() {
+  // 캔버스 상단 점수 표시 (오른쪽 게임 화면용)
   ctx.font = "16px 'Press Start 2P'";
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
 
-  $("#scoreBoard").text("Score: "+score);
+  // 왼쪽 하단 점수판 UI 영역 업데이트
+  const $scoreBoard = $("#scoreBoard");
+
+  // 점수 변동 시 애니메이션 효과 적용
+  $scoreBoard
+    .text("Score: " + score)
+    .addClass("updated");
+
+  setTimeout(() => {
+    $scoreBoard.removeClass("updated");
+  }, 300); // 애니메이션 지속 시간과 일치
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
