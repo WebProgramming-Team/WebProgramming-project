@@ -93,8 +93,12 @@ const canvasHeight = 900;
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 
-//이 아래는 벽돌배열입니다.
 
+
+//게임 관련 변수들
+
+
+//이 아래는 벽돌배열입니다.
 //벽돌에 대응되는 태그들
 //벽돌위에 글씨를 넣고싶다면 label: "원하는 메세지"  이렇게 추가하세요
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 

@@ -491,9 +491,9 @@ canvas {
 
 
 /* 모든 메뉴 페이지에 */
-.menu-page {
+/*.menu-page {
   display: none;
-}
+}*/
 
 #intro-page {
   display: block;
