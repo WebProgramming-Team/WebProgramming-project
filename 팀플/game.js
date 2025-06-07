@@ -125,7 +125,11 @@ const desEleHard = [
   { selector: ".lab.calculator", effect: "breakCalculator" },
   { selector: ".lab.gugudan", effect: "breakGugudan" },
   { selector: ".lab.numGame", effect: "breakNumGame" },
-  { selector: ".lab.wordBook", effect: "breakWordBook" }
+  { selector: ".lab.wordBook", effect: "breakWordBook" },
+  { selector: ".lab.clickHere", effect: "breakClickHere" },
+  { selector: ".lab.image-toggle", effect: "breakImageToggle" },
+  { selector: ".lab.colorList", effect: "breakColorList" },
+  { selector: ".lab.flashBox", effect: "breakFlashBox" }
 ];
 
 
@@ -211,7 +215,80 @@ const effectHandlers = {
     scrollToTarget(target);
     fadeOutElement(target, 10000);
     triggerLabEffectOnTarget(target);
+  },
+
+  breakClickHere: (target, b, iframeDoc) => {
+    const script = iframeDoc.createElement("script");
+    script.innerHTML = `
+    const p = document.getElementById("innerTest");
+    if (p) {
+      p.innerText = "🚫 입력 불가: 시스템 오류 발생";
+      p.style.color = "red";
+    }
+    alert("⚠️ 시스템 오류: 입력이 차단되었습니다.");
+    `;
+    iframeDoc.body.appendChild(script);
+
+    shakeIframe();
+    showHackingProgress();
+    scrollToTarget(target);
+    fadeOutElement(target, 10000);
+    triggerLabEffectOnTarget(target);
+  },
+
+  breakImageToggle: (target, b, iframeDoc) => {
+    const img = iframeDoc.getElementById("image");
+    const btn = iframeDoc.getElementById("imageButton");
+    if (img) {
+    img.src = "projects/easy-mode/broken.png"; // 또는 실제 망가진 이미지
   }
+  if (btn) {
+    btn.disabled = true;
+    btn.value = "⚠️ 고장남";
+  }
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+},
+
+breakColorList: (target, b, iframeDoc) => {
+  const container = iframeDoc.getElementById("colorTable");
+  if (container) {
+    container.innerHTML = "<p style='color: gray;'>⚫ 색상 데이터 손실</p>";
+  }
+
+  const createBtn = iframeDoc.getElementById("ctCreate");
+  if (createBtn) createBtn.disabled = true;
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+},
+
+breakFlashBox: (target, b, iframeDoc) => {
+  const div = iframeDoc.getElementById("target");
+  if (div) {
+    div.style.backgroundColor = "black";
+    div.style.color = "red";
+    div.innerText = "⚡ Flash Overload – 전원 차단됨";
+  }
+
+  const stopBtn = iframeDoc.getElementById("stopColor");
+  if (stopBtn) stopBtn.disabled = true;
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+}
+
+
+
   // 앞으로 추가할 것들 계속 여기 정의
   // "breakWordList": (target, b, iframeDoc) => {...}
 };
@@ -230,6 +307,10 @@ const allEffectHandlers = {
     breakGugudan: effectHandlers.breakGugudan,
     breakNumGame: effectHandlers.breakNumGame,
     breakWordBook: effectHandlers.breakWordBook,
+    breakClickHere: effectHandlers.breakClickHere,
+    breakImageToggle: effectHandlers.breakImageToggle,
+    breakColorList: effectHandlers.breakColorList,
+    breakFlashBox: effectHandlers.breakFlashBox,
     remove: effectHandlers.remove  // 하드에서도 remove 가능
   }
 };
@@ -726,7 +807,10 @@ function createHardElements() {
     desEleHard.find(el => el.selector === ".lab.calculator"),
     desEleHard.find(el => el.selector === ".lab.gugudan"),
     desEleHard.find(el => el.selector === ".lab.numGame"),
-    desEleHard.find(el => el.selector === ".lab.wordBook")
+    desEleHard.find(el => el.selector === ".lab.wordBook"),
+    desEleHard.find(el => el.selector === ".lab.image-toggle"),
+    desEleHard.find(el => el.selector === ".lab.colorList"),
+    desEleHard.find(el => el.selector === ".lab.flashBox")
   ].filter(Boolean); // null 제거
 
   const elements = [];
