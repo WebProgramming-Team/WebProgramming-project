@@ -519,70 +519,66 @@ function initShowHide() {
   updateIframe(); 
 }
 
-//벽돌 생성 함수(태그 대응까지)
+//벽돌 생성 및 태그 연결 함수
 function createBricks() {
-  const bombCount = 4;
-  const bombPositions = [];
   hiddenRowNum = extraRow;
 
-  // 폭탄 위치 랜덤 지정
-  while (bombPositions.length < bombCount) {
-    const c = Math.floor(Math.random() * brickColumnCount);
-    const r = Math.floor(Math.random() * (brickRowCount+extraRow));
-    const key = `${c}-${r}`;
-    if (!bombPositions.includes(key)) {
-      bombPositions.push(key);
-    }
-  }
+  const totalCount = (brickRowCount + extraRow) * brickColumnCount;
+  const bombPositions = generateBombPositions(totalCount);
 
-  let elements = createElementsByDifficulty(difficulty);
+  const elements = shuffleEmt(createElementsByDifficulty(difficulty));
 
-  elements = shuffleEmt(elements);
-  console.log(elements);
-
-  let eCount = 0; // elements의 원소를 하나씩 가져올거임
-  let index = 0;
+  let eCount = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount + extraRow; r++) {
-      let element = elements[eCount++];
-      const isBomb = bombPositions.includes(`${c}-${r}`);
+      const index = c * (brickRowCount + extraRow) + r;
+      const isBomb = bombPositions.has(`${c}-${r}`);
+      const element = elements[eCount++];
 
-      let isSecure = false;
-      let secureState = false;
-      let hp = null;
-
-      if (difficulty != 0) {
-        isSecure = Math.random() < 0.2;
-        secureState = isSecure;
-        if (isSecure) hp = 3;
-      }
-
-      bricks[c][r] = {
-        x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-        y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
-        status: r < extraRow ? 0 : 1,
-        isBomb: isBomb,
-        isHidden: 0,
-        targetSelector: element?.selector,
-        effect: element?.effect,
-        color: element?.color,
-        isSecure: isSecure,
-        secureState: secureState,
-        hp: hp
-      };
-
-      if (r < extraRow) {
-        bricks[c][r].isHidden = 1; // 이걸로 숨겨진거 감지
-        bricks[c][r].status = 0;
-      }
-
-      index++;
+      const brick = createBrickObject(c, r, element, isBomb);
+      bricks[c][r] = brick;
     }
   }
 
   console.log(createBricksStr());
 }
+
+//보조 1. 폭탄 위치 생성
+function generateBombPositions(totalCount) {
+  const bombCount = 4;
+  const positions = new Set();
+
+  while (positions.size < bombCount) {
+    const c = Math.floor(Math.random() * brickColumnCount);
+    const r = Math.floor(Math.random() * (brickRowCount + extraRow));
+    positions.add(`${c}-${r}`);
+  }
+
+  return positions;
+}
+
+//보조 2. 벽돌 생성 객체 함수
+function createBrickObject(c, r, element, isBomb) {
+  const isTopRow = r < extraRow;
+  const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+  const hp = isSecure ? 3 : null;
+
+  return {
+    x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+    y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
+    status: isTopRow ? 0 : 1,
+    isBomb: isBomb,
+    isHidden: isTopRow ? 1 : 0,
+    targetSelector: element?.selector,
+    effect: element?.effect,
+    color: element?.color,
+    isSecure: isSecure,
+    secureState: isSecure,
+    hp: hp
+  };
+}
+
 
 // 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
 function toggleSecureBricks() {
@@ -739,7 +735,6 @@ function draw() {
 
     testFlag = false;
     updateIframe();
-
     stopMusic();
     toTheNext();
     return;
