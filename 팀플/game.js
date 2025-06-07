@@ -104,12 +104,11 @@ let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
 const desEleEasy = [
   {selector: "#header", effect: "remove"},
-  {selector: "main-aside", effect: "remove"},
-  {selector: "footer", effect: "remove"},
-  {selector: "article-title", effect: ""},
-  {selector: "article-date", effect: ""},
-  {selector: "article-header", effect: ""},
-  {selector: "article-body", effect: ""}
+  {selector: ".pull-left", effect: "remove"},
+  {selector: ".pull-right", effect: "remove"},
+  {selector: ".article-header", effect: "remove"},
+  {selector: "#main-aside", effect: "remove"},
+  {selector: "#footer", effect: "remove"}
 ];
 
 const desEleNormal = [
@@ -612,8 +611,20 @@ function createElementsByDifficulty(level) {
 
 function createEasyElements() {
   let elements = [];
-  let newEmt = desEleEasy.find(element => element.selector === "#header");
-  elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === "#header");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
+  // elements.push(newEmt);
+  // for (let i = 0; i < 2; i++) {
+  //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
+  //   elements.push(newEmt);
+  // }
+  // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
+  // elements.push(newEmt);
+  // let newEmt = desEleEasy.find(element => element.selector === "#footer");
+  // elements.push(newEmt);
 
   return elements;
 }
@@ -998,12 +1009,23 @@ function collisionDetection() {
 }
 
 function drawScore() {
+  // 캔버스 상단 점수 표시 (오른쪽 게임 화면용)
   ctx.font = "16px 'Press Start 2P'";
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
 
-  $("#scoreBoard").text("Score: "+score);
+  // 왼쪽 하단 점수판 UI 영역 업데이트
+  const $scoreBoard = $("#scoreBoard");
+
+  // 점수 변동 시 애니메이션 효과 적용
+  $scoreBoard
+    .text("Score: " + score)
+    .addClass("updated");
+
+  setTimeout(() => {
+    $scoreBoard.removeClass("updated");
+  }, 300); // 애니메이션 지속 시간과 일치
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
