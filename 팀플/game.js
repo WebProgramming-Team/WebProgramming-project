@@ -202,7 +202,7 @@ $(window).ready(function() {
 
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
- 
+
 
 //option 쪽으로 넘겨줄 것들
   // $(".bs-radio").on("change", function() {
@@ -298,10 +298,10 @@ function allHide(){
   //전부 다 hide하는 함수
     $(".menu-page").hide();//메뉴 페이지 hide
     $("#game-wrapper").hide();//game hide
-}
+  }
 
 //홈 화면 시작
-function StartGameHome(){
+  function StartGameHome(){
   //게임을 홈으로 리셋함. 
 
   allHide();//전부 다 리셋
@@ -411,121 +411,100 @@ function startHardPage() {
   init();
 }
 
+//클리어 조건 분기
 function checkGameClear(Mode){
-  //Mode별 게임 클리어 조건 확인
-
-
-
-
-  //만약 클리어했을 경우
-  if(Mode == 0){}
-// $(".EasyClear-story").show
-    //initEasyGame
-  else if(Mode == 1){}
-    // $(".NormalClear-story").show
-    //initHareGame()
-  else if(Mode == 2){}
-    //하드 난이도일 때
-    //$(".GameClear-story").show
-  else{
-    //???? 넌 누구임
-  }
-
-}
-
-function checkGameOver(Mode){
-
   //Mode(난이도) 별 게임 클리어 조건 확인
+  const cleared = isCleared(); // 예: 남은 벽돌이 없거나 조건 달성 시
+  if (!cleared) return;
 
+  showClearStory(mode);
+
+  if (mode === 0) startNormalPage();
+  else if (mode === 1) startHardPage();
+  else if (mode === 2) showGameCompletion();
 
 }
-function init() {
-  if (!isGameOver) {
-    console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
-    return;
+
+//난이도 별 스토리 보여주기
+function showClearStory(mode) {
+  switch (mode) {
+  case 0:
+    $(".EasyClear-story").show();
+    break;
+  case 1:
+    $(".NormalClear-story").show();
+    break;
+  case 2:
+    $(".GameClear-story").show();
+    break;
+  default:
+    console.warn("정의되지 않은 클리어모드:", mode);
   }
+}
+
+//게임 초기화 함수
+function init() {
+  if (!isGameOver) return;
+
   clearInterval(intervalId);
+  resetGameState();  //게임 리셋
+  configureDifficultySettings(difficulty);
+  createBricks();
+
+  if (difficulty === 2) {
+    startHardModeTimer();
+  }
+  startBrickMoveTimer(difficulty);
+  requestAnimationFrame(draw);
+}
+
+//게임 초기화
+function resetGameState() {
   testFlag = true;
   divCount = 0;
   isGameOver = false;
-  remainingTime = 60;
   isPaused = false;
-  if (timerDisplay) {
-    timerDisplay.remove();
-    timerDisplay = null;
-  }
-  $("#pan").css({"background-color":"transparent"});
+  score = 0;
+  hiddenRowNum = extraRow;
+  bricks = [];
 
+  $("#pan").css({"background-color":"transparent"});
   initShowHide();
   stopMusic();
   ingameMusic[igIdx].play();
 
-  bricks = [];
-  createBricks(); // 난이도에 상관없이 일단 생성
-
-  if (difficulty == 2) {
-    startHardModeTimer(); // 하드 모드일 때만 타이머 시작
-  }
-
-  let ballSpeed = $(".bs-label.selected .bs-radio").val();
-  if (ballSpeed == "slow") {
-    v_s = v_s_slow;
-    console.log("속도 느림");
-  } else if (ballSpeed == "fast") {
-    v_s = v_s_fast;
-    console.log("속도 빠름");
-  } else {
-    console.log("???? 속도 왜이럼");
-  }
-  console.log("현재 난이도: " + difficultyStr[difficulty]);
+  const ballSpeed = $(".bs-label.selected .bs-radio").val();
+  v_s = ballSpeed === "fast" ? v_s_fast : v_s_slow;
 
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
   ballRadius = 10;
-  dx = Math.floor(Math.random() * 16    - 8);
-  if (dx == 0) dx = 1;
+  dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
-  console.log(dx, dy, dx * dx + dy * dy);
 
   paddleHeight = 40;
   paddleWidth = 240;
   paddleX = (canvas.width - paddleWidth) / 2;
-  rightPressed = false;
-  leftPressed = false;
+}
 
-  score = 0;
-
-  //난이도에 따른 벽돌 분기처리
-  bricks = [];
-  switch (difficulty) {
-    case 0: {
+//난이도 별 설정 분리
+function configureDifficultySettings(mode) {
+  switch (mode) {
+    case 0:
       extraRow = 1;
       brickRowCount = 1;
       break;
-    };
-    case 1: {
+    case 1:
       extraRow = 3;
       brickRowCount = 3;
       break;
-    };
-    case 2: {
+    case 2:
       extraRow = 4;
       brickRowCount = 4;
-    };
+      break;
+    default:
+      console.warn("정의되지 않은 난이도:", mode);
   }
-  createBricks();
-
-  intervalId = setInterval(() => {
-    if (!isPaused && !isGameOver) {
-      moveBricksDown();
-    }
-    if (hiddenRowNum <= 0) {
-      clearInterval(intervalId);
-    }
-  }, 5000);
-
-
-  requestAnimationFrame(draw);
 }
 
 function initShowHide() {
@@ -707,6 +686,29 @@ function moveBricksDown() {
   console.log("벽돌 내려왔음, "+ extraRow +"번 중" + (extraRow - hiddenRowNum) + " 번");
   
 }
+
+//난이도 별 벽돌 내려오는 속도 관리
+function startBrickMoveTimer(difficulty) {
+  let intervalTime;
+
+  switch (difficulty) {
+    case 0: intervalTime = 8000; break; // Easy
+    case 1: intervalTime = 5000; break; // Normal
+    case 2: intervalTime = 4000; break; // Hard
+    default: intervalTime = 5000;
+  }
+
+  intervalId = setInterval(() => {
+    if (!isPaused && !isGameOver) {
+      moveBricksDown();
+    }
+
+    if (hiddenRowNum <= 0) {
+      clearInterval(intervalId);
+    }
+  }, intervalTime);
+}
+
 
 function draw() {
   console.log("draw() 실행");
@@ -1047,8 +1049,8 @@ function drawScore() {
 
   // 점수 변동 시 애니메이션 효과 적용
   $scoreBoard
-    .text("Score: " + score)
-    .addClass("updated");
+  .text("Score: " + score)
+  .addClass("updated");
 
   setTimeout(() => {
     $scoreBoard.removeClass("updated");
@@ -1252,9 +1254,9 @@ function updateIframe() {
       <a href = "#">Created By Soohyun Lee</a>
     </footer>
   </div>
-`;
+  `;
 
-const cssCodeE = `
+  const cssCodeE = `
     * {
       font-family: "맑은 고딕", Gothic, sans-serif;
       margin: 0;
@@ -1376,10 +1378,10 @@ const cssCodeE = `
       line-height: 50px;
       text-align: center;
     }
-`;
+  `;
 
-const jsCodeE = `
-`;
+  const jsCodeE = `
+  `;
 
   const htmlCodeN = `<header>
     <div id="title">
@@ -1998,7 +2000,11 @@ case 1: {
   tempCss = cssCodeN;
   tempJs = jsCodeN;
 }
-case 2: {}
+case 2: {
+  htmlCode = htmlCodeN;
+  tempCss = cssCodeN;
+  tempJs = jsCodeN;
+}
 }
 css = `<style>${tempCss}</style>`;
 js = `<script>${tempJs}<\/script>`;
@@ -2042,9 +2048,9 @@ function startHardModeTimer() {
     }
   }, 2000);
   if (timerDisplay) {
-        timerDisplay.remove();
-        timerDisplay = null;
-    }
+    timerDisplay.remove();
+    timerDisplay = null;
+  }
 
   timerDisplay = document.createElement("div");
   timerDisplay.style.position = "absolute";
