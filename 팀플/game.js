@@ -296,6 +296,36 @@ $(window).ready(function() {
   })
 });
 
+
+
+function StartGameHome(){
+  //게임을 홈으로 리셋함. 
+  //menu-page 전부 hide하고 start-page만 시작하는 함수임. 
+
+  //게임 화면 가리기
+   $("#game-wrapper").hide();
+
+
+  /*main-menu 버튼 - 함수 바인딩*/
+  $("#start-button").on("click", showLevelSelectionPage);
+  $("#options-button").on("click", showOptions);
+  $("#guitar-button").on("click", showGuitar);
+  /*--------------------------*/
+
+  /*게임 모드 선택 버튼 바인딩*/
+  $("#easy-button").on("click", startEasyPage);
+  $("#normal-button").on("click", startNormalPage);
+  $("#hard-button").on("click", startHardPage);
+
+  $(".back-button").on("click", showMainMenu);
+
+  //start.page 켜지면서 시작
+  $(".menu-page").hide();//모든 메뉴 페이지 가리기
+  $(".start-page").show();//스타트 페이지 시작하기.
+}
+
+
+
 //이지 노말 하드 선택 부분
 function showLevelSelectionPage() {
   $("#main-menu").hide();
@@ -328,43 +358,6 @@ function showMainMenu() {
   menuMusic.play();
 }
 
-function StartGameHome(){
-   $("#game-wrapper").hide();//가리기
-
-
-  /*main-menu 버튼 - 함수 바인딩*/
-  $("#start-button").on("click", showLevelSelectionPage);
-  $("#options-button").on("click", showOptions);
-  $("#guitar-button").on("click", showGuitar);
-  /*--------------------------*/
-
-  /*게임 모드 선택 버튼*/
-  $("#easy-button").on("click", startEasyPage);
-  $("#normal-button").on("click", startNormalPage);
-  $("#hard-button").on("click", startHardPage);
-
-  $(".back-button").on("click", showMainMenu);
-
-  //난이도별 모드 설정 및 리셋
-  $("#easy-button").on("click", function () {
-    difficulty = 0;
-    init();
-  });
-
-  $("#normal-button").on("click", function () {
-    difficulty = 1;
-    init();
-  });
-
-  $("#hard-button").on("click", function () {
-    difficulty = 2;
-    init();
-  });
-
-  //start.page 켜지면서 시작
-  $(".menu-page").hide();//모든 메뉴 페이지 가리기
-  $(".start-page").show();//스타트 페이지 시작하기.
-}
 
 
 
