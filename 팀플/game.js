@@ -329,22 +329,72 @@ function showMainMenu() {
   menuMusic.play();
 }
 
+
+//Easy 시작
 function startEasyPage() {
+  //$(#Game-start-stroy).show
   difficulty = 0;
   init();
+  initEasyGame();
 }
 
 function startNormalPage() {
   difficulty = 1;
   init();
+  initNormalGame();
 }
 
 function startHardPage() {
   difficulty = 2;
   init();
+  initHardGame();
 }
 
+function initEasyGame(){
+  //게임 초기화
 
+}
+function initNormalGame(){
+  //노멀 게임 초기화
+
+}
+function initHardGame(){
+  //하드 게임 초기화
+
+}
+
+function playGame(){
+  //init에서 초기화한 변수 가지고 게임 돌리도록 여기서 조정
+  //매번 checkGameClear, checkGameOver 확인해야 함
+}
+function checkGameClear(var Mode){
+  //Mode별 게임 클리어 조건 확인
+
+
+
+
+  //만약 클리어했을 경우
+  if(Mode == 0)
+// $(".EasyClear-story").show
+    //initEasyGame
+  else if(Mode == 1)
+    // $(".NormalClear-story").show
+    //initHareGame()
+  else if(Mode == 2)
+    //하드 난이도일 때
+    //$(".GameClear-story").show
+  else{
+    //???? 넌 누구임
+  }
+
+}
+
+function checkGameOver(var Mode){
+
+  //Mode(난이도) 별 게임 클리어 조건 확인
+
+
+}
 function init() {
   if (!isGameOver) {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
