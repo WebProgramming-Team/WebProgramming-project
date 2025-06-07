@@ -446,39 +446,61 @@ function showClearStory(mode) {
 function init() {
   if (!isGameOver) return;
 
-  clearInterval(intervalId);
+  clearInterval(intervalId);//interval 쪽 변경
+
+
+  configureDifficultySettings(difficulty); // 게임 변수 리셋
+
+
   resetGameState();  //게임 리셋
-  configureDifficultySettings(difficulty);
-  createBricks();
+
+
+  createBricks(); // 블럭 만들기
 
   if (difficulty === 2) {
-    startHardModeTimer();
+    startHardModeTimer(); // 하드 모드면 타이머 시작하기
   }
-  startBrickMoveTimer(difficulty);
-  requestAnimationFrame(draw);
+
+
+  startBrickMoveTimer(difficulty); // brick move timer 시작
+
+  requestAnimationFrame(draw); // draw 시작
 }
 
 //게임 초기화
 function resetGameState() {
   testFlag = true;
-  divCount = 0;
-  isGameOver = false;
-  isPaused = false;
-  score = 0;
-  hiddenRowNum = extraRow;
+
+
+  isGameOver = false; // 게임 오버 false
+
+  isPaused = false; // 퍼즈 false
+
+  score = 0; // score = 0점
+
+  hiddenRowNum = extraRow; 
   bricks = [];
 
-  $("#pan").css({"background-color":"transparent"});
-  initShowHide();
-  stopMusic();
-  ingameMusic[igIdx].play();
+  $("#pan").css({"background-color":"transparent"}); // ??
 
-  const ballSpeed = $(".bs-label.selected .bs-radio").val();
-  v_s = ballSpeed === "fast" ? v_s_fast : v_s_slow;
+  initShowHide(); // 게임 화면 가리고
+
+  stopMusic(); // 음악 멈추기
+
+  ingameMusic[igIdx].play();//선택된 뮤직 시작.
+
+
+  // const ballSpeed = $(".bs-label.selected .bs-radio").val();
+  v_s = v_s_slow; // slow한 버전으로 구현
+
+
 
   ballX = canvas.width / 2;
-  ballY = canvas.height - 30;
-  ballRadius = 10;
+  ballY = canvas.height - 80;
+
+
+  ballRadius = 30;
+
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
@@ -489,8 +511,12 @@ function resetGameState() {
 
 //난이도 별 설정 분리
 function configureDifficultySettings(mode) {
+
+  //init 규칙
+  //블럭 개수 관련 설정 -> 
   switch (mode) {
     case 0:
+      //블럭 설정
       extraRow = 1;
       brickRowCount = 1;
       break;
@@ -508,7 +534,7 @@ function configureDifficultySettings(mode) {
 }
 
 function initShowHide() {
-  $(".menu-page").hide();
+  allHide();
   $("#game-wrapper").show();
   $("#gameCanvas").show();
   $("#ps").show();
@@ -864,6 +890,8 @@ function gameOver() {
 }
 
 function stopMusic() {
+
+  //메뉴 음악 끄고, 게임 오버 음악 끄기
   for (let i = 0; i < gameOverMusic.length; i++) {
     gameOverMusic[i].pause();
     gameOverMusic[i].currentTime = 0;
