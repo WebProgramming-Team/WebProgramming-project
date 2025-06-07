@@ -318,7 +318,7 @@ function StartGameHome(){
  $("#hard-button").on("click", startHardPage);
 
  $(".back-button").on("click", showMainMenu);
-
+  //주석
   //start.page 켜지면서 시작
   $(".menu-page").hide();//모든 메뉴 페이지 가리기
   $(".start-page").show();//스타트 페이지 시작하기.
