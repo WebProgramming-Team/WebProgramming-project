@@ -46,8 +46,10 @@ function setClock() {
 		m="April";
 	else if(now.getMonth()==4)
 		m="May";
-	else if(now.getMonth==5)
+	else if(now.getMonth()==5)
 		m="June";
+	else if(now.getMonth()==6)
+		m="July";
 
 	let s=m+" "+ now.getDate()+". "+ now.getHours()+" : "+now.getMinutes()+" : "+now.getSeconds();
 	var table = document.getElementById('ctime');

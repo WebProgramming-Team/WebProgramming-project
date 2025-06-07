@@ -10,6 +10,11 @@ let igIdx = 0;
 const v_s_fast = 128;
 const v_s_slow = 72;
 let v_s = v_s_fast;
+let difficulty; //이건 난이도를 정함
+let difficultyStr = ["easy", "normal", "hard"];
+
+// 테스트용 updateIframe에 css 쪽 보면 씀
+let testFlag = true;
 
 //기본 난이도 전역변수
 let difficulty = 0;
@@ -29,6 +34,10 @@ let warningEffect = null;
 // 게임 오버
 let uDiedMsg;
 
+//설정에서 바꿀 수 있는 것들
+
+//공 이미지
+var ballImage = new Image();
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
@@ -63,23 +72,69 @@ gameOverMusic[1].loop = true;
 const canvasWidth = 900;  //우리 코드에서는 900px
 const canvasHeight = 900;
 
+//이 아래는 막대기 관련 변수입니다.
+const paddleImage = new Image();
+paddleImage.src = "images/paddle-asset/joystickVer2.png";
+
+let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
+
 
 //이 아래는 벽돌배열입니다.
 
 //벽돌에 대응되는 태그들
 //벽돌위에 글씨를 넣고싶다면 label: "원하는 메세지"  이렇게 추가하세요
 //{ selector: "#title", label: "타이틀 제거", effect: "remove" }, 
-const destructibleElements = [
+const desEleNormal = [
   { selector: "#title", effect: "remove" },
-  { selector: ".lab.calculator", effect: "changeColor", color: "red" },
-  { selector: ".lab.gugudan", effect: "changeColor", color: "skyblue" },
-  { selector: ".lab.numGame", effect: "changeColor", color: "black" },
-  { selector: "none"}
+  { selector: ".lab", effect: "remove", name: "div"},
+  { selector: "none"},
 ];
 
+const desEleHard=[{ selector: ".lab.calculator", effect: "breakCalculator" }];
+
+//이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
+const effectHandlers = {
+  remove: (target) => {
+    target.remove();
+  },
+  changeColor: (target, b) => {
+    if (b.color) target.style.backgroundColor = b.color;
+  },
+  breakCalculator: (target, b, iframeDoc) => {
+    const script = iframeDoc.createElement("script");
+    script.innerHTML = `
+      const addBtn = document.getElementById("addButton");
+      if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.value = "망가짐 😵";
+      }
+      const sum = document.getElementById("sum");
+      if (sum) {
+        sum.value = "ERROR!";
+      }
+    `;
+    iframeDoc.body.appendChild(script);
+
+    // ====== 연기 효과 표시 ======
+    const rect = target.getBoundingClientRect();
+    const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
+
+    const x = rect.left - iframeRect.left + rect.width / 2;
+    const y = rect.top - iframeRect.top + rect.height / 2;
+
+    showLabEffect(x, y);
+  },
+  // 앞으로 추가할 것들 계속 여기 정의
+  // "breakWordList": (target, b, iframeDoc) => {...}
+};
+
+
+
+let totalTitleNum = 1;
+let totalDivNum = 6; // 삭제할 div 개수
 
 // 벽돌 관련 전역 변수들
-let extraRow = 2;
+let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
@@ -119,9 +174,11 @@ $(window).ready(function() {
   $("#guitar-button").on("click", showGuitar);
   /*--------------------------*/
 
+  /*게임 모드 선택 버튼*/
+  $("#easy-button").on("click", startEasyPage);
+  $("#normal-button").on("click", startNormalPage);
+  $("#hard-button").on("click", startHardPage);
 
-
-  $(".game-start").on("click", init);
   $(".back-button").on("click", showMainMenu);
 
   //난이도별 모드 설정 및 리셋
@@ -139,6 +196,12 @@ $(window).ready(function() {
     difficulty = 2;
     init();
   });
+
+  //변수 초기화
+  ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
+
+  //시작 게임 화면 구성
+  $(".start-page").show();
 
   $(this).on("mousemove", function(e) {
     paddleX = e.pageX;
@@ -234,8 +297,8 @@ function showLevelSelectionPage() {
 }
 
 function showOptions() {
-  $("#main-menu").hide();
-  $("#options").show();
+  $(".menu-page").hide();
+  $("#options-menu").show();
 }
 
 function showGuitar() {
@@ -258,11 +321,29 @@ function showMainMenu() {
   menuMusic.play();
 }
 
+function startEasyPage() {
+  difficulty = 0;
+  init();
+}
+
+function startNormalPage() {
+  difficulty = 1;
+  init();
+}
+
+function startHardPage() {
+  difficulty = 2;
+  init();
+}
+
+
 function init() {
   if (!isGameOver) {
     console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
     return;
   }
+  testFlag = true;
+  divCount = 0;
   isGameOver = false;
   remainingTime = 60;
   isPaused = false;
@@ -277,11 +358,11 @@ function init() {
   ingameMusic[igIdx].play();
 
   bricks = [];
-    createBricks(); // 난이도에 상관없이 일단 생성
+  createBricks(); // 난이도에 상관없이 일단 생성
 
-    if (difficulty == 2) {
-        startHardModeTimer(); // 하드 모드일 때만 타이머 시작
-    }
+  if (difficulty == 2) {
+    startHardModeTimer(); // 하드 모드일 때만 타이머 시작
+  }
 
   let ballSpeed = $(".bs-label.selected .bs-radio").val();
   if (ballSpeed == "slow") {
@@ -293,6 +374,7 @@ function init() {
   } else {
     console.log("???? 속도 왜이럼");
   }
+  console.log("현재 난이도: " + difficultyStr[difficulty]);
 
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
@@ -301,28 +383,40 @@ function init() {
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
-  paddleHeight = 10;
-  paddleWidth = 180;
+  paddleHeight = 40;
+  paddleWidth = 240;
   paddleX = (canvas.width - paddleWidth) / 2;
   rightPressed = false;
   leftPressed = false;
 
   score = 0;
 
-  if (intervalId) {
-    clearInterval(intervalId);
+  //난이도에 따른 벽돌 분기처리
+  bricks = [];
+  if (difficulty === 0) {
+    extraRow = 2;
+    brickRowCount = 2;
+  } 
+
+  else if (difficulty === 1) {
+    extraRow = 3;
+    brickRowCount = 3;
+  } 
+
+  else if (difficulty === 2) {
+    extraRow = 4;
+    brickRowCount = 4;
   }
-  blockDownCount = 0;
+  createBricks();
+
   intervalId = setInterval(() => {
     if (!isPaused && !isGameOver) {
       moveBricksDown();
-      blockDownCount++;
-      console.log(blockDownCount, ", 최대", extraRow+ "번");
     }
-    if (blockDownCount >= extraRow) {
+    if (hiddenRowNum <= 0) {
       clearInterval(intervalId);
     }
-  }, 5000);
+  }, 1000);
 
 
   requestAnimationFrame(draw);
@@ -340,8 +434,9 @@ function initShowHide() {
    //실습 iframe 업데이트
   updateIframe(); 
 }
+
 //벽돌 생성 함수(태그 대응까지)
-function createBricks(addRow = false) {
+function createBricks() {
   const bombCount = 2;
   const bombPositions = [];
   hiddenRowNum = extraRow;
@@ -349,17 +444,18 @@ function createBricks(addRow = false) {
   // 폭탄 위치 랜덤 지정
   while (bombPositions.length < bombCount) {
     const c = Math.floor(Math.random() * brickColumnCount);
-    const r = addRow ? 0 : Math.floor(Math.random() * (brickRowCount+extraRow));
+    const r = Math.floor(Math.random() * (brickRowCount+extraRow));
     const key = `${c}-${r}`;
     if (!bombPositions.includes(key)) {
       bombPositions.push(key);
     }
   }
 
-  let elements = [];
-  for (let i = 0; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
-    elements.push(destructibleElements[Math.floor(Math.random() * destructibleElements.length)]);
-  }
+  let elements = createElementsByDifficulty(difficulty);
+
+  elements = shuffleEmt(elements);
+  console.log(elements);
+
   let eCount = 0; // elements의 원소를 하나씩 가져올거임
   let index = 0;
   for (let c = 0; c < brickColumnCount; c++) {
@@ -385,10 +481,14 @@ function createBricks(addRow = false) {
         isBomb: isBomb,
         targetSelector: element?.selector,
         effect: element?.effect,
+<<<<<<< HEAD
         color: element?.color,
         isSecure: isSecure,
         secureState: secureState,
         hp: hp
+=======
+        // color: element?.color
+>>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
       };
 
       if (r < extraRow) {
@@ -402,6 +502,7 @@ function createBricks(addRow = false) {
   console.log(createBricksStr());
 }
 
+<<<<<<< HEAD
 // 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
 function toggleSecureBricks() {
   for (let c = 0; c < bricks.length; c++) {
@@ -422,31 +523,63 @@ function toggleSecureBricks() {
   }
   drawBricks();
 }
+=======
+function createElementsByDifficulty(level) {
+  let elements = [];
+
+  if (level === 0) {
+    // Easy
+    elements = [ /* 초급 전용 요소들 */ ];
+  } else if (level === 1) {
+    elements = createNormalElements(); // 기존처럼 노말
+  } else if (level === 2) {
+    elements = createHardElements();   // 하드 요소들만 따로 준비
+  }
+
+  return shuffleEmt(elements);
+}
+
+
+function createNormalElements() {
+  let elements = [];
+  let newEmt = desEleNormal.find(element => element.selector === "#title");
+  elements.push(newEmt);
+  for (let i = 0; i < totalDivNum; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === ".lab");
+    elements.push(newEmt);
+  }
+  for (let i = elements.length; i < brickRowCount*brickColumnCount + extraRow*brickColumnCount; i++) {
+    let newEmt = desEleNormal.find(element => element.selector === "none");
+    elements.push(newEmt);
+  }
+
+  return elements;
+}
+
+function createHardElements() {
+  let elements = [];
+
+  // 하드모드에서는 전부 calculator 블록으로만 구성
+  const calculator = desEleHard.find(el => el.selector === ".lab.calculator");
+
+  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
+
+  for (let i = 0; i < totalBrickCount; i++) {
+    elements.push(calculator);
+  }
+
+  return elements;
+}
+
+>>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
 
 function moveBricksDown() {
-  if (isGameOver) {
+  if (isGameOver || (hiddenRowNum <= 0)) {
     return;
   }
 
-  // createBricks(true);
+  hiddenRowNum -=1;
 
-  // let currentMaxRowY = 0;
-  // for (let c = 0; c < brickColumnCount; c++) {
-  //   if (bricks[c] && bricks[c].length > 0) {
-  //     for (let r = bricks[c].length - 1; r >= 0; r--) {
-  //       const brick = bricks[c][r];
-  //       if (brick && brick.status === 1) {
-  //         currentMaxRowY = Math.max(currentMaxRowY, brick.y + brickHeight);
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
-  if (hiddenRowNum > 0) {
-    hiddenRowNum -=1;
-  }
-  let index = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount + extraRow; r++) {
       bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
@@ -456,23 +589,9 @@ function moveBricksDown() {
   for (let i = 0; i < brickColumnCount; i++) {
     bricks[i][hiddenRowNum].status = 1;
   }
-
-  // const gameOverLine = canvas.height - paddleHeight - ballRadius;
-
-  // if (currentMaxRowY >= gameOverLine) {
-  //   isGameOver = true;
-  //   clearInterval(intervalId);
-  //   gameOver();
-  //   return;
-  // }
-
-  console.log("벽돌 내려왔음");
+  console.log("벽돌 내려왔음, "+ extraRow +"번 중" + (extraRow - hiddenRowNum) + " 번");
+  
 }
-
-let intervalId = setInterval(() => {
-  moveBricksDown();
-  collisionDetection();
-}, 5000);
 
 function draw() {
   console.log("draw() 실행");
@@ -500,62 +619,101 @@ function draw() {
   if (checkClear()) {
     isGameOver = true;
     clearInterval(intervalId);
+
+    testFlag = false;
+    updateIframe();
+
     stopMusic();
-    setTimeout(() => {
-      alert("🎉 클리어! 점수: " + score + "\n다시 시작합니다.");
-      document.location.reload();
-    }, 10);
+    toTheNext();
     return;
-  }
+  } 
 
   requestAnimationFrame(draw);
    drawSecureIndicator();
 }
 
-function bounceBall() {
-  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) dx = -dx;
 
-  if (ballY + dy < ballRadius) dy = -dy;
+function toTheNext() {
+  difficulty += 1;
+
+  if (difficulty > 2) {
+    isGameOver = true;
+    showMainMenu();
+  }
+
+  setTimeout(function() {
+    init();
+  }, 3000);
+}
+
+//개선판
+function bounceBall() {
+  //  1. 좌우 벽에 부딪히면 반사
+  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+    dx = -dx;
+  }
+
+  //  2. 위쪽 벽에 부딪히면 반사
+  if (ballY + dy < ballRadius) {
+    dy = -dy;
+  }
+
+  //  3. 아래쪽 - 패들과 충돌 체크
   else if (ballY + dy > canvas.height - ballRadius) {
-    const buffer = 10;
-    if (ballX > paddleX - buffer && ballX < paddleX + paddleWidth + buffer) {
-      ran = Math.random() * 5 - 2.5;
-      temp = dx;
-      console.log("dx, ran: ", dx, ran);
-      if (((dx + ran) < 3 && (dx + ran > -3)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx *= 3;
-        console.log("dx *3: ", dx, ran);
-      }
-      else if (((dx + ran) > 9 || (dx + ran < -9)) && (Math.floor(Math.random() * 3) == 0)) {
-        dx /= 3;
-        console.log("dx /3: ", dx, ran);
-      }
+    const paddleTop = canvas.height - paddleHeight;
+    const paddleBottom = canvas.height;
+    const buffer = 10; // 약간 여유를 줌
+
+    const hitTopSurface =
+    ballY + ballRadius + dy >= paddleTop &&  // 공의 바닥이 패들 윗면에 닿음
+    ballY + ballRadius <= paddleBottom &&   // 공이 패들 아래로 완전히 들어가지 않음
+    ballX >= paddleX - buffer &&
+    ballX <= paddleX + paddleWidth + buffer;
+
+    if (hitTopSurface) {
+      //  패들 눌림 이펙트
+      paddleHitEffect = 1.0;
+
+      //  랜덤 튕김 방향 설정
+      let ran = (Math.random() - 0.5) * 0.1; // ±0.05 정도
+      let temp = dx;
+
+      // 너무 낮은 각도 방지 + 너무 가파른 각도 방지
+      let newDx = dx + ran;
       let count = 0;
-      while ((v_s - (dx + ran) * (dx + ran) <= 0) || ((dx + ran < 0.5) && (dx + ran > -0.5))) {
-        ran = Math.random() * 5 - 2.5;
-        console.log("ran 다시: ", dx, ran);
-        count++;
-        if (count == 5) {
-          dx = 0;
-          console.log("무한루프로 dx재설정: ", dx, ran);
-          break;
-        }
+
+      while (
+        (v_s - newDx * newDx <= 0) || // 속도 계산 불가
+        (Math.abs(newDx) < 1.5)       // 너무 낮은 각도 방지
+        ) {
+        ran = (Math.random() - 0.5) * 0.1;
+      newDx = dx + ran;
+      count++;
+      if (count > 5) {
+        newDx = 0;
+        break;
       }
-      dx += ran;
-      if (temp * dx < 0) {
-        dx = -dx;
-        console.log("x방향 재설정 현재 temp, dx: ", temp, dx);
-      }
-      dy = -Math.sqrt(v_s - dx * dx);
-      console.log("최종 v: ", dx, dy, dx * dx + dy * dy);
     }
+
+    dx = newDx;
+
+      // 방향 반전 고려
+    if (temp * dx < 0) {
+      dx = -dx;
+    }
+
+      //  수직 속도 계산
+      dy = -Math.sqrt(Math.max(1, v_s - dx * dx)); // 항상 양수 sqrt 보장
+    }
+
+    //  바닥 충돌 = 게임 오버
     else {
       isGameOver = true;
       gameOver();
-      return;
     }
   }
 }
+
 
 function gameOver() {
   stopMusic();
@@ -687,24 +845,23 @@ function destroyBrick(c, r) {
         ) {
         destroyBrick(nc, nr);
     }
-    console.log(createBricksStr());
   }
+  console.log(createBricksStr());
 }
 
   // 대상 요소 찾기
 const target = iframeDoc.querySelector(b.targetSelector);
 if (!target) {
-  console.log("iframDoc의 타겟이 null이므로 리턴");
+  console.log("iframDoc의 타겟이 null이므로 리턴, " + b.targetSelector);
   return;
 }
 
-  // 효과에 따라 처리
-if (b.effect === "remove") {
-  target.remove();
-} else if (b.effect === "changeColor" && b.color) {
-  target.style.backgroundColor = b.color;
-}
-}
+const handler = effectHandlers[b.effect];
+if (handler) {
+    handler(target, b, iframeDoc); // 필요한 인자 전달
+  }
+
+} //destroyBirkcs 끝
 
 // 디버깅용
 function createBricksStr() {
@@ -731,16 +888,16 @@ function collisionDetection() {
             ballY > b.y &&
             ballY < b.y + brickHeight) {
             dy = -dy;
-            destroyBrick(c, r);
+          destroyBrick(c, r);
 
-            const labArea = document.querySelector("#labArea");
-            const target = labArea?.querySelector(b.targetSelector);
-            if (target) target.remove();
-          }
+          const labArea = document.querySelector("#labArea");
+          const target = labArea?.querySelector(b.targetSelector);
+          if (target) target.remove();
         }
       }
     }
   }
+}
 }
 
 function drawScore() {
@@ -748,6 +905,8 @@ function drawScore() {
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
+
+  $("#scoreBoard").text("Score: "+score);
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
@@ -795,27 +954,82 @@ function checkClear() {
 }
 
 function drawBall() {
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "#26a6d8";
-  if (isGameOver) {
-    ctx.fillStyle = "red";
-  }
-  ctx.fill();
+   ctx.save(); // 현재 상태 저장
+
+   ctx.beginPath();
+   ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+  ctx.clip(); // 이후 그리는 건 원 내부로 제한됨
+
+  // 이미지 그리기 (중앙에 오도록 위치 조정)
+  ctx.drawImage(
+    ballImage,
+    ballX - ballRadius,
+    ballY - ballRadius,
+    ballRadius * 2,
+    ballRadius * 2
+    );
+  ctx.restore(); 
   ctx.closePath();
 }
 
 function drawPaddle() {
-  ctx.beginPath();
-  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#0f0";
-  ctx.fill();
-  ctx.closePath();
+  const y = canvas.height - paddleHeight;
+
+  if (paddleImage.complete) {
+    ctx.save();
+
+    // 이펙트 있을 때 어둡게 표현
+    if (paddleHitEffect > 0) {
+      ctx.filter = `brightness(${1 - paddleHitEffect * 0.5})`; // 어두워짐
+    }
+
+    ctx.drawImage(paddleImage, paddleX, y, paddleWidth, paddleHeight);
+
+    ctx.restore();
+
+    // 점점 효과 줄이기
+    if (paddleHitEffect > 0) {
+      paddleHitEffect -= 0.02;
+      if (paddleHitEffect < 0) paddleHitEffect = 0;
+    }
+  } 
+  else {
+    // 이미지 로딩 안됐을 경우 기본 막대
+    ctx.beginPath();
+    ctx.rect(paddleX, y, paddleWidth, paddleHeight);
+    ctx.fillStyle = "#0f0";
+    ctx.fill();
+    ctx.closePath();
+  }
 }
 
-//아이프레임 영역을 업데이트
+// 벽돌에 태그 랜덤으로 먹이기용 랜덤함수
+function shuffleEmt(emts) {
+  for (let i = emts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [emts[i], emts[j]] = [emts[j], emts[i]];
+  }
+  return emts;
+}
+
+//왼쪽 실습영역 이펙트 함수
+function showLabEffect(x, y) {
+  const labCanvas = document.getElementById("labCanvas");
+  const labCtx = canvas.getContext("2d");
+
+  labCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
+  labCtx.beginPath();
+  labCtx.arc(x, y, 40, 0, Math.PI * 2);
+  labCtx.fill();
+
+  setTimeout(() => {
+    labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
+  }, 800);
+}
+
+//아이프레임 영역을  업데이트
 function updateIframe() {
-  const htmlCode = `<header>
+  const htmlCodeN = `<header>
     <div id="title">
       Play with JS!
     </div>
@@ -964,11 +1178,11 @@ function updateIframe() {
 </div>
 <footer>
   <p>Web programming, Spring 2025</p>
-  <p>Created by 202411235 강동훈</p>
+  <p>Created by 202412345 김아무개</p>
 </footer>`;
 
 //css 코드의 시작
-const cssCode=`*{margin: 0; padding: 0;}
+const cssCodeN=`*{margin: 0; padding: 0;}
 
 body {
   font-family:  "Winky Sans", sans-serif;
@@ -1099,7 +1313,7 @@ table {
 }`;   //css 코드의 끝
 
 //js 코드의 시작
-const jsCode=`console.log("JS 동작 중!")
+const jsCodeN=`console.log("JS 동작 중!")
 console.log("Hello from JS!");
 
 
@@ -1149,8 +1363,10 @@ console.log("Hello from JS!");
       m="April";
       else if(now.getMonth()==4)
       m="May";
-      else if(now.getMonth==5)
-      m="June";
+      else if(now.getMonth()==5)
+       m="June";
+      else if(now.getMonth()==6)
+        m="July";
 
       let s=m+" "+ now.getDate()+". "+ now.getHours()+" : "+now.getMinutes()+" : "+now.getSeconds();
       var table = document.getElementById('ctime');
@@ -1422,9 +1638,16 @@ console.log("Hello from JS!");
     }
 `;
 
+let htmlCode = htmlCodeN;
 
-const css = `<style>${cssCode}</style>`;
-const js = `<script>${jsCode}<\/script>`;
+let css;
+if (testFlag) {
+  css = `<style>${cssCodeN}</style>`;
+}
+else {
+  css = ""; 
+}
+let js = `<script>${jsCodeN}<\/script>`;
 
 const fullHTML = `
         <!DOCTYPE html>
