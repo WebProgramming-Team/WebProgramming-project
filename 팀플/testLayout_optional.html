@@ -19,7 +19,8 @@
  	    </div>
 	    <div id = "options-menu-title-area">
 	    	<p>설정</p>
-	    </div>
+	    </div> 
+	    <button id="option-to-main" class = "back-button">뒤로</button>
 	    <div id = "options-menu-callout-area1" class = "callout-60">
 	    	<div class = "options-callout-area-titlearea">
 	    		<p>🖥️ 배경화면 모드 설정</p>
@@ -65,14 +66,42 @@
 		    </div>
 	    </div>
 
+		<div id="options-menu-callout-area3" class="callout-60">
+		  <div class="options-callout-area-titlearea">
+		    <p>🎵 음악 설정</p>
+		  </div>
 
-	    <div id = "options-menu-callout-area3" class = "callout-60">
-	    	<div class = "options-callout-area-titlearea">
-	    		<p>🎵 음악 설정</p>
-	    	</div>
+		  <!-- 왼쪽: 앨범 아트 -->
+		  <div class="music-left">
+		    <div class="album-art">
+		    	<!-- 음악 이름 -->
+		    	<img id = "options-music-art">
+		    </div>
+		    <div class="music-title">Music 1</div>
+		    
+		    <!-- 버튼 영역 -->
+		    <div class="music-controls">
+		      <span class = "select-front-music">◁◁</span>
+		      <span>❚❚ </span>
+		      <span class = "">▷▷</span>
+	
+		    </div>
+		  </div>
 
-	    	
-	    </div>
+		  <!-- 오른쪽: 상세 정보 -->
+		  <div class="music-right">
+		    <div class="main-info">
+		    	<span>재밌는 노래를 들어보세요!<br> 
+		    		진짜 재밌는 노래들로 가득합니다<br> 
+		    	아니 진짜라니깐</span>
+		    </div>
+		    <div class="sub-info">
+		    	<span>음량 : <span>
+		    	 <input type = "range" min = "0" max = "100" class = "volume-bar">
+		    </div>
+		  </div>
+		</div>
+
    </div>
 
 </body>

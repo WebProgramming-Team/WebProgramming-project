@@ -193,6 +193,57 @@ body {
   cursor: pointer;
 }
 
+.music-left, .music-right {
+  display: inline-block;
+  vertical-align: top;
+  margin: 3% 5%;
+}
 
+.music-left {
+  width: 20rem;
+  text-align: center;
+}
+
+.album-art {
+  width: 20rem;
+  height: 20rem;
+  background-color: white;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.music-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.music-controls span {
+  margin: 0 0.5rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.music-right {
+  width: 50%;
+}
+
+.main-info {
+  width: 100%;
+  height: 20rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sub-info {
+  width: 100%;
+  height: 5rem;
+  border-radius: 0.5rem;
+}
+
+.volume-bar{
+  width: 60%;
+  heigh:50%;
+ }
 
  /*－－－－－－－*/ }

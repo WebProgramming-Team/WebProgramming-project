@@ -179,6 +179,10 @@ $(window).ready(function() {
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
   //===============//
 
+  //시작 게임 화면 구성// 
+
+  $(".start-page").show();
+
   $(this).on("mousemove", function(e) {
     paddleX = e.pageX;
     if (paddleX >= canvas.width - paddleWidth) {
@@ -273,8 +277,8 @@ function showLevelSelectionPage() {
 }
 
 function showOptions() {
-  $("#main-menu").hide();
-  $("#options").show();
+  $(".menu-page").hide();
+  $("#options-menu").show();
 }
 
 function showGuitar() {
