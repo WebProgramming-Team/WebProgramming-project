@@ -115,6 +115,11 @@ const desEleEasy = [
   {selector: "#footer", effect: "remove"}
 ];
 
+
+//name, countFunction, effect
+// -> 
+
+// 
 const desEleNormal = [
   { selector: "#title", effect: "remove" },
   { selector: ".lab", effect: "remove", name: "div"},
@@ -165,7 +170,14 @@ let totalTitleNum = 1;
 let totalDivNum = 6; // 삭제할 div 개수
 
 // 벽돌 관련 전역 변수들
-let extraRow = 0;
+
+//게임 초기화 관련 전역 변수들
+let currentBombAmount = 0; // 현재 스테이지 bomb 개수
+let extraRow = 0; // 전체 벽돌 개수
+
+
+
+
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
@@ -451,8 +463,8 @@ function init() {
 
   configureDifficultySettings(difficulty); // 게임 변수 리셋
 
-
-  resetGameState();  //게임 리셋
+ 
+  resetGameState();  //게임 리셋 -> 문제 없음
 
 
   createBricks(); // 블럭 만들기
@@ -495,12 +507,13 @@ function resetGameState() {
 
 
 
+//볼 초기 상태 설정
   ballX = canvas.width / 2;
   ballY = canvas.height - 80;
 
 
   ballRadius = 30;
-
+//
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
