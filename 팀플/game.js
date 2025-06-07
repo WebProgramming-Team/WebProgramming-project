@@ -16,6 +16,10 @@ let difficultyStr = ["easy", "normal", "hard"];
 // 테스트용 updateIframe에 css 쪽 보면 씀
 let testFlag = true;
 
+
+// //기본 난이도 전역변수
+// let difficulty = 0;
+
 //하드모드 시간제한 변수
 let hardModeTimer = null;
 let timerDisplay = null;
@@ -296,11 +300,10 @@ $(window).ready(function() {
   })
 });
 
-
+//이지 노말 하드 선택 부분
 function showLevelSelectionPage() {
   $("#main-menu").hide();
   $("#level-selection").show();
-
   $("#game-wrapper").hide();
 }
 
@@ -467,22 +470,6 @@ function init() {
       brickRowCount = 4;
     };
   }
-
-  // if (difficulty === 0) {
-  //   extraRow = 2;
-  //   brickRowCount = 2;
-  // } 
-
-  // else if (difficulty === 1) {
-  //   extraRow = 3;
-  //   brickRowCount = 3;
-  // } 
-
-  // else if (difficulty === 2) {
-  //   extraRow = 4;
-  //   brickRowCount = 4;
-  // }
-
   createBricks();
 
   intervalId = setInterval(() => {
@@ -506,7 +493,6 @@ function initShowHide() {
   $(".pop-up-massage").hide();
   $("#pause-panel").hide();
 
-  $("html").css({"cursor":"none"});
    //실습 iframe 업데이트
   updateIframe(); 
 }
