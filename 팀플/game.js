@@ -16,8 +16,8 @@ let difficultyStr = ["easy", "normal", "hard"];
 // 테스트용 updateIframe에 css 쪽 보면 씀
 let testFlag = true;
 
-//기본 난이도 전역변수
-let difficulty = 0;
+// //기본 난이도 전역변수
+// let difficulty = 0;
 
 //하드모드 시간제한 변수
 let hardModeTimer = null;
@@ -481,14 +481,10 @@ function createBricks() {
         isBomb: isBomb,
         targetSelector: element?.selector,
         effect: element?.effect,
-<<<<<<< HEAD
         color: element?.color,
         isSecure: isSecure,
         secureState: secureState,
         hp: hp
-=======
-        // color: element?.color
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
       };
 
       if (r < extraRow) {
@@ -502,7 +498,7 @@ function createBricks() {
   console.log(createBricksStr());
 }
 
-<<<<<<< HEAD
+
 // 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
 function toggleSecureBricks() {
   for (let c = 0; c < bricks.length; c++) {
@@ -523,7 +519,7 @@ function toggleSecureBricks() {
   }
   drawBricks();
 }
-=======
+
 function createElementsByDifficulty(level) {
   let elements = [];
 
@@ -571,7 +567,7 @@ function createHardElements() {
   return elements;
 }
 
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
+
 
 function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
