@@ -931,12 +931,23 @@ function collisionDetection() {
 }
 
 function drawScore() {
+  // 캔버스 상단 점수 표시 (오른쪽 게임 화면용)
   ctx.font = "16px 'Press Start 2P'";
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
 
-  $("#scoreBoard").text("Score: "+score);
+  // 왼쪽 하단 점수판 UI 영역 업데이트
+  const $scoreBoard = $("#scoreBoard");
+
+  // 점수 변동 시 애니메이션 효과 적용
+  $scoreBoard
+    .text("Score: " + score)
+    .addClass("updated");
+
+  setTimeout(() => {
+    $scoreBoard.removeClass("updated");
+  }, 300); // 애니메이션 지속 시간과 일치
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
