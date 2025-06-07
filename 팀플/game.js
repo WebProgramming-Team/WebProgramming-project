@@ -383,7 +383,7 @@ function playGame(){
   //init에서 초기화한 변수 가지고 게임 돌리도록 여기서 조정
   //매번 checkGameClear, checkGameOver 확인해야 함
 }
-function checkGameClear(var Mode){
+function checkGameClear(Mode){
   //Mode별 게임 클리어 조건 확인
 
 
@@ -393,45 +393,46 @@ function checkGameClear(var Mode){
   if(Mode == 0)
 // $(".EasyClear-story").show
     //initEasyGame
-  else if(Mode == 1)
+    else if(Mode == 1)
     // $(".NormalClear-story").show
     //initHareGame()
-  else if(Mode == 2)
+      else if(Mode == 2)
     //하드 난이도일 때
     //$(".GameClear-story").show
-  else{
+        else{
     //???? 넌 누구임
-  }
+        }
 
-}
+      }
 
-function checkGameOver(var Mode){
+      function checkGameOver(Mode){
 
   //Mode(난이도) 별 게임 클리어 조건 확인
 
 
-}
-function init() {
-  if (!isGameOver) {
-    console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
-    return;
-  }
-  testFlag = true;
-  divCount = 0;
-  isGameOver = false;
-  remainingTime = 60;
-  isPaused = false;
-  if (timerDisplay) {
-    timerDisplay.remove();
-    timerDisplay = null;
-  }
-  $("#pan").css({"background-color":"transparent"});
+      }
 
-  initShowHide();
-  stopMusic();
-  ingameMusic[igIdx].play();
+      function init() {
+        if (!isGameOver) {
+          console.log("게임오버상태가 아니므로 init()을 호출할 수 없음");
+          return;
+        }
+        testFlag = true;
+        divCount = 0;
+        isGameOver = false;
+        remainingTime = 60;
+        isPaused = false;
+        if (timerDisplay) {
+          timerDisplay.remove();
+          timerDisplay = null;
+        }
+        $("#pan").css({"background-color":"transparent"});
 
-  bricks = [];
+        initShowHide();
+        stopMusic();
+        ingameMusic[igIdx].play();
+
+        bricks = [];
   createBricks(); // 난이도에 상관없이 일단 생성
 
   if (difficulty == 2) {
@@ -468,34 +469,33 @@ function init() {
   //난이도에 따른 벽돌 분기처리
   bricks = [];
   switch (difficulty) {
-    case 0: {
-      extraRow = 1;
-      brickRowCount = 1;
-      break;
-    };
-    case 1: {
-      extraRow = 3;
-      brickRowCount = 3;
-      break;
-    };
-    case 2: {
-      extraRow = 4;
-      brickRowCount = 4;
-    };
+  case 0: {
+    extraRow = 1;
+    brickRowCount = 1;
+    break;
+  };
+case 1: {
+  extraRow = 3;
+  brickRowCount = 3;
+  break;
+};
+case 2: {
+  extraRow = 4;
+  brickRowCount = 4;
+};
+}
+createBricks();
+
+intervalId = setInterval(() => {
+  if (!isPaused && !isGameOver) {
+    moveBricksDown();
   }
-  createBricks();
+  if (hiddenRowNum <= 0) {
+    clearInterval(intervalId);
+  }
+}, 5000);
 
-  intervalId = setInterval(() => {
-    if (!isPaused && !isGameOver) {
-      moveBricksDown();
-    }
-    if (hiddenRowNum <= 0) {
-      clearInterval(intervalId);
-    }
-  }, 5000);
-
-
-  requestAnimationFrame(draw);
+requestAnimationFrame(draw);
 }
 
 function initShowHide() {
@@ -1005,8 +1005,8 @@ function drawScore() {
 
   // 점수 변동 시 애니메이션 효과 적용
   $scoreBoard
-    .text("Score: " + score)
-    .addClass("updated");
+  .text("Score: " + score)
+  .addClass("updated");
 
   setTimeout(() => {
     $scoreBoard.removeClass("updated");
@@ -1210,9 +1210,9 @@ function updateIframe() {
       <a href = "#">Created By Soohyun Lee</a>
     </footer>
   </div>
-`;
+  `;
 
-const cssCodeE = `
+  const cssCodeE = `
     * {
       font-family: "맑은 고딕", Gothic, sans-serif;
       margin: 0;
@@ -1334,10 +1334,10 @@ const cssCodeE = `
       line-height: 50px;
       text-align: center;
     }
-`;
+  `;
 
-const jsCodeE = `
-`;
+  const jsCodeE = `
+  `;
 
   const htmlCodeN = `<header>
     <div id="title">
@@ -1956,8 +1956,13 @@ case 1: {
   tempCss = cssCodeN;
   tempJs = jsCodeN;
 }
-case 2: {}
+case 2: {
+  htmlCode = htmlCodeN;
+  tempCss = cssCodeN;
+  tempJs = jsCodeN;
 }
+}
+
 css = `<style>${tempCss}</style>`;
 js = `<script>${tempJs}<\/script>`;
 
@@ -2000,9 +2005,9 @@ function startHardModeTimer() {
     }
   }, 2000);
   if (timerDisplay) {
-        timerDisplay.remove();
-        timerDisplay = null;
-    }
+    timerDisplay.remove();
+    timerDisplay = null;
+  }
 
   timerDisplay = document.createElement("div");
   timerDisplay.style.position = "absolute";
