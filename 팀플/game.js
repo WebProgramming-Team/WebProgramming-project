@@ -187,42 +187,22 @@ const bombImage = new Image();
 bombImage.src = "images/block-asset/bomb.png"; // 폭탄 벽돌
 
 
+
 //브라우저 로딩시 실행.
 $(window).ready(function() {
-
-
-
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
   /*--------------*/ 
-
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
+  SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
+
   StartGameHome(); // 게임을 홈 화면으로 세팅함. 
   //변수 초기화 -> 나중에 defienGameVarDefault 쪽으로 넘겨줄거. 
 
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
 
-
-
-  //아래는 함수 바인딩
-  $(this).on("mousemove", function(e) {
-    if (lastMouseX == -1) {
-      lastMouseX = e.pageX;
-      return;
-    }
-    let mouseDx = (e.pageX - lastMouseX);
-    paddleX += mouseDx;
-
-    if (paddleX >= canvas.width - paddleWidth) {
-      paddleX = canvas.width - paddleWidth;
-    }
-    else if (paddleX <= 0) {
-      paddleX = 0;
-    }
-    lastMouseX = e.pageX;
-  });
-
+ 
 
 //option 쪽으로 넘겨줄 것들
   // $(".bs-radio").on("change", function() {
@@ -246,7 +226,33 @@ $(window).ready(function() {
 
 
 
-//기본 키 바인딩
+});
+
+
+///=========================================
+// [키 바인딩 관련]
+function SetUserControl(){
+
+  //바 컨트롤 바인딩
+  $(window).on("mousemove", function(e) {
+    if (lastMouseX == -1) {
+      lastMouseX = e.pageX;
+      return;
+    }
+    let mouseDx = (e.pageX - lastMouseX);
+    paddleX += mouseDx;
+
+    if (paddleX >= canvas.width - paddleWidth) {
+      paddleX = canvas.width - paddleWidth;
+    }
+    else if (paddleX <= 0) {
+      paddleX = 0;
+    }
+    lastMouseX = e.pageX;
+  });
+
+
+  //기본 키 바인딩
   $(document).on("keydown", function(e) {
     if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
@@ -285,11 +291,9 @@ $(window).ready(function() {
     }
   });
 
-  //기본 변수 로딩
-});
-
+}
 ///===========================================
-//여기부터 ~번까지는 전부 메인 화면 관련)
+//[게임 시작 전 메인 화면 관련]
 function allHide(){
   //전부 다 hide하는 함수
     $(".menu-page").hide();//메뉴 페이지 hide
@@ -330,6 +334,7 @@ function defineGameVarDefault(){
   gameOverMusic[0].addEventListener("ended", function() {
     gameOverMusic[1].play();
   })
+  //게임 오버 뮤직 플레이
 
   $("#menu-music-button, #intro-to-main").on("click", function() {
     menuMusic.play();
