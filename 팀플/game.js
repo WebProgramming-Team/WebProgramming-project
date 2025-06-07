@@ -9,7 +9,7 @@ let isPaused = false;
 let igIdx = 0;
 const v_s_fast = 128;
 const v_s_slow = 72;
-let v_s = v_s_fast;
+let v_s = v_s_slow;
 let difficulty; //이건 난이도를 정함
 let difficultyStr = ["easy", "normal", "hard"];
 
@@ -17,7 +17,7 @@ let difficultyStr = ["easy", "normal", "hard"];
 let testFlag = true;
 
 //기본 난이도 전역변수
-let difficulty = 0;
+difficulty = 0;
 
 //하드모드 시간제한 변수
 let hardModeTimer = null;
@@ -262,6 +262,7 @@ $(window).ready(function() {
       stopMusic();
       isGameOver = true;
       clearTimeout(uDiedMsg);
+      clearInterval(intervalId);
       setTimeout(function() {
         init();
       }, 10);
@@ -379,7 +380,7 @@ function init() {
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
   ballRadius = 10;
-  dx = Math.floor(Math.random() * 16 - 8);
+  dx = Math.floor(Math.random() * 16    - 8);
   dy = -Math.sqrt(v_s - dx * dx);
   console.log(dx, dy, dx * dx + dy * dy);
 
@@ -393,20 +394,38 @@ function init() {
 
   //난이도에 따른 벽돌 분기처리
   bricks = [];
-  if (difficulty === 0) {
-    extraRow = 2;
-    brickRowCount = 2;
-  } 
-
-  else if (difficulty === 1) {
-    extraRow = 3;
-    brickRowCount = 3;
-  } 
-
-  else if (difficulty === 2) {
-    extraRow = 4;
-    brickRowCount = 4;
+  switch (difficulty) {
+    case 0: {
+      extraRow = 1;
+      brickRowCount = 1;
+      break;
+    };
+    case 1: {
+      extraRow = 3;
+      brickRowCount = 3;
+      break;
+    };
+    case 2: {
+      extraRow = 4;
+      brickRowCount = 4;
+    };
   }
+
+  // if (difficulty === 0) {
+  //   extraRow = 2;
+  //   brickRowCount = 2;
+  // } 
+
+  // else if (difficulty === 1) {
+  //   extraRow = 3;
+  //   brickRowCount = 3;
+  // } 
+
+  // else if (difficulty === 2) {
+  //   extraRow = 4;
+  //   brickRowCount = 4;
+  // }
+
   createBricks();
 
   intervalId = setInterval(() => {
@@ -416,7 +435,7 @@ function init() {
     if (hiddenRowNum <= 0) {
       clearInterval(intervalId);
     }
-  }, 1000);
+  }, 5000);
 
 
   requestAnimationFrame(draw);
@@ -437,7 +456,7 @@ function initShowHide() {
 
 //벽돌 생성 함수(태그 대응까지)
 function createBricks() {
-  const bombCount = 2;
+  const bombCount = 4;
   const bombPositions = [];
   hiddenRowNum = extraRow;
 
@@ -479,19 +498,17 @@ function createBricks() {
         y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
         status: r < extraRow ? 0 : 1,
         isBomb: isBomb,
+        isHidden: 0,
         targetSelector: element?.selector,
         effect: element?.effect,
-<<<<<<< HEAD
         color: element?.color,
         isSecure: isSecure,
         secureState: secureState,
         hp: hp
-=======
-        // color: element?.color
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
       };
 
       if (r < extraRow) {
+        bricks[c][r].isHidden = 1; // 이걸로 숨겨진거 감지
         bricks[c][r].status = 0;
       }
 
@@ -502,7 +519,6 @@ function createBricks() {
   console.log(createBricksStr());
 }
 
-<<<<<<< HEAD
 // 2초마다 isSecure 벽돌 색/이미지 토글 함수 예시
 function toggleSecureBricks() {
   for (let c = 0; c < bricks.length; c++) {
@@ -523,7 +539,7 @@ function toggleSecureBricks() {
   }
   drawBricks();
 }
-=======
+
 function createElementsByDifficulty(level) {
   let elements = [];
 
@@ -556,23 +572,6 @@ function createNormalElements() {
   return elements;
 }
 
-function createHardElements() {
-  let elements = [];
-
-  // 하드모드에서는 전부 calculator 블록으로만 구성
-  const calculator = desEleHard.find(el => el.selector === ".lab.calculator");
-
-  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
-
-  for (let i = 0; i < totalBrickCount; i++) {
-    elements.push(calculator);
-  }
-
-  return elements;
-}
-
->>>>>>> c14ddba4eecee6c0e08908c33ddec5aa05e980e8
-
 function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
     return;
@@ -587,6 +586,7 @@ function moveBricksDown() {
   }
 
   for (let i = 0; i < brickColumnCount; i++) {
+    bricks[i][hiddenRowNum].isHidden = 0;
     bricks[i][hiddenRowNum].status = 1;
   }
   console.log("벽돌 내려왔음, "+ extraRow +"번 중" + (extraRow - hiddenRowNum) + " 번");
@@ -618,7 +618,7 @@ function draw() {
 
   if (checkClear()) {
     isGameOver = true;
-    clearInterval(intervalId);
+    // clearInterval(intervalId);
 
     testFlag = false;
     updateIframe();
@@ -629,7 +629,7 @@ function draw() {
   } 
 
   requestAnimationFrame(draw);
-   drawSecureIndicator();
+   // drawSecureIndicator(); // 이 함수 미완인 것 같아 일단 주석
 }
 
 
@@ -639,7 +639,9 @@ function toTheNext() {
   if (difficulty > 2) {
     isGameOver = true;
     showMainMenu();
+    return;
   }
+  clearInterval(intervalId);
 
   setTimeout(function() {
     init();
@@ -675,35 +677,54 @@ function bounceBall() {
       paddleHitEffect = 1.0;
 
       //  랜덤 튕김 방향 설정
-      let ran = (Math.random() - 0.5) * 0.1; // ±0.05 정도
+      let ran = (Math.random() - 0.5) * 4;
       let temp = dx;
 
       // 너무 낮은 각도 방지 + 너무 가파른 각도 방지
       let newDx = dx + ran;
       let count = 0;
+      console.log("초기 수정 Dx: "+ newDx);
+      console.log(v_s - newDx*newDx, newDx*newDx, v_s/8);
+
+      // 공이 너무 기울어져 있을 경우 보정
+      if (v_s - newDx*newDx <= v_s/8) {
+        if (Math.floor(Math.random() * 2) == 0) {
+          newDx /= 2;
+          console.log("dx 1/2배");
+        }
+        else console.log("dx 1/2배 하려다 말음");
+      }
+      else if (newDx*newDx <= v_s/8) {
+        if (Math.floor(Math.random() * 2) == 0) {
+          newDx *= 2;
+          console.log("dx 2배");
+        }
+        else console.log("dx 2배 하려다 말음");
+      }
 
       while (
-        (v_s - newDx * newDx <= 0) || // 속도 계산 불가
-        (Math.abs(newDx) < 1.5)       // 너무 낮은 각도 방지
-        ) {
-        ran = (Math.random() - 0.5) * 0.1;
-      newDx = dx + ran;
-      count++;
-      if (count > 5) {
-        newDx = 0;
-        break;
+        (v_s - newDx * newDx <= 0)
+        )
+      {
+        ran = (Math.random() - 0.5) * 4;
+        newDx = dx + ran;
+        count++;
+        if (count > 5) {
+          newDx = 0;
+          break;
+        }
       }
-    }
 
-    dx = newDx;
+      dx = newDx;
 
       // 방향 반전 고려
-    if (temp * dx < 0) {
-      dx = -dx;
-    }
+      if (temp * dx < 0) {
+        dx = -dx;
+      }
 
-      //  수직 속도 계산
+      //  수직 속도 계산 
       dy = -Math.sqrt(Math.max(1, v_s - dx * dx)); // 항상 양수 sqrt 보장
+      console.log("공 튕김, 이전: "+temp+" 이후: "+newDx+" 총 속도: "+(newDx*newDx+dy*dy));
     }
 
     //  바닥 충돌 = 게임 오버
@@ -946,7 +967,7 @@ function checkClear() {
   for (let c = 0; c < brickColumnCount; c++) {
     if (bricks[c]) {
       for (let r = 0; r < bricks[c].length; r++) {
-        if (bricks[c][r] && bricks[c][r].status === 1) return false;
+        if (bricks[c][r] && (bricks[c][r].status === 1 || bricks[c][r].isHidden === 1)) return false;
       }
     }
   }
@@ -1029,6 +1050,212 @@ function showLabEffect(x, y) {
 
 //아이프레임 영역을  업데이트
 function updateIframe() {
+  const htmlCodeE = `
+  <div id = "wrapper">
+    <header id = "header">
+      <h1 class = "title">
+        웹 프로그래밍 완전 정복
+      </h1>
+      <h2 class = "subtitle">
+        건국대학교 컴퓨터공학부
+      </h2>
+    </header>
+    <nav id = "navigation">
+      <div class = "pull-left">
+        <ul class = "outer-menu">
+          <li class = "outer-menu-item">HTML5</li>
+          <li class = "outer-menu-item">CSS3</li>
+          <li class = "outer-menu-item">JavaScript</li>
+        </ul>
+      </div>
+      <div class = "pull-right">
+        <form>
+        <input type = "text" class = "input-search">
+        <input type = "submit" value = "검색" class = "input-search-submit">
+        </form>
+      </div>
+    </nav>
+    <div id = "content">
+      <section id = "main-section">
+        <article>
+          <div class = "article-header">
+            <h1 class = "article-title">HTML5 개요와 활용</h1>
+            <p class = "article-date">2025년 03월 13일</p>
+          </div>
+          <div class = "article-body">
+            <img src = "https://placehold.co/430x280">
+            <p>sd fsdf sdfsdfsdfsd fsdsfsdfssdfsd dsfsdfdsfsdfsdfsdfdsfsd fdssdfsfsfsdfdsfdsfds fdsdsfdsf
+            dsfssdsdfdsfdsf dsfdsfds fdsfdsf sd fds fds fds dsfsdfds fds fdsfdsf dsfdsfdsfsdfds fsdfsdfsdfds fdssd fdsf dsf ds fdsf dsf dsf df sf sd ds fsd fds f df sdf ds fsd sda sdasda das dsa sda asd ad das d das dsa das das as sdasdasddsasddas asdasddassdaasdasdas dsadasdsda dasdsaasdsaddsadasdsadsad sda ds asd  das das ads dsa dsa dsa ads dsa dsa das das d s</p>
+          </div>
+        </article>
+        <article>
+          <div class = "article-header">
+            <h1 class = "article-title">HTML5 개요와 활용</h1>
+            <p class = "article-date">2025년 03월 13일</p>
+          </div>
+          <div class = "article-body">
+            <img src = "https://placehold.co/430x280">
+            <p>sd fsdf sdfsdfsdfsd fsdsfsdfssdfsd dsfsdfdsfsdfsdfsdfdsfsd fdssdfsfsfsdfdsfdsfds fdsdsfdsf
+            dsfssdsdfdsfdsf dsfdsfds fdsfdsf sd fds fds fds dsfsdfds fds fdsfdsf dsfdsfdsfsdfds fsdfsdfsdfds fdssd fdsf dsf ds fdsf dsf dsf df sf sd ds fsd fds f df sdf ds fsd sda sdasda das dsa sda asd ad das d das dsa das das as sdasdasddsasddas asdasddassdaasdasdas dsadasdsda dasdsaasdsaddsadasdsadsad sda ds asd  das das ads dsa dsa dsa ads dsa dsa das das d s</p>
+          </div>
+        </article>
+      </section>
+      <section id = "main-aside">
+        <div class = "aside-list">
+          <h3>카테고리</h3>
+          <ul>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+          </ul>
+        </div>
+        <div class = "aside-list">
+          <h3>최근 글</h3>
+          <ul>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+            <li><a href = "#">데이터</a></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+    <footer id = "footer">
+      <a href = "#">Created By Soohyun Lee</a>
+    </footer>
+  </div>
+`;
+
+const cssCodeE = `
+    * {
+      font-family: "맑은 고딕", Gothic, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    a {text-decoration: none;}
+    li {list-style: none;}
+    body {
+      background-color: #FFE4E1;
+      width: 960px;
+      margin: 0 auto;
+    }
+    article {
+      padding: 0 10px 20px 10px;
+      border-bottom: 1px solid #C9C9C9;
+    }
+
+    #wrapper {
+      background-color: white;
+      padding: 10px 20px;
+      margin-top: 40px;
+    }
+    #header {
+      padding: 40px 50px;
+    }
+    #navigation {
+      margin-bottom: 20px;
+      border-top: 1px solid #C9C9C9;
+      border-bottom: 1px solid #C9C9C9;
+      height: 40px;
+    }
+    #main-section {
+      width: 710px;
+      float: left;
+    }
+    #main-aside {
+      width: 200px;
+      float: right;
+    }
+    #content {
+      overflow: hidden;
+    }
+    #footer {
+      background-color: #FF9D6E;
+      height: 50px;
+    }
+    .title {
+      font-size: 30px;
+      color: #191919;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #383838;
+    }
+    .outer-menu-item {
+      display: block;
+      height: 30px;
+      width: 80px;
+      padding: 5px 20px;
+      text-align: center;
+      line-height: 30px;
+      float: left;
+    }
+    .outer-menu-item:hover {
+      background-color: #FF9D6E;
+      color: #282828;
+      font-weight: bold;
+    }
+    .pull-left {
+      height: 40px;
+      float: left;
+    }
+    .pull-right {
+      height: 26px;
+      padding: 7px 7px;
+      float: right;
+    }
+    .input-search {
+      display: block;
+      height: 24px;
+      width: 120px;
+      padding-left: 10px;
+      border: 1px solid #CCCCCC;
+      border-radius: 15px 0 0 15px;
+      float: left;
+    }
+    .input-search:focus {
+      background-color: yellow;
+      outline: 0;
+    }
+    .input-search-submit {
+      display: block;
+      height: 26px;
+      width: 50px;
+      border: 1px solid #CCCCCC;
+      border-radius: 0 15px 15px 0;
+      float:  left;
+    }
+    .article-header {
+      padding: 20px 0;
+    }
+    .article-title {font-size: 25px;}
+    .article-date {font-size: 13px;}
+    .article-body {font-size: 14px;}
+
+    .aside-list li a {
+      font-size: 13px;
+      color: orange;
+    }
+    .aside-list > h3 {
+      font-size: 15px;
+      color: blue;
+    }
+    #footer > a {
+      display: block;
+      font-size: 20px;
+      color: #282828;
+      font-weight: bold;
+      line-height: 50px;
+      text-align: center;
+    }
+`;
+
+const jsCodeE = `
+`;
+
   const htmlCodeN = `<header>
     <div id="title">
       Play with JS!
@@ -1577,10 +1804,6 @@ console.log("Hello from JS!");
 
     let colorInterval; // 인터벌 ID 저장 변수
 
-    function changeColor(){
-      colorInterval= setInterval(flashText,1000);
-    }
-
     function flashText() {
       var elem=document.getElementById("target");
       elem.style.color=(elem.style.color=="red")?"blue":"red";
@@ -1637,17 +1860,23 @@ console.log("Hello from JS!");
       }
     }
 `;
-
-let htmlCode = htmlCodeN;
-
-let css;
-if (testFlag) {
-  css = `<style>${cssCodeN}</style>`;
+let tempCss, tempJs, htmlCode, css, js;
+switch (difficulty) {
+case 0: {
+  htmlCode = htmlCodeE;
+  tempCss = cssCodeE;
+  tempJs = jsCodeE;
+  break;
 }
-else {
-  css = ""; 
+case 1: {
+  htmlCode = htmlCodeN;
+  tempCss = cssCodeN;
+  tempJs = jsCodeN;
 }
-let js = `<script>${jsCodeN}<\/script>`;
+case 2: {}
+}
+css = `<style>${tempCss}</style>`;
+js = `<script>${tempJs}<\/script>`;
 
 const fullHTML = `
         <!DOCTYPE html>
@@ -1760,10 +1989,11 @@ function gameOverDueToTime() {
 //     };
 // }
 
-function drawSecureIndicator() {
-  if (isSecure) {
-    ctx.font = "20px Arial";
-    ctx.fillStyle = "yellow";
-    ctx.fillText("SECURE MODE", canvas.width - 150, 30);
-  }
-}
+// 코드 미완인 것 같아 주석처리
+// function drawSecureIndicator() {
+//   if (isSecure) {
+//     ctx.font = "20px Arial";
+//     ctx.fillStyle = "yellow";
+//     ctx.fillText("SECURE MODE", canvas.width - 150, 30);
+//   }
+// }
