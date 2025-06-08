@@ -432,9 +432,23 @@ body {
   width: 100%;
   height: 90%;
   position: relative;
+  overflow: hidden;
 }
 
-#labFrame,
+#labFrameWrapper {
+  transform: scale(1.6);
+  transform-origin: top left;
+  width: 100%;
+  height: 100%;
+}
+
+#labFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
 #labCanvas,
 #pan {
   position: absolute;

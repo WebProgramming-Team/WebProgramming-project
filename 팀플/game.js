@@ -171,7 +171,7 @@ const effectHandlers = {
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
-    triggerLabEffectOnTarget(target);
+    // triggerLabEffectOnTarget(target);
   },
 
   breakGugudan: (target, b, iframeDoc) => {
@@ -186,7 +186,7 @@ const effectHandlers = {
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
-    triggerLabEffectOnTarget(target);
+    // triggerLabEffectOnTarget(target);
   },
 
   breakNumGame: (target, b, iframeDoc) => {
@@ -205,7 +205,7 @@ const effectHandlers = {
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
-    triggerLabEffectOnTarget(target);
+    // triggerLabEffectOnTarget(target);
   },
 
   breakWordBook: (target, b, iframeDoc) => {
@@ -223,7 +223,7 @@ const effectHandlers = {
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
-    triggerLabEffectOnTarget(target);
+    // triggerLabEffectOnTarget(target);
   },
 
   breakClickHere: (target, b, iframeDoc) => {
@@ -241,7 +241,7 @@ const effectHandlers = {
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
-    triggerLabEffectOnTarget(target);
+    // triggerLabEffectOnTarget(target);
   },
 
   breakImageToggle: (target, b, iframeDoc) => {
@@ -258,7 +258,7 @@ const effectHandlers = {
   showHackingProgress();
   scrollToTarget(target);
   fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // triggerLabEffectOnTarget(target);
 },
 
 breakColorList: (target, b, iframeDoc) => {
@@ -274,7 +274,7 @@ breakColorList: (target, b, iframeDoc) => {
   showHackingProgress();
   scrollToTarget(target);
   fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // triggerLabEffectOnTarget(target);
 },
 
 breakFlashBox: (target, b, iframeDoc) => {
@@ -292,7 +292,7 @@ breakFlashBox: (target, b, iframeDoc) => {
   showHackingProgress();
   scrollToTarget(target);
   fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // triggerLabEffectOnTarget(target);
 },
 
 breakMovingBox: (target, b, iframeDoc) => {
@@ -315,7 +315,7 @@ breakMovingBox: (target, b, iframeDoc) => {
   showHackingProgress();
   scrollToTarget(target);
   fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // triggerLabEffectOnTarget(target);
 },
 
 breakHangman: (target, b, iframeDoc) => {
@@ -326,22 +326,24 @@ breakHangman: (target, b, iframeDoc) => {
 
   if (img) {
     img.src = "projects/easy-mode/breakHangMan.png";
-  }
+   img.style.width = "122px";    // 💡 기존 이미지 사이즈에 맞춤
+   img.style.height = "168px";
+ }
 
-  if (clue) {
-    clue.innerHTML = "💀 이 페이지는 해킹되었습니다 💀";
-    clue.style.color = "red";
-    clue.style.fontWeight = "bold";
-  }
+ if (clue) {
+  clue.innerHTML = "💀 이 페이지는 해킹되었습니다 💀";
+  clue.style.color = "red";
+  clue.style.fontWeight = "bold";
+}
 
-  if (guessBtn) guessBtn.disabled = true;
-  if (newGameBtn) newGameBtn.disabled = true;
+if (guessBtn) guessBtn.disabled = true;
+if (newGameBtn) newGameBtn.disabled = true;
 
-  shakeIframe();
-  showHackingProgress();
-  scrollToTarget(target);
-  fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+shakeIframe();
+showHackingProgress();
+scrollToTarget(target);
+fadeOutElement(target, 10000);
+// triggerLabEffectOnTarget(target);
 },
 
 breakHeaderTitle: (target, b, iframeDoc) => {
@@ -356,8 +358,8 @@ breakHeaderTitle: (target, b, iframeDoc) => {
   shakeIframe();
   showHackingProgress();
   scrollToTarget(target);
-  fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // fadeOutElement(target, 10000);
+  // triggerLabEffectOnTarget(target);
 },
 
 breakFooterWarning: (target, b, iframeDoc) => {
@@ -373,8 +375,8 @@ breakFooterWarning: (target, b, iframeDoc) => {
   shakeIframe();
   showHackingProgress();
   scrollToTarget(target);
-  fadeOutElement(target, 10000);
-  triggerLabEffectOnTarget(target);
+  // fadeOutElement(target, 10000);
+  // triggerLabEffectOnTarget(target);
 }
 
 
@@ -1105,14 +1107,16 @@ const uniqueTargets = [
 function createHardElementsFixed() {
   const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
 
-  // 나머지 빈 블럭은 effect: "none" 으로 채우기
-  const elements = [...uniqueTargets];
+  const reversedTargets = [...uniqueTargets].reverse(); // 위에 있는 태그가 아래 블럭에!
+  const elements = [];
+
   while (elements.length < totalBrickCount) {
-    elements.push({ selector: "none", effect: "none", label: "" });
+    elements.push(...reversedTargets);
   }
 
   return elements.slice(0, totalBrickCount);
 }
+
 
 
 function moveBricksDown() {
@@ -1482,20 +1486,20 @@ function checkTagCount(tag){
       easy_headerCount++;
     }
 
-  if (tag.isBomb) {
-    triggerBombChain(c, r);
-    if (b.isBomb) {
+    if (tag.isBomb) {
       triggerBombChain(c, r);
-    }else if(tag == "footer"){
-      console.log("푸터 태크 하나 사라짐");
-      easy_footerCount++;
-    }else{
-     console.log("뭐시여 무슨 태그여 이거");
-   }
-   console.log("\nTotal counts:");
-   console.log("Articles: " + easy_articleCount);
-   console.log("Headers: " + easy_headerCount);
-   console.log("Footers: " + easy_footerCount);
+      if (b.isBomb) {
+        triggerBombChain(c, r);
+      }else if(tag == "footer"){
+        console.log("푸터 태크 하나 사라짐");
+        easy_footerCount++;
+      }else{
+       console.log("뭐시여 무슨 태그여 이거");
+     }
+     console.log("\nTotal counts:");
+     console.log("Articles: " + easy_articleCount);
+     console.log("Headers: " + easy_headerCount);
+     console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
 
@@ -1521,6 +1525,7 @@ function checkTagCount(tag){
     return;
 
   }
+}
 }
 function NormalModeGameFun() {
   const iframe = document.getElementById("labFrame");
@@ -1632,20 +1637,31 @@ function EasyModeGameFun() {
 function drawDestructionEffects(ctx) {
   for (let i = destructionEffects.length - 1; i >= 0; i--) {
     const effect = destructionEffects[i];
+
     ctx.globalAlpha = effect.opacity;
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "red";
+
+    // 글꼴 크기 증가 + 진한 빨강
+    ctx.font = "bold 40px Arial";
+    ctx.fillStyle = "#cc0000"; // 진한 빨강
+    ctx.strokeStyle = "black"; // 테두리 효과
+    ctx.lineWidth = 2;
     ctx.textAlign = "center";
+
+    // 테두리와 텍스트 그리기
+    ctx.strokeText(effect.label, effect.x, effect.y);
     ctx.fillText(effect.label, effect.x, effect.y);
+
     ctx.globalAlpha = 1.0;
 
-    // 서서히 사라지게
-    effect.opacity -= 0.02;
+    // 사라지는 속도 느리게 (기존 0.02 → 0.005)
+    effect.opacity -= 0.001;
+
     if (effect.opacity <= 0) {
-      destructionEffects.splice(i, 1);  // 완전히 사라지면 배열에서 제거
+      destructionEffects.splice(i, 1);
     }
   }
 }
+
 //보조용 함수들 두개
 function removeHtmlTagFromIframe(id) {
   const iframe = document.getElementById("labFrame");
@@ -1919,21 +1935,6 @@ function shuffleEmt(emts) {
     [emts[i], emts[j]] = [emts[j], emts[i]];
   }
   return emts;
-}
-
-//왼쪽 실습영역 이펙트 함수
-function showLabEffect(x, y) {
-  const labCanvas = document.getElementById("labCanvas");
-  const labCtx = canvas.getContext("2d");
-
-  labCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
-  labCtx.beginPath();
-  labCtx.arc(x, y, 40, 0, Math.PI * 2);
-  labCtx.fill();
-
-  setTimeout(() => {
-    labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
-  }, 800);
 }
 
 //아이프레임 영역을  업데이트
@@ -2924,10 +2925,27 @@ function showHackingProgress() {
   bar.insertAdjacentHTML('beforeend', '<div class="hacking-success">SUCCESS!</div>');
 }
 
-//타겟 태그 자동 스크롤로 이동
+// 타겟 태그 자동 스크롤로 이동
 function scrollToTarget(target) {
   target.scrollIntoView({ behavior: "smooth", block: "center" });
 }
+// function scrollToTarget(target) {
+//   target.scrollIntoView({
+//     behavior: "smooth",
+//     block: "center",
+//     inline: "nearest"
+//   });
+
+//   // 강제로 다시 확대
+//   setTimeout(() => {
+//     const frame = document.getElementById("labFrame");
+//     frame.style.transform = "scale(1.6)";
+//     frame.style.transformOrigin = "top left";
+//   }, 0); // 바로 다음 tick에 적용
+// }
+
+
+
 
 //10초 후 태그 천천히 사라짐
 function fadeOutElement(target, delay = 10000) {
@@ -2944,8 +2962,24 @@ function triggerLabEffectOnTarget(target) {
   const iframeRect = document.getElementById("labFrame").getBoundingClientRect();
   const x = rect.left - iframeRect.left + rect.width / 2;
   const y = rect.top - iframeRect.top + rect.height / 2;
-  showLabEffect(x, y);
+  // showLabEffect(x, y);
 }
+
+//왼쪽 실습영역 이펙트 함수
+// function showLabEffect(x, y) {
+//   const labCanvas = document.getElementById("labCanvas");
+//   const labCtx = canvas.getContext("2d");
+
+//   labCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
+//   labCtx.beginPath();
+//   labCtx.arc(x, y, 40, 0, Math.PI * 2);
+//   labCtx.fill();
+
+//   setTimeout(() => {
+//     labCtx.clearRect(0, 0, labCanvas.width, labCanvas.height);
+//   }, 800);
+// }
+
 
 //중복 제거용 이펙트
 function getEffectLabel(selector) {
