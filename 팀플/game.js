@@ -325,7 +325,7 @@ breakHangman: (target, b, iframeDoc) => {
   const newGameBtn = iframeDoc.querySelector("#newGame");
 
   if (img) {
-    img.src = "projects/easy-mode/hangman/hangman6.gif";
+    img.src = "projects/easy-mode/breakHangMan.png";
   }
 
   if (clue) {
@@ -509,67 +509,100 @@ $(window).ready(function() {
 
 ///=========================================
 // [키 바인딩 관련]
-function SetUserControl(){
-
-  //바 컨트롤 바인딩
-  $(window).on("mousemove", function(e) {
-    if (lastMouseX == -1) {
-      lastMouseX = e.pageX;
-      return;
-    }
-    let mouseDx = (e.pageX - lastMouseX);
-    paddleX += mouseDx;
-
-    if (paddleX >= canvas.width - paddleWidth) {
-      paddleX = canvas.width - paddleWidth;
-    }
-    else if (paddleX <= 0) {
-      paddleX = 0;
-    }
-    lastMouseX = e.pageX;
-  });
-
-
-  //기본 키 바인딩
-  $(document).on("keydown", function(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
-  });
-
-  $(document).on("keyup", function(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-
-    if (e.key.toLowerCase() === "p" || e.key.toLowerCase() === "e") {
-      if (isPaused) {
-        isPaused = false;
-        $("#pause-panel").hide();
-        $("html").css({"cursor":"none"});
-        requestAnimationFrame(draw);
-      }
-      else {
-        isPaused = true;
-        $("#pause-panel").show();
-        $("html").css({"cursor":"default"});
-      }
-      console.log("isPaused is ", isPaused);
-    }
-
-    if (e.key.toLowerCase() === "r") {
-      stopMusic();
-      isGameOver = true;
-      clearTimeout(uDiedMsg);
-      clearInterval(intervalId);
-      setTimeout(function() {
-        init();
-      }, 10);
-    }
-    if (e.key.toLowerCase() === "q") {
-      showMainMenu();
-    }
-  });
-
+// ===========================
+// [키 바인딩 리팩토링 버전]
+// ===========================
+function SetUserControl() {
+  bindMouseMovement();
+  bindKeyboardEvents();
+  bindControlButtons(); // 버튼도 연결
 }
+
+function bindMouseMovement() {
+  $(window).on("mousemove", handleMouseMove);
+}
+
+function handleMouseMove(e) {
+  if (lastMouseX === -1) {
+    lastMouseX = e.pageX;
+    return;
+  }
+
+  const mouseDx = e.pageX - lastMouseX;
+  paddleX += mouseDx;
+
+  paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, paddleX));
+  lastMouseX = e.pageX;
+}
+
+function bindKeyboardEvents() {
+  $(document).on("keydown", handleKeyDown);
+  $(document).on("keyup", handleKeyUp);
+}
+
+function handleKeyDown(e) {
+  const key = e.key;
+  if (key === "Right" || key === "ArrowRight") rightPressed = true;
+  else if (key === "Left" || key === "ArrowLeft") leftPressed = true;
+}
+
+function handleKeyUp(e) {
+  const key = e.key;
+  const lowerKey = key.toLowerCase();
+
+  // 방향키 해제
+  if (key === "Right" || key === "ArrowRight") rightPressed = false;
+  else if (key === "Left" || key === "ArrowLeft") leftPressed = false;
+
+  // 일시정지/재개
+  if (key === "Escape") {
+    togglePause();  // ESC로 통일
+  }
+
+  // 다시 시작
+  if (lowerKey === "r") {
+    restartGame();
+  }
+
+  // 메인메뉴로
+  if (lowerKey === "q") {
+    showMainMenu();
+  }
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    $("#pause-panel").show();
+    $("html").css({ "cursor": "default" });
+  } else {
+    $("#pause-panel").hide();
+    $("html").css({ "cursor": "none" });
+    requestAnimationFrame(draw);
+  }
+
+  console.log("isPaused is", isPaused);
+}
+
+//r버튼 눌렀을때 게임 재시작 요소
+function restartGame() {
+  stopMusic();
+  isGameOver = true;
+  clearTimeout(uDiedMsg);
+  clearInterval(intervalId);
+  setTimeout(() => init(), 10);
+}
+
+//버튼에도 이벤트 연결
+function bindControlButtons() {
+  $("#pause-btn").on("click", togglePause);
+  $("#restart-btn").on("click", restartGame);
+  $("#quit-btn").on("click", showMainMenu);
+}
+
+
+
 ///===========================================
 //[게임 시작 전 메인 화면 관련]
 function allHide(){
@@ -913,25 +946,25 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-    { type: "article", count: 4 },
-    { type: "footer", count: 2 },
-    { type: "header", count: 2 }
-    
+      { type: "article", count: 4 },
+      { type: "footer", count: 2 },
+      { type: "header", count: 2 }
+
   ]; //블럭 어떻게 넣을건지 확인
-    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
 
 
-  } else if (level === 1) {
-     const blockPlan = [
-    { type: "body", count: 3 },
-    { type: "main-menu", count: 2 },
-    { type: "lab", count: 2 },
-    {type:" table-border", count:1}
+} else if (level === 1) {
+ const blockPlan = [
+  { type: "body", count: 3 },
+  { type: "main-menu", count: 2 },
+  { type: "lab", count: 2 },
+  {type:" table-border", count:1}
   ]; //블럭 어떻게 넣을건지 확인
 
 
-    layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
-  } else if (level === 2) {
+  layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
+} else if (level === 2) {
     elements = createHardElementsFixed();   // 하드 요소들만 따로 준비
   }
 
@@ -1101,22 +1134,22 @@ function createHardElementsRandom() {
   // 개수 맞게 자르기
   return shuffleEmt(elements.slice(0, totalBrickCount));
 }
-  
+
   //전역에 고정 배치 블럭 지정
-  const uniqueTargets = [
-    { selector: ".lab.calculator", effect: "breakCalculator", label: "계산기 파괴!" },
-    { selector: ".lab.gugudan", effect: "breakGugudan", label: "구구단 폭파!" },
-    { selector: ".lab.numGame", effect: "breakNumGame", label: "숫자게임 고장!" },
-    { selector: ".lab.wordBook", effect: "breakWordBook", label: "단어장 삭제!" },
-    { selector: ".lab.clickHere", effect: "breakClickHere", label: "클릭 이벤트 삭제!" },
-    { selector: ".lab.image-toggle", effect: "breakImageToggle", label: "사진 기능 파괴!" },
-    { selector: ".lab.colorList", effect: "breakColorList", label: "색상표 제거!" },
-    { selector: ".lab.flashBox", effect: "breakFlashBox", label: "깜빡이 종료!" },
-    { selector: ".lab.movingBox", effect: "breakMovingBox", label: "상자 멈춤!" },
-    { selector: "#hangman", effect: "breakHangman", label: "행맨 파괴!" },
-    { selector: "#title", effect: "breakHeaderTitle", label: "제목 삭제!" },
-    { selector: "footer", effect: "breakFooterWarning", label: "푸터 경고!" }
-  ];
+const uniqueTargets = [
+  { selector: ".lab.calculator", effect: "breakCalculator", label: "계산기 파괴!" },
+  { selector: ".lab.gugudan", effect: "breakGugudan", label: "구구단 폭파!" },
+  { selector: ".lab.numGame", effect: "breakNumGame", label: "숫자게임 고장!" },
+  { selector: ".lab.wordBook", effect: "breakWordBook", label: "단어장 삭제!" },
+  { selector: ".lab.clickHere", effect: "breakClickHere", label: "클릭 이벤트 삭제!" },
+  { selector: ".lab.image-toggle", effect: "breakImageToggle", label: "사진 기능 파괴!" },
+  { selector: ".lab.colorList", effect: "breakColorList", label: "색상표 제거!" },
+  { selector: ".lab.flashBox", effect: "breakFlashBox", label: "깜빡이 종료!" },
+  { selector: ".lab.movingBox", effect: "breakMovingBox", label: "상자 멈춤!" },
+  { selector: "#hangman", effect: "breakHangman", label: "행맨 파괴!" },
+  { selector: "#title", effect: "breakHeaderTitle", label: "제목 삭제!" },
+  { selector: "footer", effect: "breakFooterWarning", label: "푸터 경고!" }
+];
 
 //이건 벽돌 위치가 고정된것.
 function createHardElementsFixed() {
@@ -1421,12 +1454,12 @@ function destroyBrick(c, r) {
      b.status = 0; // 먼저 비활성화 처리 (중복 방지)
      triggerBombChain(c, r);
    } 
-  handleScoreEffect(b);
-  handleWarning(score);
-  const effectSuccess = processIframeEffect(b, c, r);
+   handleScoreEffect(b);
+   handleWarning(score);
+   const effectSuccess = processIframeEffect(b, c, r);
 
   // 효과 적용 후 캔버스 위에 뜨는 파괴 메시지 이펙트
-  if (effectSuccess && b.targetSelector) {
+   if (effectSuccess && b.targetSelector) {
     const label = getEffectLabel(b.targetSelector);
     destructionEffects.push({
       x: b.x + brickWidth / 2,
@@ -1643,18 +1676,6 @@ function drawScore() {
   ctx.fillStyle = "#fff";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
-
-  // 왼쪽 하단 점수판 UI 영역 업데이트
-  const $scoreBoard = $("#scoreBoard");
-
-  // 점수 변동 시 애니메이션 효과 적용
-  $scoreBoard
-  .text("Score: " + score)
-  .addClass("updated");
-
-  setTimeout(() => {
-    $scoreBoard.removeClass("updated");
-  }, 300); // 애니메이션 지속 시간과 일치
 
   // 떠오르는 점수 이펙트 그리기
   for (let i = 0; i < scoreEffects.length; i++) {
@@ -2759,21 +2780,26 @@ function blackout(duration = 800) {
 function showHackingProgress() {
   const bar = document.getElementById("hackingBar");
   const fill = document.getElementById("hackingFill");
+
   bar.style.display = "block";
   fill.style.width = "0%";
 
   let percent = 0;
+
   const interval = setInterval(() => {
-    percent += 5;
+    percent += 10; // 더 빠르게
     fill.style.width = `${percent}%`;
+
     if (percent >= 100) {
       clearInterval(interval);
       setTimeout(() => {
         bar.style.display = "none";
-      }, 500);
+      }, 300); // 사라지는 시간도 더 짧게
     }
-  }, 100);
+  }, 50); // 더 짧은 간격
+  bar.insertAdjacentHTML('beforeend', '<div class="hacking-success">SUCCESS!</div>');
 }
+
 //타겟 태그 자동 스크롤로 이동
 function scrollToTarget(target) {
   target.scrollIntoView({ behavior: "smooth", block: "center" });
