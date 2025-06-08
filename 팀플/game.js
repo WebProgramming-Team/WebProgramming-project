@@ -1322,23 +1322,63 @@ function startBrickMoveTimer(difficulty) {
     requestAnimationFrame(draw);
   }
 
-  function showStory(){
-    allHide();
-    $("clear-panel").show();
-    if(difficulty == 0){
-      //이지모드 
-    }
+function showStory() {
+  allHide();
+  $("#clear-panel").show();
+  
+  const storyText = getStoryByDifficulty(difficulty);
+  const lines = storyText.split("\n");
+  const container = $("#story-text");
+  container.text("");  // 초기화
 
-    difficulty += 1;
-    if (difficulty > 2) {
-      isGameOver = true;
-      showMainMenu();
-
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < lines.length) {
+      container.append(lines[index] + "\n");
+      index++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        $("#clear-panel").hide();
+        difficulty++;
+        if (difficulty > 2) {
+          isGameOver = true;
+          showMainMenu();
+        } else {
+          init();
+        }
+      }, 3000); // 다 출력된 후 3초 대기
     }
-    setTimeout(function() {
-      init();
-    }, 3000);
+  }, 1000); // 한 줄씩 1초 간격 출력
+}
+
+//난이도 별로 스토리 출력
+function getStoryByDifficulty(level) {
+  if (level === 0) {
+    return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
+하지만 웹 프로그래밍은 상대평가니까,
+다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+굉장히 기발한 아이디어다!
+
+나는 남의 과제를 망쳐서,
+내 평균을 끌어올리기로 결심한다.
+
+우선, 쉬운 실습부터 파괴해보자.`;
+  } else if (level === 1) {
+    return `중간 실습은 한 번에 부숴지지 않는다.
+공을 여러 번 맞혀야 태그가 파괴된다.
+
+이제 점점 더 어려워지는 실습...
+하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
+  } else {
+    return `시간이 없다...
+제한된 시간 속에서 모든 블록을 파괴하라!
+
+이건 실력이 아닌 운도 시험하는 도전이다.
+하지만 나는 할 수 있다.`;
   }
+}
+
 
 
 //개선판
