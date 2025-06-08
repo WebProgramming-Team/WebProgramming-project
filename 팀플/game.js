@@ -1151,11 +1151,11 @@ function createElementsByDifficulty(level) {
   { type: "main-menu", count: 2 },
   { type: "footer", count: 2 },
   { type: "lab", count: 2 },
-  {type:"container", count:4}
+  {type: "container", count:4}
   ]; //블럭 어떻게 넣을건지 확인
 
 
-  layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
+  layout = generateBlockLayoutWithRules(6, 4, blockPlan, 4);
 } else if (level === 2) {
     elements = createHardElementsFixed();   // 하드 요소들만 따로 준비
   }
@@ -1707,8 +1707,8 @@ function destroyBrick(c, r) {
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
-  if (handleSecureBlock(b)) return;
-  b.status = 0; // 먼저 비활성화 처리 (중복 방지)
+  // if (handleSecureBlock(b)) return;
+  // b.status = 0; // 먼저 비활성화 처리 (중복 방지)
 
   if (b.tag != null) checkTagCount(b.tag);
 
@@ -1720,7 +1720,7 @@ function destroyBrick(c, r) {
    handleScoreEffect(b);
    handleWarning(score);
    const effectSuccess = processIframeEffect(b, c, r);
-
+   b.status = 0;
   // 효과 적용 후 캔버스 위에 뜨는 파괴 메시지 이펙트
    if (effectSuccess && b.targetSelector) {
     const label = getEffectLabel(b.targetSelector);
@@ -1768,6 +1768,7 @@ function checkTagCount(tag){
     switch (tag) {
     case "body":
       normal_bodyCount++; break;
+
     case "header":
       normal_headerCount++; break;
     case "footer":
