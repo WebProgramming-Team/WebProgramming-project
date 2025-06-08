@@ -472,12 +472,7 @@ body {
   display: block;
 }
 
-
-
-
-
-
-
+/*이 아래는 게임에 영향있는 부가요소*/
 
 #scoreBoard.updated {
   animation: popScore 0.3s ease;
