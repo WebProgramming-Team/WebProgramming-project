@@ -1038,7 +1038,7 @@ function createElementsByDifficulty(level) {
     { type: "header", count: 1 }
     
   ]; //블럭 어떻게 넣을건지 확인
-    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 1);
+    layout = generateBlockLayoutWithRules(2, 4, blockPlan, 1);
 
 } else if (level === 1) {
  const blockPlan = [
