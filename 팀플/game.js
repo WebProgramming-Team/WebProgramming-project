@@ -1456,8 +1456,9 @@ function checkTagCount(tag){
     }else if(tag == "header"){
       console.log("헤더 하나 사라짐 하나 사라짐"); 
       easy_headerCount++;
+    }
 
-  if (b.isBomb) {
+  if (tag.isBomb) {
     triggerBombChain(c, r);
     }else if(tag == "footer"){
       console.log("푸터 태크 하나 사라짐");
@@ -2806,8 +2807,6 @@ function triggerLabEffectOnTarget(target) {
   showLabEffect(x, y);
 }
 
-<<<<<<< HEAD
-=======
 //중복 제거용 이펙트
 function getEffectLabel(selector) {
   if (selector.includes("calculator")) return "덧셈 계산기 파괴!";
