@@ -790,6 +790,7 @@ function showOptions() {
 function showGuitar() {
   $("#main-menu").hide();
   $("#guitar").show();
+  $("#clear-panel").hide();
 }
 
 function showMainMenu() {
@@ -835,20 +836,24 @@ function startHardPage() {
 }
 
 function showIntroStory() {
+  console.log('인트로 스토리 진행');
   const introText = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
-하지만 웹 프로그래밍은 상대평가니까,
-다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
-굉장히 기발한 아이디어다!
+  하지만 웹 프로그래밍은 상대평가니까,
+  다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+  굉장히 기발한 아이디어다!
 
-나는 남의 과제를 망쳐서,
-내 평균을 끌어올리기로 결심한다.`;
+  나는 남의 과제를 망쳐서,
+  내 평균을 끌어올리기로 결심한다.`;
 
-  showStoryPanel(introText, () => {
+    //콜백함수로 정의
+    showStoryPanel(introText, () => {
     showStoryIntroOnly(); // Intro가 끝나면 설명 스토리로
   });
 }
 
+//이건 기타 메뉴의 스토리
 function showStoryIntroOnly() {
+  console.log('인트로 넘어가서 진행2');
   const explainText = getStoryByDifficulty(difficulty); // 기존 설명 그대로 사용
   showStoryPanel(explainText, () => {
     init(); // 설명이 끝나면 게임 시작
@@ -878,6 +883,59 @@ function showStoryPanel(text, callback) {
   }, 1000);
 }
 
+function goToStory(type) {
+  allHide(); // 다른 메뉴 숨기기
+  $("#clear-panel").show();
+
+  const container = $("#story-text");
+  container.text("");
+
+  let text = "";
+  switch (type) {
+    case "intro":
+      text = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
+하지만 웹 프로그래밍은 상대평가니까,
+다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+굉장히 기발한 아이디어다!
+
+나는 남의 과제를 망쳐서,
+내 평균을 끌어올리기로 결심한다.`;
+      break;
+    case "easy":
+      text = getStoryByDifficulty(0); // 기존 설명 재활용
+      break;
+    case "normal":
+      text = getStoryByDifficulty(1);
+      break;
+    case "hard":
+      text = getStoryByDifficulty(2);
+      break;
+    case "clear":
+      text = `🎉 모든 난이도 클리어!
+
+웹프의 마스터가 된 당신에게 박수를 보냅니다.
+이제 다른 사람의 과제를 부수는 걸 넘어서...
+
+진짜 개발자가 되어보세요.`;
+      break;
+  }
+
+  const lines = text.split("\n");
+  let index = 0;
+
+  const interval = setInterval(() => {
+    if (index < lines.length) {
+      container.append(lines[index] + "\n");
+      index++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        $("#clear-panel").hide();
+        $("#guitar").show(); // 기타 메뉴로 다시 돌아가기
+      }, 3000);
+    }
+  }, 800); // 줄마다 0.8초씩 보여주기
+}
 
 
 

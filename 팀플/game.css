@@ -407,7 +407,7 @@ body {
   display: none;
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: white;
   color: #00ff00;
   font-family: "Press Start 2P", monospace;
   font-size: 1.2rem;
@@ -795,6 +795,83 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
+#start-button:hover {
+  cursor: pointer;
+}
+
+#options-button:hover{
+  cursor: pointer;
+}
+
+#guitar-button:hover{
+  cursor: pointer;
+}
+/*이 아래는 기타 메뉴*/
+/* 기타 메뉴 레이아웃: 고전 이야기 분위기 */
+.guitar-menu-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 20px;
+  /*background: linear-gradient(to bottom, #fdf6e3, #fcefc7);*/
+  font-family: "Nanum Pen Script", cursive;
+  padding: 40px;
+  background-image: url("images/guitarIMG.png");
+  /*background-size: cover;*/
+  /*background-position: center;*/
+}
+
+/* 제목 스타일 */
+.guitar-menu-page h1 {
+  font-size: 5.5rem;
+  color: #4b2e0d;
+  text-shadow: 1px 1px #fff3;
+  margin-bottom: 30px;
+}
+
+/* 스토리 버튼 스타일: 옛 책갈피 느낌 */
+.story-button {
+  padding: 20px 40px;
+  font-size: 3.5rem;
+  margin: 10px;
+  background-color: #7c5230;
+  color: #fffbe8;
+  border: 3px solid #4b2e0d;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 350px;
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+  font-family: "Nanum Pen Script", cursive;
+}
+
+.story-button:hover {
+  background-color: #a36c45;
+  transform: scale(1.03);
+}
+
+/* 뒤로가기 버튼도 고전 느낌 유지 */
+.back-button {
+  padding: 14px 30px;
+  font-size: 3.5rem;
+  margin-top: 40px;
+  background-color: #4b2e0d;
+  color: #fffbe8;
+  border: 2px solid #3b1d06;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: "Nanum Pen Script", cursive;
+}
+
+.back-button:hover {
+  background-color: #6a3d1e;
+}
+
 
 /*[폰트 정의 모음]*/
 
