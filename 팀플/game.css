@@ -1,13 +1,20 @@
 /*반응형 구현 위한 html 태그 내부 픽셀*/
 /* 전체 body에서는 기본 스크롤 허용 */
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
+html{
+  /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
+  /*window width, height 1521x799 기준 16px*/
+  font-size:100%;
 
+ }
+
+/*전체 body 속성 */
+body {
+  width: 60vw;
+  height: 100vh;
+  background: #222;
+  display: block;
+  margin: 0 auto;
+}
 /* [메인 메뉴 씬 css 설정 모음] */
 
 /* 해결해야 하는 사항
@@ -180,12 +187,12 @@ html, body {
 
 /*최상단 백그라운드 이미지 1*/
 #options-menu-background-area img{
-  width:1600px;
+  width:1900px;
   height:900px;/*사진 기본 크기*/
 
   position:absolute;
   top:-450px;
-  left:-400px;
+  left : 0px;
   /*top, left값 향후 조정 예정*/
 
 }
@@ -276,7 +283,7 @@ html, body {
 }
 .radio-container {
   margin-top: 10px;
-  font-size: 20px;
+  font-size: 30px;
   font-weight: bold;
 }
 
@@ -292,8 +299,8 @@ html, body {
 /*실제 공 이미지*/
 .ball-container-img {
   margin:8% auto 5% 9%;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   display: inline-block;
   overflow: hidden;
   object-fit: cover;
@@ -301,8 +308,7 @@ html, body {
 
 /*js용 선택됐을 때 코드*/
 .ball-selected {
-  border-color: blue;
-  border: 4px solid black;
+  border: 10px solid green;
   border-radius: 50%;
 }
 
@@ -311,6 +317,9 @@ html, body {
   border: none;
 }
 
+.ball-finalSelect {
+  border-color: yellow;
+}
 #ball-image-selector {
   text-align: center;
 }
@@ -387,6 +396,17 @@ html, body {
 }
 
 
+/*스토리 화면 */ 
+#clear-panel{
+  width:100%;
+  height:100%;
+  background-color: white;
+  font-size:500px;
+  
+}
+
+
+
 /* 전체 좌우 분할 */
 /* 전체 게임 화면 */
 #game-wrapper {
@@ -396,6 +416,7 @@ html, body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 /* 왼쪽 영역: 실습 */
@@ -409,7 +430,7 @@ html, body {
 /* 실습 iframe + 효과 캔버스 영역 */
 #labArea {
   width: 100%;
-  height: 85%;
+  height: 90%;
   position: relative;
 }
 
@@ -437,21 +458,113 @@ html, body {
   opacity: 0.3;
 }
 
-/* 점수판/툴팁 */
+/* 일시정지 or 게임메뉴로 이동 버튼*/
 #ps {
-  height: 15%;
-  background-color: #aaf; /* 예시 색상 */
+  background: linear-gradient(to right, #222 0%, #333 100%);
+  padding: 20px 40px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-left: 20px;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Press Start 2P", monospace;
+  border-top: 4px solid #00f;
+  border-bottom: 4px solid #00f;
+  box-shadow: 0 -2px 10px #00f inset, 0 2px 10px #0ff;
 }
 
-/* 점수 등 텍스트 */
-#ps p {
-  font-size: 24px;
-  margin: 4px 0;
+/* 좌측 버튼 묶음 */
+.ps-left {
+  flex: 1;
 }
+
+/* 가운데 정렬 + 버튼 간격 */
+.ps-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+}
+
+/* 아케이드 느낌의 버튼 */
+.ps-btn {
+  background: #111;
+  color: #0f0;
+  border: 3px solid #0f0;
+  border-radius: 12px;
+  padding: 20px 30px;
+  font-size: 1.2rem;
+  font-family: "Press Start 2P", monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.ps-btn:hover {
+  background: #222;
+  color: #fff;
+  border-color: #fff;
+  transform: scale(1.05);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.ps-btn:active {
+  transform: scale(0.95);
+  box-shadow: none;
+}
+
+/* 우측 해킹 UI 묶음 */
+.ps-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 해킹 텍스트 */
+#hackingText {
+  color: #ff4444;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.8rem;
+  display: none;
+  animation: blinkHack 1s step-start infinite;
+  margin-bottom: 4px;
+}
+
+/* 해킹바 */
+#hackingBar {
+  width: 200px;
+  height: 16px;
+  background: #222;
+  border-radius: 10px;
+  overflow: hidden;
+  display: none;
+  box-shadow: 0 0 8px #0ff, 0 0 12px #0f0 inset;
+}
+
+#hackingFill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    red, orange, yellow, green, cyan, blue, violet);
+  background-size: 300% 100%;
+  animation: rainbowMove 1s linear infinite;
+  transition: width 0.1s ease-out;
+  border-radius: 10px;
+}
+
+/* 무지개 흐르는 효과 */
+@keyframes rainbowMove {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
+}
+
+/* 깜빡이는 느낌 */
+@keyframes blinkHack {
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
 
 /* 오른쪽 영역: 게임 */
 #game-area {
@@ -469,10 +582,6 @@ html, body {
 }
 
 /*이 아래는 게임에 영향있는 부가요소*/
-
-#scoreBoard.updated {
-  animation: popScore 0.3s ease;
-}
 
 @keyframes popScore {
   0%   { transform: scale(1); color: yellow; }
@@ -561,25 +670,60 @@ html, body {
 /* ---------------------------------
    일시정지 패널
 ---------------------------------- */
+/* 일시정지 패널 */
 #pause-panel {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 680px;
-  height: 480px;
-  background-color: white;
-  border: 1px solid black;
-  z-index: 4;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.8);
+  width: 520px;
+  padding: 30px;
+  background: rgba(20, 20, 20, 0.9);
+  border: 4px solid #00ff00;
+  border-radius: 16px;
   display: none;
+  z-index: 1000;
+  font-family: "Press Start 2P", monospace;
+  color: #0f0;
+  box-shadow: 0 0 20px #0f0;
+  text-align: center;
 }
 
-/* 내부 요소도 위에 보이도록 */
-#pause-panel * {
-  z-index: 5;
+/* 타이틀 */
+.pause-title {
+  font-size: 1.5rem;
+  color: #0f0;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px #0f0;
 }
+
+/* 설명 안내 */
+.pause-instructions p {
+  margin: 10px 0;
+  font-size: 0.8rem;
+  color: #fff;
+  text-shadow: 0 0 4px red;
+}
+
+/* 볼륨 섹션 */
+.pause-volume {
+  margin-top: 30px;
+  font-size: 0.8rem;
+  color: #0ff;
+}
+
+.volume-bar {
+  width: 80%;
+  margin-top: 10px;
+  accent-color: #0ff;
+}
+
+.volume-value{
+  margin-top: 5px;
+  font-size: 0.8rem;
+}
+
+/*여기까지가 일시정지 메뉴*/
 
 h1 {
   font-size: 80px;
@@ -634,7 +778,11 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   font-style: normal;
 }
 
-//난이도 선택 디자인
+/*레벨 선택*/
+
+.level-selction-page{
+  background-color: white;
+}
 #level-choice {
   font-size: 2em;
   text-align: center;
