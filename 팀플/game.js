@@ -505,7 +505,6 @@ $(window).ready(function() {
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
-
   /*--------------*/ 
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
@@ -613,61 +612,7 @@ function bindControlButtons() {
   $("#quit-btn").on("click", showMainMenu);
 }
 
-///==================================
-//설정 쪽 코드
- // 모든 공 이미지 요소 선택
-  let ballImages;
-  let totalBalls;
 
-  // 선택 인덱스 초기값
-  let selectedIndex = 2;
-  let finalSelectIndex = -1;
-
-  // 선택 상태 갱신 함수
-  function updateBallSelection() {
-    ballImages.forEach((img, i) => {
-      if (i === selectedIndex) {
-        img.classList.add('ball-selected');
-        if(i === finalSelectIndex){
-          img.classList.add("ball-finalSelect");
-           ballImage.src = img.src;
-         }
-        img.classList.remove('ball-unselected');
-
-      } else {
-        img.classList.remove('ball-selected');
-        img.classList.add('ball-unselected');
-        img.classList.remove("ball-finalSelect");
-      }
-    });
-  }
-
-  // 왼쪽 회전
-  function rotateLeft() {
-    selectedIndex = (selectedIndex - 1 + totalBalls) % totalBalls;
-    updateBallSelection();
-  }
-
-  // 오른쪽 회전
-  function rotateRight() {
-    selectedIndex = (selectedIndex + 1) % totalBalls;
-    updateBallSelection();
-  }
-
-  // 선택한 이미지 src 출력 또는 활용
-  function showSelectedIndex() {
-    const selectedImg = ballImages[selectedIndex];
-    const selectedSrc = selectedImg.src;
-    finalSelectIndex = selectedIndex;
-    updateBallSelection();
-
-    ballImage.src = selectedSrc;
-
-    console.log("선택된 이미지 경로:", selectedSrc);
-  }
-
-
-  
 
 ///===========================================
 //[게임 시작 전 메인 화면 관련]
@@ -729,16 +674,11 @@ function showLevelSelectionPage() {
   $("#normal-button").on("click", startNormalPage);
   $("#hard-button").on("click", startHardPage);
   $(".level-selction-page").show(); 
-
 }
 
 function showOptions() {
   allHide();
   $(".option-page").show();
-  ballImages = document.querySelectorAll('.ball-container-img');
-  totalBalls = ballImages.length;
-  updateBallSelection(); // 설정 관련 업데이트
-  
   //옵션 관련 추가 
 }
 
@@ -794,9 +734,6 @@ function startHardPage() {
 //게임 초기화 함수
 function init() {
   if (!isGameOver) return;
-
-  $("body").css("width", "100%");
-  $("html").css("width", "100%");
   console.log("게임 초기화");
   clearInterval(intervalId);//interval 쪽 변경
   configureDifficultySettings(difficulty); // 게임 변수 리셋
@@ -991,25 +928,25 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-    { type: "article", count: 4 },
-    { type: "footer", count: 2 },
-    { type: "header", count: 2 }
-    
+      { type: "article", count: 4 },
+      { type: "footer", count: 2 },
+      { type: "header", count: 2 }
+      
   ]; //블럭 어떻게 넣을건지 확인
-    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
 
 
-  } else if (level === 1) {
-     const blockPlan = [
-    { type: "body", count: 3 },
-    { type: "main-menu", count: 2 },
-    { type: "lab", count: 2 },
-    {type:" table-border", count:1}
+} else if (level === 1) {
+ const blockPlan = [
+  { type: "body", count: 3 },
+  { type: "main-menu", count: 2 },
+  { type: "lab", count: 2 },
+  {type:" table-border", count:1}
   ]; //블럭 어떻게 넣을건지 확인
 
 
-    layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
-  } else if (level === 2) {
+  layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
+} else if (level === 2) {
     elements = createHardElementsFixed();   // 하드 요소들만 따로 준비
   }
 
@@ -1291,8 +1228,8 @@ function startBrickMoveTimer(difficulty) {
       isGameOver = true;
       showMainMenu();
 
-  }
-  setTimeout(function() {
+    }
+    setTimeout(function() {
       init();
     }, 3000);
   }
@@ -1545,8 +1482,8 @@ function checkTagCount(tag){
       easy_headerCount++;
     }
 
-  if (b.isBomb) {
-    triggerBombChain(c, r);
+    if (b.isBomb) {
+      triggerBombChain(c, r);
     }else if(tag == "footer"){
       console.log("푸터 태크 하나 사라짐");
       easy_footerCount++;
@@ -1562,7 +1499,7 @@ function checkTagCount(tag){
 
   }else if(difficulty==1){
     //노말 모드 계획
-  switch (tag) {
+    switch (tag) {
     case "body":
       normal_bodyCount++; break;
     case "header":
@@ -1583,7 +1520,6 @@ function checkTagCount(tag){
 
   }
 }
-}
 function NormalModeGameFun() {
   const iframe = document.getElementById("labFrame");
   if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
@@ -1599,28 +1535,28 @@ function NormalModeGameFun() {
   if (!isChangedHeader && normal_headerCount >= 2) {
     const headers = doc.getElementsByTagName("header");
     for (let h of headers) h.style.position = "absolute";
-    isChangedHeader = true;
+      isChangedHeader = true;
     console.log("iframe 내부 header 스타일 변경!");
   }
 
   if (!isChangedMainMenu && normal_mainMenuCount >= 2) {
     const menus = doc.getElementsByClassName("main-menu");
     for (let m of menus) m.style.display = "none";
-    isChangedMainMenu = true;
+      isChangedMainMenu = true;
     console.log("iframe 내부 main-menu 숨김!");
   }
 
   if (!isChangedFooter && normal_footerCount >= 2) {
     const footers = doc.getElementsByTagName("footer");
     for (let f of footers) f.style.backgroundColor = "red";
-    isChangedFooter = true;
+      isChangedFooter = true;
     console.log("iframe 내부 footer 배경색 변경!");
   }
 
   if (!isChangedLab && normal_labCount >= 2) {
     const labs = doc.getElementsByClassName("lab");
     for (let l of labs) l.style.border = "none";
-    isChangedLab = true;
+      isChangedLab = true;
     console.log("iframe 내부 lab border 제거!");
   }
 
@@ -1678,16 +1614,16 @@ function EasyModeGameFun() {
   if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
     isDeletearticle1 && easy_headerCount >= 1){
     removeHtmlTagFromIframe("wrapper");
-    console.log("헤더컷!");
+  console.log("헤더컷!");
 
-    destructionEffects.push({
-      x: canvas.width / 2,
-      y: 140,
-      label: "wrapper 파괴!",
-      opacity: 1.0
-    });
-    isDeleteAll = true;
-  }
+  destructionEffects.push({
+    x: canvas.width / 2,
+    y: 140,
+    label: "wrapper 파괴!",
+    opacity: 1.0
+  });
+  isDeleteAll = true;
+}
 }
 
 //블럭 부서질 때마다 어떤 블럭 부서졌는지 말해주는거!
@@ -1804,9 +1740,9 @@ function triggerBombChain(c, r) {
       nr >= 0 && nr < bricks[nc]?.length
       ) {
       console.log(`[DEBUG] 인접 벽돌 제거 시도: (${nc}, ${nr})`);
-      destroyBrick(nc, nr);
-    }
+    destroyBrick(nc, nr);
   }
+}
 }
 
 
@@ -1895,7 +1831,7 @@ function checkClearByDifficulty() {
   case 0:
    return checkEasyClear();
 
-  case 1:
+ case 1:
       return checkNormalClear(); // 기존 checkClear 내용 그대로
     case 2:
       return checkHardClear();   // 새로 만든 하드 클리어 기준
@@ -1904,27 +1840,27 @@ function checkClearByDifficulty() {
     }
   }
 
-function checkEasyClear() {
+  function checkEasyClear() {
    return isDeleteAll;
-  }
+ }
 //노말 클리어 체크
-  function checkNormalClear() {
+ function checkNormalClear() {
    return isChangedBody && 
-isChangedHeader && 
-isChangedFooter && 
-isChangedMainMenu && 
-isChangedLab && 
-isChangedContainer;
+   isChangedHeader && 
+   isChangedFooter && 
+   isChangedMainMenu && 
+   isChangedLab && 
+   isChangedContainer;
 
-}
+ }
 
 //하드 클리어 체크
-  function checkHardClear() {
-    const targetSelectors = uniqueTargets.map(t => t.selector);
-    return targetSelectors.every(sel => destroyedSelectors.has(sel));
-  }
+ function checkHardClear() {
+  const targetSelectors = uniqueTargets.map(t => t.selector);
+  return targetSelectors.every(sel => destroyedSelectors.has(sel));
+}
 
-  function drawBall() {
+function drawBall() {
    ctx.save(); // 현재 상태 저장
 
    ctx.beginPath();
@@ -3040,4 +2976,3 @@ function drawDestructionEffects() {
   // 다 사라진건 제거
   destructionEffects = destructionEffects.filter(e => e.opacity > 0);
 }
-
