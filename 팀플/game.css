@@ -1,13 +1,20 @@
 /*반응형 구현 위한 html 태그 내부 픽셀*/
 /* 전체 body에서는 기본 스크롤 허용 */
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
+html{
+  /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
+  /*window width, height 1521x799 기준 16px*/
+  font-size:100%;
 
+ }
+
+/*전체 body 속성 */
+body {
+  width: 65vw;
+  height: 100vh;
+  background: #222;
+  display: block;
+  margin: 0 auto;
+}
 /* [메인 메뉴 씬 css 설정 모음] */
 
 /* 해결해야 하는 사항

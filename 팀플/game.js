@@ -505,6 +505,7 @@ $(window).ready(function() {
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
+
   /*--------------*/ 
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
@@ -720,6 +721,9 @@ function startHardPage() {
 //게임 초기화 함수
 function init() {
   if (!isGameOver) return;
+
+  $("body").css("width", "100%");
+  $("html").css("width", "100%");
   console.log("게임 초기화");
   clearInterval(intervalId);//interval 쪽 변경
   configureDifficultySettings(difficulty); // 게임 변수 리셋
@@ -1470,6 +1474,7 @@ function checkTagCount(tag){
 
   }
 }
+}
 function NormalModeGameFun() {
   const iframe = document.getElementById("labFrame");
   if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
@@ -1814,7 +1819,7 @@ isChangedMainMenu &&
 isChangedLab && 
 isChangedContainer;
 
-  }
+}
 
 //하드 클리어 체크
   function checkHardClear() {
@@ -2899,8 +2904,6 @@ function triggerLabEffectOnTarget(target) {
   showLabEffect(x, y);
 }
 
-<<<<<<< HEAD
-=======
 //중복 제거용 이펙트
 function getEffectLabel(selector) {
   if (selector.includes("calculator")) return "덧셈 계산기 파괴!";
@@ -2932,3 +2935,4 @@ function drawDestructionEffects() {
   // 다 사라진건 제거
   destructionEffects = destructionEffects.filter(e => e.opacity > 0);
 }
+
