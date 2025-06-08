@@ -689,15 +689,6 @@ function createBricks() {
   const elements = shuffleEmt(createElementsByDifficulty(difficulty));
 
 
-  const layout = layout;
-
-  if(mode == 0){
-    bricks = createBricksFromLayout(layout);
-    console.log(createBricksStr());
-    return;
-  }
-
-
   let eCount = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
@@ -730,11 +721,10 @@ function generateBombPositions(totalCount) {
 
 //보조 2. 벽돌 생성 객체 함수
 function createBrickObject(c, r, element, isBomb) {
-
   //easy 모드일 때 임시 루틴
-  if(mode == 0){
+  if(difficulty == 0){
      const bricks = [];
-        const tag = layout[r][c];
+        let tag = layout[r][c];
         const isBomb = tag === "bomb";
         const isTopRow = r < extraRow;
         const isSecure = (difficulty !== 0 && Math.random() < 0.2);
@@ -750,9 +740,9 @@ function createBrickObject(c, r, element, isBomb) {
       color: element?.color,
       isSecure: isSecure,
       secureState: isSecure,
-      hp: hp 
-      tag: tag;
-        };
+      hp: hp,
+      tag:tag
+    };
   }
     
   const isTopRow = r < extraRow;
@@ -770,38 +760,9 @@ function createBrickObject(c, r, element, isBomb) {
     color: element?.color,
     isSecure: isSecure,
     secureState: isSecure,
-    hp: hp 
-    tag:null;
+    hp: hp,
+    tag:null
   };
-}
-
-//보조 3 -> 레이아웃 이용해서 만드는 블럭
-function createBricksFromLayout(layout) {
-  const bricks = [];
-  for (let r = 0; r < layout.length; r++) {
-    for (let c = 0; c < layout[r].length; c++) {
-      const tag = layout[r][c];
-      const isBomb = tag === "bomb";
-      const isTopRow = r < extraRow;
-      const isSecure = (difficulty !== 0 && Math.random() < 0.2);
-      const hp = isSecure ? 3 : null;
-
-      if (!bricks[c]) bricks[c] = [];
-
-      bricks[c][r] = {
-        tag: tag,
-        isBomb: isBomb,
-        x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-        y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
-        status: isTopRow ? 0 : 1,
-        isHidden: isTopRow ? 1 : 0,
-        isSecure: isSecure,
-        secureState: isSecure,
-        hp: hp
-      };
-    }
-  }
-  return bricks;
 }
 
 
