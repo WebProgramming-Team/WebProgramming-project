@@ -2,14 +2,13 @@
 html{
   /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
   /*window width, height 1521x799 기준 16px*/
-  font-size:62.5%;
+  font-size:100%;
  }
 
 /*전체 body 속성 */
 body {
-  width: 1640px;
-
-  height: 150vx;
+  width: 60vw;
+  height: 150vh;
   background: white;
   display: block;
   margin: 0 auto;
@@ -45,12 +44,11 @@ body {
 
 /*최상단 백그라운드 이미지 1*/
 #main-menu-background-area img{
-  width:1640px;
-  height:900px;/*사진 기본 크기*/
+  width:1640px * 2;
+  height:900px * 2;/*사진 기본 크기*/
 
   position:absolute;
-  top:-450px;
-  left:-400px;
+  left:0px;
   /*top, left값 향후 조정 예정*/
 
 }

@@ -823,9 +823,6 @@ function createElementsByDifficulty(level) {
     layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
 
 
-    elements = createEasyElements();
-
-
   } else if (level === 1) {
     elements = createNormalElements(); // 기존처럼 노말
   } else if (level === 2) {
@@ -835,25 +832,25 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
-function createEasyElements() {
-  let elements = [];
-  // let newEmt = desEleEasy.find(element => element.selector === "#header");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
-  // elements.push(newEmt);
-  // for (let i = 0; i < 2; i++) {
-  //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
-  //   elements.push(newEmt);
-  // }
-  // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === "#footer");
-  // elements.push(newEmt);
+// function createEasyElements() {
+//   let elements = [];
+//   // let newEmt = desEleEasy.find(element => element.selector === "#header");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
+//   // elements.push(newEmt);
+//   // for (let i = 0; i < 2; i++) {
+//   //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
+//   //   elements.push(newEmt);
+//   // }
+//   // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === "#footer");
+//   // elements.push(newEmt);
 
-  return elements;
-}
+//   return elements;
+// }
 
 
 function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
