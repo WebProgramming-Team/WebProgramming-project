@@ -1,0 +1,119 @@
+/*반응형 구현 위한 html 태그 내부 픽셀*/
+html{
+  /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
+  /*window width, height 1521x799 기준 16px*/
+  font-size:62.5%;
+
+ }
+
+/*전체 body 속성 */
+body {
+  width: 65vw;
+  height: 100vh;
+  background: #222;
+  display: block;
+  margin: 0 auto;
+}
+
+
+/*메인 메뉴 전체*/
+#options-menu{
+  margin: 0 auto;
+  position: relative; 
+  width: 100%;
+  height: 220%;
+  overflow: hidden;
+  background-color: white;
+}
+
+
+/*맨 위의 백그라운드 이미지 들어가는 div 영역*/
+#options-menu-background-area{
+  position: relative; 
+  width: 100%;     
+  height:10%;   
+  overflow: hidden;
+  margin: 0 auto 5% auto;
+  background-color: blue;
+
+}
+
+/*최상단 백그라운드 이미지 1*/
+#options-menu-background-area img{
+  width:1600px;
+  height:900px;/*사진 기본 크기*/
+
+  position:absolute;
+  top:-450px;
+  left:-400px;
+  /*top, left값 향후 조정 예정*/
+
+}
+
+
+/*타이틀에 설정 모양 이모지 들어가는 공간*/
+#options-menu-titleEmoji-area{
+  position: absolute;
+  top:7% ;
+  left:10%;
+  aspect-ratio: 1/1; /* 비율 설정 */
+  width:10%;
+}
+
+#options-menu-titleEmoji-area p{
+  position:relative;
+  margin:auto;
+  aspect-ratio: 1/1;
+  width: 100%;
+  font-size:9rem; /*1rem : 10px */
+}
+
+/*타이틀 텍스트 들어가는 공간*/
+ #options-menu-title-area{
+  margin: 3% auto auto 10%;
+  position: relative;
+  display:inline-block;
+  font-size:5rem; /*1rem : 10px */
+  width:40%;
+  height:6%;
+ }
+
+ #options-menu-title-area p{
+  margin:auto;
+  font-weight: bold;
+}
+
+/*콜아웃(게임 시작 버튼 들어가는 영역)에 해당하는 애들*/
+
+.callout-60{
+  margin:1% auto 1.5% 10%;
+  font-size:1.8rem;
+  width:80%;
+  height: 40rem; /* 대승적 결단 - rem 쓰기 */
+  background-color: #F8F8F7;
+}
+
+ #options-menu-callout-area1{
+  position: relative;
+ }
+
+ /*두번쨰 콜아웃 타이틀 텍스트 부분*/
+.options-callout-area-titlearea{
+  margin-top:1em;
+  margin-bottom:0.5em;
+}
+.options-callout-area-titlearea p{
+  margin:auto;
+  display: block;
+  position: relative;
+  left:4%;
+  height: 100%;
+  line-height: 6rem;
+  font-weight: bold;
+  white-space: nowrap;/*줄바꿈 없게*/
+}
+
+
+
+
+ /*－－－－－－－*/ }
