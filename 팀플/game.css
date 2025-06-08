@@ -1,25 +1,21 @@
 /*반응형 구현 위한 html 태그 내부 픽셀*/
-html{
-  /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
-  /*window width, height 1521x799 기준 16px*/
-  font-size:62.5%;
- }
-
-/*전체 body 속성 */
-body {
-  width: 1640px;
-
-  height: 150vx;
-  background: white;
-  display: block;
-  margin: 0 auto;
-  overflow-x: hidden;
+/* 전체 body에서는 기본 스크롤 허용 */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 /* [메인 메뉴 씬 css 설정 모음] */
 
 /* 해결해야 하는 사항
 */
+/* 메뉴 영역들은 넘치면 스크롤 허용 */
+.menu-page {
+  overflow-y: auto;
+}
 
 /*메인 메뉴 전체*/
 #main-menu{
@@ -27,7 +23,6 @@ body {
   position: relative; 
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background-color: white;
 }
 
@@ -45,12 +40,11 @@ body {
 
 /*최상단 백그라운드 이미지 1*/
 #main-menu-background-area img{
-  width:1640px;
-  height:900px;/*사진 기본 크기*/
+  width:1640px * 2;
+  height:900px * 2;/*사진 기본 크기*/
 
   position:absolute;
-  top:-450px;
-  left:-400px;
+  left:0px;
   /*top, left값 향후 조정 예정*/
 
 }
@@ -298,8 +292,8 @@ body {
 /*실제 공 이미지*/
 .ball-container-img {
   margin:8% auto 5% 9%;
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
   display: inline-block;
   overflow: hidden;
   object-fit: cover;
@@ -322,7 +316,7 @@ body {
 }
 
 .arrow {
-  font-size: 32px;
+  font-size: 3rem;
   font-weight: bold;
   margin: 0 2rem;
   cursor: pointer;
@@ -330,8 +324,8 @@ body {
 }
 
 #ball-select-button {
-  width: 50px;
-  height: 50px;
+  width: 5rem;
+  height: 5rem;
   background-color: yellow;
   border-radius: 50%;
   display: inline-block;
@@ -394,71 +388,87 @@ body {
 
 
 /* 전체 좌우 분할 */
+/* 전체 게임 화면 */
 #game-wrapper {
   position: relative;
   display: flex;
-  /*width: 100%;
-  max-width: 1600px;
-  */
-  width: 1600px;
-  margin: 0 auto;
-  height: 900px;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
+/* 왼쪽 영역: 실습 */
 #leftArea {
-  width: 750px;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
+/* 실습 iframe + 효과 캔버스 영역 */
 #labArea {
   width: 100%;
-  height: 90%;
-  display: flex;
-  justify-content: center;
+  height: 85%;
   position: relative;
 }
 
-#labFrame {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/*랩 캔버스 이펙트*/
-#labCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* 마우스 클릭 통과 */
-}
-
-/*커서 안보이게 할라고 판 씌움*/
+#labFrame,
+#labCanvas,
 #pan {
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background-color: transparent;
+  top: 0;
+  left: 0;
+}
+
+#labFrame {
+  z-index: 1;
+  border: none;
+}
+#labCanvas {
+  z-index: 2;
+  pointer-events: none;
+}
+#pan {
   z-index: 3;
-  opacity: 30%;
+  background-color: transparent;
+  opacity: 0.3;
 }
 
-/*게임 보드판 왼쪽 아래 영역*/
+/* 점수판/툴팁 */
 #ps {
-  display: none;
-  width: 100%;
-  height: 10%;
-  background-color: aqua;
+  height: 15%;
+  background-color: #aaf; /* 예시 색상 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 20px;
 }
 
+/* 점수 등 텍스트 */
 #ps p {
-  font-size: 32px;
-  color: black;
-  margin: 0;
+  font-size: 24px;
+  margin: 4px 0;
 }
+
+/* 오른쪽 영역: 게임 */
+#game-area {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  background-color: #111;
+}
+
+/* 게임 캔버스 */
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/*이 아래는 게임에 영향있는 부가요소*/
 
 #scoreBoard.updated {
   animation: popScore 0.3s ease;
@@ -470,31 +480,6 @@ body {
   100% { transform: scale(1); color: white; }
 }
 
-/* 오른쪽: 게임 */
-#game-area {
-  width: 850px;
-  height: 900px;
-  position: relative;
-  background: #111;
-  /*border-left: 2px solid #ccc;*/
-}
-
-#gameCanvas {
-  width: 850px;
-  height: 900px;
-}
-
-/* canvas 등은 그대로 유지 */
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  z-index: 2;
-  display: none;
-}
 
 
 /*이 아래, 설정의 공 속도 라디오 버튼 관련*/
