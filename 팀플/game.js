@@ -404,7 +404,39 @@ const allEffectHandlers = {
   }
 };
 
+let layout; // 블럭에서 매번 사용하는 레이아웃
 
+//이지모드 관련 변수들
+let easy_articleCount = 0;
+let easy_headerCount = 0;
+let easy_footerCount = 0;
+
+//이지모드용 전역변수들
+/*easy모드용 계획 
+article1 제거 -> article2 제거 -> footer 제거 -> wrapper 제거*/
+
+//easy모드 블럭 배치
+
+ /* 이지 모드 계획
+   { type: "footer", count: 2 },
+    { type: "header", count: 2 },
+    { type: "article", count: 4 }
+  */
+
+let isDeletearticle1 = false;
+let isDeletearticle2 = false; 
+let isDeleteFooter = false;
+let isDeleteAll = false;
+function initEasyVar(){
+  easy_articleCount = 0;
+  easy_headerCount = 0;
+  easy_footerCount = 0;
+  isDeletearticle1 = false;
+  isDeletearticle2 = false; 
+  isDeleteFooter = false;
+  isDeleteAll = false;
+}
+//
 
 let totalTitleNum = 1;
 let totalDivNum = 6; // 삭제할 div 개수
@@ -730,12 +762,13 @@ function resetGameState() {
 //난이도 별 설정 분리
 function configureDifficultySettings(mode) {
   //init 규칙
-  //블럭 개수 관련 설정 -> 
+  //블럭 개수 관련 설정 -> 해당 사이트 변수 최고하
   switch (mode) {
   case 0:
       //블럭 설정
     extraRow = 1;
     brickRowCount = 1;
+    initEasyVar();//Easy용 변수 초기화
     break;
   case 1:
     extraRow = 3;
@@ -771,6 +804,7 @@ function createBricks() {
 
   const elements = shuffleEmt(createElementsByDifficulty(difficulty));
 
+
   let eCount = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
@@ -803,6 +837,30 @@ function generateBombPositions(totalCount) {
 
 //보조 2. 벽돌 생성 객체 함수
 function createBrickObject(c, r, element, isBomb) {
+  //easy 모드일 때 임시 루틴
+  if(difficulty == 0){
+     const bricks = [];
+        let tag = layout[r][c];
+        const isBomb = tag === "bomb";
+        const isTopRow = r < extraRow;
+        const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+        const hp = isSecure ? 3 : null;
+        return {
+      x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+      y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
+      status: isTopRow ? 0 : 1,
+      isBomb: isBomb,
+      isHidden: isTopRow ? 1 : 0,
+      targetSelector: element?.selector,
+      effect: element?.effect,
+      color: element?.color,
+      isSecure: isSecure,
+      secureState: isSecure,
+      hp: hp,
+      tag:tag
+    };
+  }
+    
   const isTopRow = r < extraRow;
   const isSecure = (difficulty !== 0 && Math.random() < 0.2);
   const hp = isSecure ? 3 : null;
@@ -818,7 +876,8 @@ function createBrickObject(c, r, element, isBomb) {
     color: element?.color,
     isSecure: isSecure,
     secureState: isSecure,
-    hp: hp
+    hp: hp,
+    tag:null
   };
 }
 
@@ -844,7 +903,18 @@ function createElementsByDifficulty(level) {
   let elements = [];
 
   if (level === 0) {
+    const blockPlan = [
+    { type: "article", count: 4 },
+    { type: "footer", count: 2 },
+    { type: "header", count: 2 }
+    
+  ]; //블럭 어떻게 넣을건지 확인
+    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+
+
     elements = createEasyElements();
+
+
   } else if (level === 1) {
     elements = createNormalElements(); // 기존처럼 노말
   } else if (level === 2) {
@@ -873,6 +943,108 @@ function createEasyElements() {
 
   return elements;
 }
+
+
+function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
+  const layout = Array.from({ length: rows }, () => Array(cols).fill(null));
+  const totalCells = rows * cols;
+
+  // 1. 필요한 블럭 수 계산
+  const blocks = [];
+  blockPlan.forEach(plan => {
+    for (let i = 0; i < plan.count; i++) {
+      blocks.push(plan.type);
+    }
+  });
+
+  const blockCount = blocks.length;
+  const fillableCount = totalCells - blockCount;
+
+  if (fillableCount < currentBomb) {
+    throw new Error("bomb 개수가 너무 많습니다. 블럭 배치 후 남는 공간보다 bomb가 많음.");
+  }
+
+  // 2. bomb + dummy 배치할 셀 준비
+  const fillCells = Array(fillableCount).fill("dummy");
+  for (let i = 0; i < currentBomb; i++) {
+    fillCells[i] = "bomb";
+  }
+
+  // 3. 무작위로 섞음
+  shuffleArray(fillCells);
+
+  // 4. 먼저 dummy와 bomb를 layout에 채움 (빈 공간만)
+let fillIndex = 0;
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    if (fillIndex < fillCells.length) {
+      layout[r][c] = fillCells[fillIndex++];
+    }
+  }
+}
+
+// 추가: layout 전체를 다시 셔플
+const flatLayout = layout.flat();  // 2차원 배열을 1차원으로
+shuffleArray(flatLayout);         // 셔플
+for (let i = 0; i < rows * cols; i++) {
+  const r = Math.floor(i / cols);
+  const c = i % cols;
+  layout[r][c] = flatLayout[i];
+}
+
+  // 5. blockPlan 순서대로 블럭 배치 (순서 유지를 위해)
+  const placedTagIndices = new Set();
+
+  for (const type of blocks) {
+    const currentIdx = blockPlan.findIndex(p => p.type === type);
+    let placed = false;
+
+    for (let r = 0; r < rows && !placed; r++) {
+      for (let c = 0; c < cols && !placed; c++) {
+        if (layout[r][c] === null || layout[r][c] === "dummy") {
+          const isOrderValid = [...placedTagIndices].every(idx => idx <= currentIdx);
+          if (!isOrderValid) continue;
+
+          layout[r][c] = type;
+          placed = true;
+          placedTagIndices.add(currentIdx);
+        }
+      }
+    }
+  }
+
+  // 6. 남은 dummy 다시 채움 (혹시 null이 남아있을 경우)
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (layout[r][c] === null) layout[r][c] = "dummy";
+    }
+  }
+
+  // 출력 디버깅
+  layout.forEach((row, rowIndex) => {
+    const rowStr = row.map(cell => {
+      if (cell === "bomb") return "💣";
+      else if (cell === "dummy") return "⬜";
+      else return `[${cell}]`;
+    }).join(" ");
+    console.log(`Row ${rowIndex}: ${rowStr}`);
+  });
+
+  return layout;
+}
+
+// 셔플 함수
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+
+
+
+
 
 function createNormalElements() {
   let elements = [];
@@ -1173,23 +1345,104 @@ function drawBricks() {
 
 //한 벽돌이 맞았을 때 처리 전체를 관리하는 중심 함수
 function destroyBrick(c, r) {
-  console.log("벽돌 파괴 함수 호출");
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
-  if (handleSecureBlock(b)) return;
+  b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
 
-  b.status = 0;
+  if (b.tag != null) checkTagCount(b.tag);
+  if (b.isBomb) triggerBombChain(c, r);
+  if (handleSecureBlock(b)) return;
 
   handleScoreEffect(b);
   handleWarning(score);
+  processIframeEffect(b, c, r);
+}
+//보조 5. 태그 지워지는거 실시간으로 확인 후 변경사항 
+function checkTagCount(tag){
 
-  if (!processIframeEffect(b, c, r)) return;
+  if(difficulty == 0){
+   /* 이지 모드 계획
+   { type: "footer", count: 2 },
+    { type: "header", count: 2 },
+    { type: "article", count: 4 }
+    easy 모드 태그 관련*/
+    if(tag == "article"){ 
+      console.log("아티클 태그 하나 사라짐"); 
+      easy_articleCount++;
+    }else if(tag == "header"){
+      console.log("헤더 하나 사라짐 하나 사라짐"); 
+      easy_headerCount++;
 
-  if (b.isBomb) {
-    triggerBombChain(c, r);
+    }else if(tag == "footer"){
+      console.log("푸터 태크 하나 사라짐");
+      easy_footerCount++;
+    }else{
+       console.log("뭐시여 무슨 태그여 이거");
+    }
+    console.log("\nTotal counts:");
+    console.log("Articles: " + easy_articleCount);
+    console.log("Headers: " + easy_headerCount);
+    console.log("Footers: " + easy_footerCount);
+    EasyModeGameFun(); // 이지 모드 게임 fun
+    return;
   }
 }
+
+
+function EasyModeGameFun(){
+
+  if(!isDeletearticle1 && easy_articleCount >= 2){
+    removeHtmlTagFromIframe("article1");
+    console.log("아티클1컷!");
+  }
+
+  if(!isDeletearticle2 && easy_articleCount >= 4){
+    removeHtmlTagFromIframe("article2");
+    console.log("아티클2컷!");
+  }
+
+  if(!isDeleteFooter && easy_footerCount >= 2){
+    removeHtmlTagFromIframe("footer");
+    console.log("푸터컷!");
+  }
+  if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
+    isDeletearticle1 && easy_headerCount >= 2){
+    removeHtmlTagFromIframe("wrapper");
+    console.log("헤더컷!");
+  }
+
+
+}
+
+
+//보조용 함수들 두개
+function removeHtmlTagFromIframe(id) {
+  const iframe = document.getElementById("labFrame");
+  if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+
+  const element = iframe.contentDocument.getElementById(id);
+  if (element) {
+    element.style.display = "none";
+  } else {
+    console.warn(`Element with id '${id}' not found in iframe.`);
+  }
+}
+
+
+
+function changeCssTagFromIframe(id, cssProperty, value) {
+  const iframe = document.getElementById("labFrame");
+  if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+
+  const element = iframe.contentDocument.getElementById(id);
+  if (element) {
+    element.style[cssProperty] = value;
+  } else {
+    console.warn(`Element with id '${id}' not found in iframe.`);
+  }
+}
+
 //보조 1. 보안 벽돌(isSecure)일 경우 HP를 차감하고, 아직 안 부서졌으면 true 반환하여 파괴 중단
 function handleSecureBlock(b) {
   if (b.isSecure && typeof b.hp === "number") {
@@ -1462,7 +1715,7 @@ function updateIframe() {
     </nav>
     <div id = "content">
       <section id = "main-section">
-        <article>
+        <article id = "article1">
           <div class = "article-header">
             <h1 class = "article-title">HTML5 개요와 활용</h1>
             <p class = "article-date">2025년 03월 13일</p>
@@ -1473,7 +1726,7 @@ function updateIframe() {
             dsfssdsdfdsfdsf dsfdsfds fdsfdsf sd fds fds fds dsfsdfds fds fdsfdsf dsfdsfdsfsdfds fsdfsdfsdfds fdssd fdsf dsf ds fdsf dsf dsf df sf sd ds fsd fds f df sdf ds fsd sda sdasda das dsa sda asd ad das d das dsa das das as sdasdasddsasddas asdasddassdaasdasdas dsadasdsda dasdsaasdsaddsadasdsadsad sda ds asd  das das ads dsa dsa dsa ads dsa dsa das das d s</p>
           </div>
         </article>
-        <article>
+        <article id = "article2">
           <div class = "article-header">
             <h1 class = "article-title">HTML5 개요와 활용</h1>
             <p class = "article-date">2025년 03월 13일</p>
