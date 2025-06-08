@@ -2591,7 +2591,7 @@ function gameOverDueToTime() {
   isGameOver = true;
   $("#startBtn,#pauseBtn").hide();
   $("#restartBtn, #ingame-to-menu-button").show();
-  $("#game-over-massage").text("시간 초과!").show();
+  $("#game-over-massage").text("Time Out");
   stopMusic();
   gameOverMusic[0].play();
   drawBall();
