@@ -57,22 +57,85 @@ var ballImage = new Image();
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
 const gameOverMusic = [];
 const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/Megalovania.mp3"];
+const ingameMusicTitleAndSummary = [
+   {title:"iwbtbt", summary:"I Wanna Be The BOSHY는 당대 최고의 걸작으로서 <br>수많은 명곡과 아류작을 만들어냈습니다<br>고전의 풍미를 즐겨보세요"},
+  {title:"train", summary:"학기는 열차와 같습니다.<br>마음대로 끝낼 수 없다는 점에서요<br>종착지는 없습니다"},
+  {title:"Megalovania", summary:"와!"}
+]
+const ingameMusicAlbumArtpath = ["images/sound/iwbtb.jpg","images/sound/train.jpg", "images/sound/Megalovania.jpg"]
+
+
 const ingameMusic = [];
 const menuMusic = new Audio("musics/etc/main.mp3");
 let igIdx = 0;//인게임 뮤직 변수에서 어떤 값을 플레이할 것인가? -> setting 쪽에서 넘겨받음
 
 
-//인게임 음악 바인딩
-for (let i = 0; i < ingameMusicPath.length; i++) {
-  const igPath = ingameMusicPath[i];
-  const audio2 = new Audio(igPath);
 
-  ingameMusic.push(audio2);
 
-  ingameMusic[i].loop = true;
-  ingameMusic[i].volume = 0.25;
+//인게임 음악 관련
+  let currentMusicIndex = 0;
+  let previewAudio = null;
+
+  let artElement;
+  let mainInfo;
+  let titleElement;
+  let frontBtn;
+  let nextBtn;
+  let selectBtn;;
+
+  function updateMusicDisplay() {
+    const musicInfo = ingameMusicTitleAndSummary[currentMusicIndex];
+    const artPath = ingameMusicAlbumArtpath[currentMusicIndex];
+    animateArtChange();
+    artElement.src = artPath;
+    mainInfo.innerHTML = musicInfo.summary;
+    titleElement.textContent = musicInfo.title;
+
+  }
+
+  function playPreviewThenReturn() {
+    if (previewAudio) {
+      previewAudio.pause();
+    }
+
+    menuMusic.pause();
+
+    const previewSrc = ingameMusicPath[currentMusicIndex];
+    previewAudio = new Audio(previewSrc);
+    previewAudio.play();
+
+    // 일정 시간 후 메뉴 음악 다시 재생
+    setTimeout(() => {
+      previewAudio.pause();
+      menuMusic.play();
+    }, 8000); // 4초 미리듣기
+  }
+
+  function goToPreviousMusic() {
+    currentMusicIndex = (currentMusicIndex - 1 + ingameMusicPath.length) % ingameMusicPath.length;
+    updateMusicDisplay();
+    playPreviewThenReturn();
+  }
+
+  function goToNextMusic() {
+    currentMusicIndex = (currentMusicIndex + 1) % ingameMusicPath.length;
+    updateMusicDisplay();
+    playPreviewThenReturn();
+  }
+
+  function selectThisMusic() {
+    const selected = currentMusicIndex;
+    igIdx = selected;
+    console.log("선택된 음악:", selected);
+  }
+
+ function animateArtChange() {
+  artElement.style.opacity = 0;
+  setTimeout(() => {
+    updateMusicDisplay();
+    artElement.style.opacity = 1;
+  }, 200);
 }
-
 
 //게임오버 뮤직 바인딩
 
@@ -84,10 +147,14 @@ for (let i = 0; i < gameOverMusicPath.length; i++) {
 
   gameOverMusic[i].volume = 0.25;
 }
-ingameMusic[1].volume = ingameMusic[1].volume * 0.6;
-menuMusic.volume = 0.2;
+for(let i = 0; i < ingameMusicPath.length; i++){
+   ingameMusic.push(new Audio(ingameMusicPath[i]));
+   ingameMusic[i].loop = true;
+}
 menuMusic.loop = true;
 gameOverMusic[1].loop = true;
+
+
 
 
 // 캔버스 크기
@@ -97,7 +164,23 @@ const canvasHeight = 900;
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 
+//===배경 관련====
 
+let backgroundimg = [
+  new Image(),
+  new Image(),
+  new Image()
+];
+
+backgroundimg[0].src = "images/Game/whitebackground.PNG";
+backgroundimg[1].src = "images/Game/backgroundGame.PNG";
+backgroundimg[2].src = "images/Game/bonobono.jpg";
+
+let bgidx = 0;
+
+function changeBackground(index) {
+  bgidx = index;
+}
 
 //게임 관련 변수들
 
@@ -630,8 +713,7 @@ function allHide(){
   //게임을 홈으로 리셋함. 
 
   allHide();//전부 다 리셋
-
-
+  $("body").css("width", "60vw");
   /*main-menu 버튼 - 함수 바인딩*/
   $("#start-button").on("click", showLevelSelectionPage);
   //레벨 선택 쪽으로 이동하게 만듬.
@@ -681,6 +763,27 @@ function showLevelSelectionPage() {
 function showOptions() {
   allHide();
   $(".option-page").show();
+
+  //볼 관련 설정 업데이트
+  ballImages = document.querySelectorAll('.ball-container-img');
+  totalBalls = ballImages.length;
+  updateBallSelection(); // 설정 관련 업데이트
+
+//바인딩
+  artElement = document.getElementById("options-music-art");
+  mainInfo = document.querySelector(".main-info");
+  titleElement = document.querySelector(".music-title");
+
+  frontBtn = document.querySelector(".select-front-music");
+  nextBtn = document.querySelector(".select-next-music");
+  selectBtn = document.querySelector(".select-this-music");
+   // 초기화
+  updateMusicDisplay();
+  // 이벤트 연결
+  frontBtn.addEventListener("click", goToPreviousMusic);
+  nextBtn.addEventListener("click", goToNextMusic);
+  selectBtn.addEventListener("click", selectThisMusic);
+  
   //옵션 관련 추가 
 }
 
@@ -930,13 +1033,12 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-      { type: "article", count: 4 },
-      { type: "footer", count: 2 },
-      { type: "header", count: 2 }
-      
+    { type: "article", count: 4 },
+    { type: "footer", count: 2 },
+    { type: "header", count: 1 }
+    
   ]; //블럭 어떻게 넣을건지 확인
-  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
-
+    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 1);
 
 } else if (level === 1) {
  const blockPlan = [
@@ -1193,7 +1295,7 @@ function startBrickMoveTimer(difficulty) {
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.drawImage(backgroundimg[bgidx], 0, 0, canvas.width, canvas.height);//배경 그리기
     drawBricks();
     drawBall();
     drawPaddle();
@@ -1375,9 +1477,9 @@ function stopMusic() {
     gameOverMusic[i].currentTime = 0;
   }
   ingameMusic.forEach(function(audio) {
-    audio.pause();
     audio.currentTime = 0;
-  })
+  });
+  ingameMusic[igIdx].pause();
   menuMusic.pause();
   menuMusic.currentTime = 0;
 }
@@ -1484,22 +1586,17 @@ function checkTagCount(tag){
     }else if(tag == "header"){
       console.log("헤더 하나 사라짐 하나 사라짐"); 
       easy_headerCount++;
-    }
 
-    if (tag.isBomb) {
-      triggerBombChain(c, r);
-      if (b.isBomb) {
-        triggerBombChain(c, r);
-      }else if(tag == "footer"){
-        console.log("푸터 태크 하나 사라짐");
-        easy_footerCount++;
-      }else{
-       console.log("뭐시여 무슨 태그여 이거");
-     }
-     console.log("\nTotal counts:");
-     console.log("Articles: " + easy_articleCount);
-     console.log("Headers: " + easy_headerCount);
-     console.log("Footers: " + easy_footerCount);
+    }else if(tag == "footer"){
+      console.log("푸터 태크 하나 사라짐");
+      easy_footerCount++;
+    }else{
+     console.log("뭐시여 무슨 태그여 이거");
+   }
+   console.log("\nTotal counts:");
+   console.log("Articles: " + easy_articleCount);
+   console.log("Headers: " + easy_headerCount);
+   console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
 
@@ -1526,7 +1623,7 @@ function checkTagCount(tag){
 
   }
 }
-}
+
 function NormalModeGameFun() {
   const iframe = document.getElementById("labFrame");
   if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
