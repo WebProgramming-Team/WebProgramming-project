@@ -58,9 +58,9 @@ const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-die
 const gameOverMusic = [];
 const ingameMusicPath = ["musics/ingame/iwbtb.mp3", "musics/ingame/train.mp3", "musics/ingame/Megalovania.mp3"];
 const ingameMusicTitleAndSummary = [
-   {title:"iwbtbt", summary:"I Wanna Be The BOSHY는 당대 최고의 걸작으로서 <br>수많은 명곡과 아류작을 만들어냈습니다<br>고전의 풍미를 즐겨보세요"},
-  {title:"train", summary:"학기는 열차와 같습니다.<br>마음대로 끝낼 수 없다는 점에서요<br>종착지는 없습니다"},
-  {title:"Megalovania", summary:"와!"}
+ {title:"iwbtbt", summary:"I Wanna Be The BOSHY는 당대 최고의 걸작으로서 <br>수많은 명곡과 아류작을 만들어냈습니다<br>고전의 풍미를 즐겨보세요"},
+ {title:"train", summary:"학기는 열차와 같습니다.<br>마음대로 끝낼 수 없다는 점에서요<br>종착지는 없습니다"},
+ {title:"Megalovania", summary:"와!"}
 ]
 const ingameMusicAlbumArtpath = ["images/sound/iwbtb.jpg","images/sound/train.jpg", "images/sound/Megalovania.jpg"]
 
@@ -73,63 +73,63 @@ let igIdx = 0;//인게임 뮤직 변수에서 어떤 값을 플레이할 것인�
 
 
 //인게임 음악 관련
-  let currentMusicIndex = 0;
-  let previewAudio = null;
+let currentMusicIndex = 0;
+let previewAudio = null;
 
-  let artElement;
-  let mainInfo;
-  let titleElement;
-  let frontBtn;
-  let nextBtn;
-  let selectBtn;;
+let artElement;
+let mainInfo;
+let titleElement;
+let frontBtn;
+let nextBtn;
+let selectBtn;;
 
-  function updateMusicDisplay() {
-    const musicInfo = ingameMusicTitleAndSummary[currentMusicIndex];
-    const artPath = ingameMusicAlbumArtpath[currentMusicIndex];
-    animateArtChange();
-    artElement.src = artPath;
-    mainInfo.innerHTML = musicInfo.summary;
-    titleElement.textContent = musicInfo.title;
+function updateMusicDisplay() {
+  const musicInfo = ingameMusicTitleAndSummary[currentMusicIndex];
+  const artPath = ingameMusicAlbumArtpath[currentMusicIndex];
+  animateArtChange();
+  artElement.src = artPath;
+  mainInfo.innerHTML = musicInfo.summary;
+  titleElement.textContent = musicInfo.title;
 
+}
+
+function playPreviewThenReturn() {
+  if (previewAudio) {
+    previewAudio.pause();
   }
 
-  function playPreviewThenReturn() {
-    if (previewAudio) {
-      previewAudio.pause();
-    }
+  menuMusic.pause();
 
-    menuMusic.pause();
-
-    const previewSrc = ingameMusicPath[currentMusicIndex];
-    previewAudio = new Audio(previewSrc);
-    previewAudio.play();
+  const previewSrc = ingameMusicPath[currentMusicIndex];
+  previewAudio = new Audio(previewSrc);
+  previewAudio.play();
 
     // 일정 시간 후 메뉴 음악 다시 재생
-    setTimeout(() => {
-      previewAudio.pause();
-      menuMusic.play();
+  setTimeout(() => {
+    previewAudio.pause();
+    menuMusic.play();
     }, 8000); // 4초 미리듣기
-  }
+}
 
-  function goToPreviousMusic() {
-    currentMusicIndex = (currentMusicIndex - 1 + ingameMusicPath.length) % ingameMusicPath.length;
-    updateMusicDisplay();
-    playPreviewThenReturn();
-  }
+function goToPreviousMusic() {
+  currentMusicIndex = (currentMusicIndex - 1 + ingameMusicPath.length) % ingameMusicPath.length;
+  updateMusicDisplay();
+  playPreviewThenReturn();
+}
 
-  function goToNextMusic() {
-    currentMusicIndex = (currentMusicIndex + 1) % ingameMusicPath.length;
-    updateMusicDisplay();
-    playPreviewThenReturn();
-  }
+function goToNextMusic() {
+  currentMusicIndex = (currentMusicIndex + 1) % ingameMusicPath.length;
+  updateMusicDisplay();
+  playPreviewThenReturn();
+}
 
-  function selectThisMusic() {
-    const selected = currentMusicIndex;
-    igIdx = selected;
-    console.log("선택된 음악:", selected);
-  }
+function selectThisMusic() {
+  const selected = currentMusicIndex;
+  igIdx = selected;
+  console.log("선택된 음악:", selected);
+}
 
- function animateArtChange() {
+function animateArtChange() {
   artElement.style.opacity = 0;
   setTimeout(() => {
     updateMusicDisplay();
@@ -148,8 +148,8 @@ for (let i = 0; i < gameOverMusicPath.length; i++) {
   gameOverMusic[i].volume = 0.25;
 }
 for(let i = 0; i < ingameMusicPath.length; i++){
-   ingameMusic.push(new Audio(ingameMusicPath[i]));
-   ingameMusic[i].loop = true;
+ ingameMusic.push(new Audio(ingameMusicPath[i]));
+ ingameMusic[i].loop = true;
 }
 menuMusic.loop = true;
 gameOverMusic[1].loop = true;
@@ -1033,12 +1033,12 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-    { type: "article", count: 4 },
-    { type: "footer", count: 2 },
-    { type: "header", count: 1 }
-    
+      { type: "article", count: 4 },
+      { type: "footer", count: 2 },
+      { type: "header", count: 1 }
+
   ]; //블럭 어떻게 넣을건지 확인
-    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 1);
+  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 1);
 
 } else if (level === 1) {
  const blockPlan = [
@@ -1322,14 +1322,78 @@ function startBrickMoveTimer(difficulty) {
     requestAnimationFrame(draw);
   }
 
-function showStory() {
-  allHide();
+  //스토리 보여주는 함수
+  function showStory() {
+    allHide();
+    $("#clear-panel").show();
+
+    const storyText = getStoryByDifficulty(difficulty);
+    const lines = storyText.split("\n");
+    const container = $("#story-text");
+    container.text("");
+
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < lines.length) {
+        container.append(lines[index] + "\n");
+        index++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          $("#clear-panel").hide();
+
+          difficulty++;
+
+          if (difficulty > 2) {
+          showFinalMessage(); //  하드 클리어 축하 메세지
+        } else {
+          init(); // 다음 난이도 실행
+        }
+      }, 2000); // 대사 끝나고 2초 후
+      }
+    }, 1000);
+  }
+
+
+//난이도 별로 스토리 출력
+  function getStoryByDifficulty(level) {
+    if (level === 0) {
+      return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
+하지만 웹 프로그래밍은 상대평가니까,
+다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+굉장히 기발한 아이디어다!
+
+나는 남의 과제를 망쳐서,
+내 평균을 끌어올리기로 결심한다.
+
+      우선, 쉬운 실습부터 파괴해보자.`;
+    } else if (level === 1) {
+      return `중간 실습은 한 번에 부숴지지 않는다.
+공을 여러 번 맞혀야 태그가 파괴된다.
+
+이제 점점 더 어려워지는 실습...
+      하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
+    } else {
+      return `시간이 없다...
+제한된 시간 속에서 모든 블록을 파괴하라!
+
+이건 실력이 아닌 운도 시험하는 도전이다.
+      하지만 나는 할 수 있다.`;
+    }
+  }
+//축하 클리어 메세지
+function showFinalMessage() {
   $("#clear-panel").show();
-  
-  const storyText = getStoryByDifficulty(difficulty);
-  const lines = storyText.split("\n");
+  const msg = `🎉 모든 난이도 클리어!
+
+웹프의 마스터가 된 당신에게 박수를 보냅니다.
+이제 다른 사람의 과제를 부수는 걸 넘어서...
+
+진짜 개발자가 되어보세요.`;
+
   const container = $("#story-text");
-  container.text("");  // 초기화
+  container.text("");
+  const lines = msg.split("\n");
 
   let index = 0;
   const interval = setInterval(() => {
@@ -1340,43 +1404,10 @@ function showStory() {
       clearInterval(interval);
       setTimeout(() => {
         $("#clear-panel").hide();
-        difficulty++;
-        if (difficulty > 2) {
-          isGameOver = true;
-          showMainMenu();
-        } else {
-          init();
-        }
-      }, 3000); // 다 출력된 후 3초 대기
+        showMainMenu();
+      }, 4000);
     }
-  }, 1000); // 한 줄씩 1초 간격 출력
-}
-
-//난이도 별로 스토리 출력
-function getStoryByDifficulty(level) {
-  if (level === 0) {
-    return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
-하지만 웹 프로그래밍은 상대평가니까,
-다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
-굉장히 기발한 아이디어다!
-
-나는 남의 과제를 망쳐서,
-내 평균을 끌어올리기로 결심한다.
-
-우선, 쉬운 실습부터 파괴해보자.`;
-  } else if (level === 1) {
-    return `중간 실습은 한 번에 부숴지지 않는다.
-공을 여러 번 맞혀야 태그가 파괴된다.
-
-이제 점점 더 어려워지는 실습...
-하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
-  } else {
-    return `시간이 없다...
-제한된 시간 속에서 모든 블록을 파괴하라!
-
-이건 실력이 아닌 운도 시험하는 도전이다.
-하지만 나는 할 수 있다.`;
-  }
+  }, 1000);
 }
 
 
@@ -1983,10 +2014,10 @@ function drawScore() {
 //난이도에 따라 알맞은 클리어 함수
 function checkClearByDifficulty() {
   switch (difficulty) {
-  case 0:
-   return checkEasyClear();
 
- case 1:
+  case 0:
+    return checkEasyClear();
+  case 1:
       return checkNormalClear(); // 기존 checkClear 내용 그대로
     case 2:
       return checkHardClear();   // 새로 만든 하드 클리어 기준
@@ -1995,6 +2026,7 @@ function checkClearByDifficulty() {
     }
   }
 
+//이지 클리어 체크
   function checkEasyClear() {
    return isDeleteAll;
  }
