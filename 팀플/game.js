@@ -315,6 +315,12 @@ const allEffectHandlers = {
   }
 };
 
+let layout; // 블럭에서 매번 사용하는 레이아웃
+
+//이지모드 카운팅용
+let easy_articleCount = 0;
+let easy_headerCount = 0;
+let easy_footerCount = 0;
 
 
 let totalTitleNum = 1;
@@ -682,6 +688,16 @@ function createBricks() {
 
   const elements = shuffleEmt(createElementsByDifficulty(difficulty));
 
+
+  const layout = layout;
+
+  if(mode == 0){
+    bricks = createBricksFromLayout(layout);
+    console.log(createBricksStr());
+    return;
+  }
+
+
   let eCount = 0;
   for (let c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
@@ -714,6 +730,31 @@ function generateBombPositions(totalCount) {
 
 //보조 2. 벽돌 생성 객체 함수
 function createBrickObject(c, r, element, isBomb) {
+
+  //easy 모드일 때 임시 루틴
+  if(mode == 0){
+     const bricks = [];
+        const tag = layout[r][c];
+        const isBomb = tag === "bomb";
+        const isTopRow = r < extraRow;
+        const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+        const hp = isSecure ? 3 : null;
+        return {
+      x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+      y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
+      status: isTopRow ? 0 : 1,
+      isBomb: isBomb,
+      isHidden: isTopRow ? 1 : 0,
+      targetSelector: element?.selector,
+      effect: element?.effect,
+      color: element?.color,
+      isSecure: isSecure,
+      secureState: isSecure,
+      hp: hp 
+      tag: tag;
+        };
+  }
+    
   const isTopRow = r < extraRow;
   const isSecure = (difficulty !== 0 && Math.random() < 0.2);
   const hp = isSecure ? 3 : null;
@@ -729,8 +770,38 @@ function createBrickObject(c, r, element, isBomb) {
     color: element?.color,
     isSecure: isSecure,
     secureState: isSecure,
-    hp: hp
+    hp: hp 
+    tag:null;
   };
+}
+
+//보조 3 -> 레이아웃 이용해서 만드는 블럭
+function createBricksFromLayout(layout) {
+  const bricks = [];
+  for (let r = 0; r < layout.length; r++) {
+    for (let c = 0; c < layout[r].length; c++) {
+      const tag = layout[r][c];
+      const isBomb = tag === "bomb";
+      const isTopRow = r < extraRow;
+      const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+      const hp = isSecure ? 3 : null;
+
+      if (!bricks[c]) bricks[c] = [];
+
+      bricks[c][r] = {
+        tag: tag,
+        isBomb: isBomb,
+        x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+        y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
+        status: isTopRow ? 0 : 1,
+        isHidden: isTopRow ? 1 : 0,
+        isSecure: isSecure,
+        secureState: isSecure,
+        hp: hp
+      };
+    }
+  }
+  return bricks;
 }
 
 
@@ -755,7 +826,17 @@ function createElementsByDifficulty(level) {
   let elements = [];
 
   if (level === 0) {
+    const blockPlan = [
+    { type: "footer", count: 2 },
+    { type: "header", count: 2 },
+    { type: "article", count: 4 }
+  ];
+    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+
+
     elements = createEasyElements();
+
+
   } else if (level === 1) {
     elements = createNormalElements(); // 기존처럼 노말
   } else if (level === 2) {
@@ -784,6 +865,79 @@ function createEasyElements() {
 
   return elements;
 }
+
+
+
+//단순태그제거만 필요한 경우 이거 사용
+function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
+  const layout = Array.from({ length: rows }, () => Array(cols).fill(null));
+  const totalCells = rows * cols;
+
+  const bombPositions = new Set();
+  while (bombPositions.size < currentBomb) {
+    const pos = Math.floor(Math.random() * totalCells);
+    bombPositions.add(pos);
+  }
+
+  const blocks = [];
+  blockPlan.forEach(plan => {
+    for (let i = 0; i < plan.count; i++) {
+      blocks.push(plan.type);
+    }
+  });
+
+  // 먼저 폭탄부터 배치
+  bombPositions.forEach(pos => {
+    const r = Math.floor(pos / cols);
+    const c = pos % cols;
+    layout[r][c] = "bomb";
+  });
+
+  // 블록 배치
+  for (let i = 0; i < blocks.length; i++) {
+    const type = blocks[i];
+    let placed = false;
+
+    for (let r = 0; r < rows && !placed; r++) {
+      for (let c = 0; c < cols && !placed; c++) {
+        if (layout[r][c] === null) {
+          if (type === "article" && !hasAbove(layout, r, "header")) continue;
+          if (type === "header" && !hasAbove(layout, r, "footer")) continue;
+
+          layout[r][c] = type;
+          placed = true;
+        }
+      }
+    }
+  }
+
+  // 남는 칸은 dummy로 채움
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (layout[r][c] === null) layout[r][c] = "dummy";
+    }
+  }
+
+  return layout;
+}
+
+
+
+
+// r행보다 위에 특정 태그가 있는지 확인
+function hasAbove(layout, r, requiredType) {
+  for (let i = 0; i < r; i++) {
+    for (let j = 0; j < layout[i].length; j++) {
+      if (layout[i][j] === requiredType) return true;
+    }
+  }
+  return false;
+}
+
+
+
+
+
 
 function createNormalElements() {
   let elements = [];
