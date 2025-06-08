@@ -177,39 +177,57 @@
     </div>
     <!-- 여따가 스코어 좀 적고 이상한 툴팁도 좀 적고 -->
     <div id="ps">
+     <!-- 좌측: 버튼 묶음 -->
+     <div class="ps-left">
       <div class="ps-controls">
         <button class="ps-btn" id="pause-btn" title="Esc 키로도 가능">⏸  PAUSE</button>
         <button class="ps-btn" id="restart-btn" title="R 키로도 가능">🔁RESET</button>
         <button class="ps-btn" id="quit-btn" title="Q 키로도 가능">🏠 MAIN</button>
       </div>
+    </div>
+
+    <!-- 해킹 상태 텍스트 -->
+    <!-- 우측: 해킹 UI 묶음 -->
+    <div class="ps-right">
+      <div id="hackingText">⚠Now Hacking....</div>
       <div id="hackingBar">
         <div id="hackingFill"></div>
       </div>
     </div>
-
   </div>
 
-  <div id="game-area">
-    <!-- 벽돌깨기 게임 영역 -->
-    <canvas id="gameCanvas" width="850" height="900"></canvas>  
-    <!-- 게임 오버 메시지 -->
-    <img id = "backgroundImage" src = " ">
-  </div>
-
-  <div id = "game-over-massage" class = "pop-up-massage">
-    Game Over!
-  </div>
-  <div id = "game-over-subtitle" class = "pop-up-massage">
-    'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
-  </div>
-<!-- 일시정지 메뉴 -->
-<div id = "pause-panel">
-  'R'을 눌러 다시하기<br>
-  'Q'를 눌러 메인메뉴로<br>
-  <label>볼륨 설정: </label>
-  <input type = "range" min = "0" max = "100" class = "volume-bar">
-  <div class = "volume">50</div>
 </div>
+
+<div id="game-area">
+  <!-- 벽돌깨기 게임 영역 -->
+  <canvas id="gameCanvas" width="850" height="900"></canvas>  
+  <!-- 게임 오버 메시지 -->
+  <img id = "backgroundImage" src = " ">
+</div>
+
+<div id = "game-over-massage" class = "pop-up-massage">
+  Game Over!
+</div>
+<div id = "game-over-subtitle" class = "pop-up-massage">
+  'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
+</div>
+
+<!-- 일시정지 메뉴 -->
+<div id="pause-panel">
+  <div class="pause-title">⏸ PAUSED</div>
+
+  <div class="pause-instructions">
+    <p>🔁 R: 다시 시작</p>
+    <p>🏠 Q: 메인메뉴</p>
+  </div>
+
+  <div class="pause-volume">
+    <label for="pause-volume-slider">🎚️ Volume Set</label>
+    <input id="pause-volume-slider" type="range" min="0" max="100" value="50" class="volume-bar">
+    <div class="volume-value">50</div>
+  </div>
+</div>
+
 
 
 
