@@ -1412,7 +1412,8 @@ function checkTagCount(tag){
     return;
   }else if(difficulty==1){
     //노말 모드 계획
-    //
+  //   
+
   }
 }
 
@@ -1463,11 +1464,13 @@ function EasyModeGameFun() {
     destructionEffects.push({
       x: canvas.width / 2,
       y: 140,
-      label: "wrapper 파괴!",
+      label: "헤더 파괴!",
       opacity: 1.0
     });
   }
 }
+
+//보조용 함수 
 function drawDestructionEffects(ctx) {
   for (let i = destructionEffects.length - 1; i >= 0; i--) {
     const effect = destructionEffects[i];
