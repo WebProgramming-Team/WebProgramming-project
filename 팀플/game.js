@@ -129,7 +129,11 @@ const desEleHard = [
   { selector: ".lab.clickHere", effect: "breakClickHere" },
   { selector: ".lab.image-toggle", effect: "breakImageToggle" },
   { selector: ".lab.colorList", effect: "breakColorList" },
-  { selector: ".lab.flashBox", effect: "breakFlashBox" }
+  { selector: ".lab.flashBox", effect: "breakFlashBox" },
+  { selector: ".lab.movingBox", effect: "breakMovingBox" },
+  { selector: "#hangman", effect: "breakHangman" },
+  { selector: "#title", effect: "breakHeaderTitle" },
+  { selector: "footer", effect: "breakFooterWarning" }
 ];
 
 
@@ -158,7 +162,7 @@ const effectHandlers = {
 
     // 이펙트 한 줄로
     shakeIframe();
-    blackout();
+    //blackout();
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
@@ -173,7 +177,7 @@ const effectHandlers = {
     });
 
     shakeIframe();
-    blackout();
+    //blackout();
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
@@ -192,7 +196,7 @@ const effectHandlers = {
     }
 
     shakeIframe();
-    blackout();
+    //blackout();
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
@@ -210,7 +214,7 @@ const effectHandlers = {
     }
 
     shakeIframe();
-    blackout();
+    //blackout();
     showHackingProgress();
     scrollToTarget(target);
     fadeOutElement(target, 10000);
@@ -225,7 +229,6 @@ const effectHandlers = {
       p.innerText = "🚫 입력 불가: 시스템 오류 발생";
       p.style.color = "red";
     }
-    alert("⚠️ 시스템 오류: 입력이 차단되었습니다.");
     `;
     iframeDoc.body.appendChild(script);
 
@@ -285,6 +288,88 @@ breakFlashBox: (target, b, iframeDoc) => {
   scrollToTarget(target);
   fadeOutElement(target, 10000);
   triggerLabEffectOnTarget(target);
+},
+
+breakMovingBox: (target, b, iframeDoc) => {
+  const box = iframeDoc.querySelector("#animate");
+  const button = iframeDoc.querySelector("#moveBox");
+
+  if (box) {
+    box.style.backgroundColor = "gray";
+    box.style.transition = "none";
+    box.style.top = "50px";
+    box.style.left = "50px";
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.value = "Error!";
+  }
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+},
+
+breakHangman: (target, b, iframeDoc) => {
+  const img = iframeDoc.querySelector("#hangmanpic");
+  const clue = iframeDoc.querySelector("#clue");
+  const guessBtn = iframeDoc.querySelector("#guessButton");
+  const newGameBtn = iframeDoc.querySelector("#newGame");
+
+  if (img) {
+    img.src = "projects/easy-mode/hangman/hangman6.gif";
+  }
+
+  if (clue) {
+    clue.innerHTML = "💀 이 페이지는 해킹되었습니다 💀";
+    clue.style.color = "red";
+    clue.style.fontWeight = "bold";
+  }
+
+  if (guessBtn) guessBtn.disabled = true;
+  if (newGameBtn) newGameBtn.disabled = true;
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+},
+
+breakHeaderTitle: (target, b, iframeDoc) => {
+  const title = iframeDoc.querySelector("#title");
+  if (title) {
+    title.innerText = "⚠️ 과제가 조작되었습니다 ⚠️";
+    title.style.color = "red";
+    title.style.fontWeight = "bold";
+    title.style.fontSize = "26px";
+  }
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
+},
+
+breakFooterWarning: (target, b, iframeDoc) => {
+  const footer = iframeDoc.querySelector("footer");
+  if (footer) {
+    footer.innerHTML = `
+      <p style="color: red; font-weight: bold;">🚨 이 상태로 제출 시 0점 처리됩니다! 🚨</p>
+      <p style="color: darkred;">※ 과제 파일이 손상되었습니다. 복구가 필요합니다.</p>
+    `;
+    footer.style.backgroundColor = "#330000";
+  }
+
+  shakeIframe();
+  showHackingProgress();
+  scrollToTarget(target);
+  fadeOutElement(target, 10000);
+  triggerLabEffectOnTarget(target);
 }
 
 
@@ -311,6 +396,10 @@ const allEffectHandlers = {
     breakImageToggle: effectHandlers.breakImageToggle,
     breakColorList: effectHandlers.breakColorList,
     breakFlashBox: effectHandlers.breakFlashBox,
+    breakMovingBox: effectHandlers.breakMovingBox,
+    breakHangman: effectHandlers.breakHangman,
+    breakHeaderTitle: effectHandlers.breakHeaderTitle,
+    breakFooterWarning: effectHandlers.breakFooterWarning,
     remove: effectHandlers.remove  // 하드에서도 remove 가능
   }
 };
@@ -357,7 +446,7 @@ let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
-const brickHeight = 36;
+const brickHeight = 60;
 const brickPadding = 2;
 const brickOffsetTop = 50;
 const brickOffsetLeft = 5;
@@ -977,9 +1066,14 @@ function createHardElements() {
     desEleHard.find(el => el.selector === ".lab.gugudan"),
     desEleHard.find(el => el.selector === ".lab.numGame"),
     desEleHard.find(el => el.selector === ".lab.wordBook"),
+    desEleHard.find(el => el.selector === ".lab.clickHere"),
     desEleHard.find(el => el.selector === ".lab.image-toggle"),
     desEleHard.find(el => el.selector === ".lab.colorList"),
-    desEleHard.find(el => el.selector === ".lab.flashBox")
+    desEleHard.find(el => el.selector === ".lab.flashBox"),
+    desEleHard.find(el => el.selector === ".lab.movingBox"),
+    desEleHard.find(el => el.selector === "#hangman"),
+    desEleHard.find(el => el.selector === "#title"),
+    desEleHard.find(el => el.selector === "footer")
   ].filter(Boolean); // null 제거
 
   const elements = [];
@@ -2176,8 +2270,6 @@ console.log("Hello from JS!");
     function updatePage() {
       document.getElementById("hangmanpic").src = "projects/easy-mode/hangman/hangman" + guessCount + ".gif";
 
-      //word 업데이트 될때마다 clue string은 계속 변함
-      // 단어 힌트 만들기
       var clue = "";
       var allRevealed = true;
       for (var i = 0; i < word.length; i++) {
@@ -2201,13 +2293,9 @@ console.log("Hello from JS!");
 
       // 승패 판정
       if (allRevealed) {
-        // document.getElementById("clue").innerHTML += "<br> You win!";
         document.getElementById("guessstr").innerHTML="You Win";
-        // document.getElementById("guessbutton").disabled = true;
       } else if (guessCount === 0) {
-        // document.getElementById("clue").innerHTML += "<br> You lose! 단어는: " + word;
         document.getElementById("guessstr").innerHTML="You Lose";
-        // document.getElementById("guessbutton").disabled = true;
       }
     }
 
@@ -2233,7 +2321,6 @@ console.log("Hello from JS!");
       var s2=""
       s1=a.toString();
       s2=a.join(", ");
-      // document.getElementById('wordList').innerHTML=s1;
       document.getElementById('wordList').innerHTML=s2;
     }
     //join 과 toString 을 비교해보자.
@@ -2282,19 +2369,12 @@ console.log("Hello from JS!");
       document.getElementById("wordList").innerHTML=WORD_LIST.join(", ");
 
     }
-    //일단 제일 뒤 인덱스 만들면, 0 1 2 3 4 번째 인덱스 모두 다 처음으로 이동가능
-    //j 와 i의 인덱스 값 맞바꾸기, swap
-    //다음에 올 랜덤값 i=0~3으로 바뀜. i에 의해 최댓값이 달라짐. 결정된거 빼고 나머지 섞기
-    //i=0일때까지가 아니라, 두개 남으면 그냥 끝내면 ok, 핵심은 random index의 범위 0~0.9에서 잘 만들기
 
     function innerTest() {
       let str=prompt();
       // document.getElementById("innerTest").innerHTML=str;
       document.getElementById("innerTest").innerText=str;
     }
-
-
-
 
     function changeImage(){
       var img=document.getElementById("image");
@@ -2308,8 +2388,6 @@ console.log("Hello from JS!");
       else
       bimg.src="projects/easy-mode/img1.jpg";
     }
-    //배열에 넣고 0이면 1 1이면 0 이렇게 할수도 있음..
-    //돔 모델에 전체 경로가 저장됨. 우리는 파일 이름만 필요함. 경로는 마지막에 있고, 슬레시로 구분되어 있음
 
     var colorNames=["maroon","red","orange","yellow","olive","purple","fuchsia","white","lime","green","navy","blue","aqua","teal","black","silver","gray"];
 
@@ -2338,8 +2416,6 @@ console.log("Hello from JS!");
       while(child[0]){
         parent.removeChild(child[0]);
       }
-      //child[0] 가 없어질때 까지 지움
-      //또는 돔트리의 상관관계를 이용해서 first child 라는 property를 통해 접근.
     }
 
 
@@ -2542,6 +2618,7 @@ function shakeIframe(duration = 500) {
     }
   }, 50);
 }
+
 //암전 효과
 function blackout(duration = 800) {
   const blackoutDiv = document.createElement("div");
@@ -2607,4 +2684,6 @@ function triggerLabEffectOnTarget(target) {
   const y = rect.top - iframeRect.top + rect.height / 2;
   showLabEffect(x, y);
 }
+
+
 
