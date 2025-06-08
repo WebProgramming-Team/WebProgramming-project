@@ -177,31 +177,31 @@
     </div>
     <!-- 여따가 스코어 좀 적고 이상한 툴팁도 좀 적고 -->
     <div id="ps">
-      <!-- <p id = "scoreBoard"></p> -->
-      <p>'P' 또는 'E': 일시정지/재개</p>
-      <p>'R': 다시하기, 'Q': 메인메뉴로</p>
-      <div id="hackingBar" style="
-      position: absolute; top: 20px; right: 20px;
-      width: 150px; height: 10px;
-      background: gray; overflow: hidden; display: none; z-index: 999;">
-      <div id="hackingFill" style="width: 0; height: 100%; background: lime;"></div>
+      <div class="ps-controls">
+        <button class="ps-btn" id="pause-btn" title="Esc 키로도 가능">⏸  PAUSE</button>
+        <button class="ps-btn" id="restart-btn" title="R 키로도 가능">🔁RESET</button>
+        <button class="ps-btn" id="quit-btn" title="Q 키로도 가능">🏠 MAIN</button>
       </div>
+      <div id="hackingBar">
+        <div id="hackingFill"></div>
+      </div>
+    </div>
+
   </div>
-</div>
 
-<div id="game-area">
-  <!-- 벽돌깨기 게임 영역 -->
-  <canvas id="gameCanvas" width="850" height="900"></canvas>  
-  <!-- 게임 오버 메시지 -->
-  <img id = "backgroundImage" src = " ">
-</div>
+  <div id="game-area">
+    <!-- 벽돌깨기 게임 영역 -->
+    <canvas id="gameCanvas" width="850" height="900"></canvas>  
+    <!-- 게임 오버 메시지 -->
+    <img id = "backgroundImage" src = " ">
+  </div>
 
-<div id = "game-over-massage" class = "pop-up-massage">
-  Game Over!
-</div>
-<div id = "game-over-subtitle" class = "pop-up-massage">
-  'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
-</div>
+  <div id = "game-over-massage" class = "pop-up-massage">
+    Game Over!
+  </div>
+  <div id = "game-over-subtitle" class = "pop-up-massage">
+    'R'을 눌러 다시하거나, 'Q'를 눌러 메인메뉴로 돌아가기
+  </div>
 <!-- 일시정지 메뉴 -->
 <div id = "pause-panel">
   'R'을 눌러 다시하기<br>
@@ -217,11 +217,11 @@
 <div id = "clear-panel" class = "menu-page story-page">
   <div id = "story-panel">
     <span>클리어텍스트<span>
+    </div>
+
   </div>
 
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="game.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="game.js"></script>
 </body>
 </html>
