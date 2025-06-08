@@ -2917,7 +2917,7 @@ doc.close();
 let secureToggleInterval = null;
 
 function startHardModeTimer() {
-  remainingTime = 60;
+  remainingTime = 90;
   if (hardModeTimer) {
     clearInterval(hardModeTimer);
   }
