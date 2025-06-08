@@ -473,12 +473,6 @@ body {
 }
 
 
-
-
-
-
-
-
 #scoreBoard.updated {
   animation: popScore 0.3s ease;
 }
@@ -489,6 +483,30 @@ body {
   100% { transform: scale(1); color: white; }
 }
 
+<<<<<<< HEAD
+=======
+/* 오른쪽: 게임 */
+#game-area {
+  width: 50vw;
+  height: 70%;
+  position: relative;
+  background: #111;
+  /*border-left: 2px solid #ccc;*/
+}
+
+
+/* canvas 등은 그대로 유지 */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 2;
+  display: none;
+}*/
+>>>>>>> 0d086d22d7f263257c5b3707c9528cbbe8c12a45
 
 
 /*이 아래, 설정의 공 속도 라디오 버튼 관련*/

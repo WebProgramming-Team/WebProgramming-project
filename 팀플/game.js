@@ -20,7 +20,7 @@ paddleImage.src = "images/paddle-asset/joystickVer2.png";
 
 //공 속도 관련
 const v_s_fast = 128;//빠름일때 공 속도
-const v_s_slow = 72;//느림일때 공 속도
+const v_s_slow = 10;//느림일때 공 속도
 let v_s = v_s_slow;//기본 속도 = 느림
 //난이도 관련
 let difficulty; //이건 난이도를 정함 -> Select-Mode에서 결정 후 넘겨받음
@@ -91,8 +91,8 @@ gameOverMusic[1].loop = true;
 
 
 // 캔버스 크기
-const canvasWidth = 900;  //우리 코드에서는 900px
-const canvasHeight = 900;
+let canvasWidth = 900;  //우리 코드에서는 900px
+let canvasHeight = 900;
 
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
@@ -451,11 +451,14 @@ let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
-const brickHeight = 60;
 const brickPadding = 2;
 const brickOffsetTop = 50;
 const brickOffsetLeft = 5;
-const brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
+
+let brickHeight = 10;
+let brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
+
+
 
 // 벽돌 전체 너비/높이 계산
 const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
@@ -475,6 +478,14 @@ $(window).ready(function() {
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
+
+  const $gameArea = $('#game-area');
+  canvasWidth = $gameArea.width();
+  canvasHeight = $gameArea.height();
+
+  console.log("Canvas Width:", canvasWidth);
+  console.log("Canvas Height:", canvasHeight);
+
   /*--------------*/ 
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
@@ -576,6 +587,7 @@ function allHide(){
   //전부 다 hide하는 함수
     $(".menu-page").hide();//메뉴 페이지 hide
     $("#game-wrapper").hide();//game hide
+    $("#clear-panel").hide();
   }
 
 //홈 화면 시작
@@ -685,38 +697,6 @@ function startHardPage() {
   init();
 }
 
-//클리어 조건 분기
-function checkGameClear(Mode){
-  //Mode(난이도) 별 게임 클리어 조건 확인
-  const cleared = isCleared(); // 예: 남은 벽돌이 없거나 조건 달성 시
-  if (!cleared) return;
-
-  showClearStory(mode);
-
-  if (mode === 0) startNormalPage();
-  else if (mode === 1) startHardPage();
-  else if (mode === 2) showGameCompletion();
-
-}
-
-//난이도 별 스토리 보여주기
-function showClearStory(mode) {
-  switch (mode) {
-  case 0:
-    allHide();
-    $(".EasyClear-story").show();
-    break;
-  case 1:
-    $(".NormalClear-story").show();
-    break;
-  case 2:
-    $(".GameClear-story").show();
-    break;
-  default:
-    console.warn("정의되지 않은 클리어모드:", mode);
-  }
-}
-
 //게임 초기화 함수
 function init() {
   if (!isGameOver) return;
@@ -747,7 +727,7 @@ function resetGameState() {
   bricks = [];
   $("#pan").css({"background-color":"transparent"}); // ??
 
-  $("body").css("width", "100vw");
+  $("body").css("width", "100vw"); 
   initShowHide(); // 게임 화면 가리고
   stopMusic(); // 음악 멈추기
   ingameMusic[igIdx].play();//선택된 뮤직 시작.
@@ -758,13 +738,13 @@ function resetGameState() {
   ballX = canvas.width / 2;
   ballY = canvas.height - 80;
 
-  ballRadius = 30;
+  ballRadius = 5;
 
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
-  paddleHeight = 40;
-  paddleWidth = 240;
+  paddleHeight = 10;
+  paddleWidth = 60;
   paddleX = (canvas.width - paddleWidth) / 2;
 }
 
@@ -1226,16 +1206,25 @@ function startBrickMoveTimer(difficulty) {
       testFlag = false;
       updateIframe();
       stopMusic();
-      toTheNext();
+      showStory();
       return;
     }
 
     requestAnimationFrame(draw);
   }
 
-  function toTheNext() {
-    difficulty += 1;
+ 
 
+//다음 스토리로
+  function showStory(){
+    allHide();
+    $("clear-panel").show();
+
+    if(difficulty == 0){
+      //이지모드 
+    }
+
+    difficulty += 1;
     if (difficulty > 2) {
       isGameOver = true;
       showMainMenu();
@@ -1246,7 +1235,9 @@ function startBrickMoveTimer(difficulty) {
     setTimeout(function() {
       init();
     }, 3000);
+
   }
+
 
 //개선판
   function bounceBall() {
@@ -1694,6 +1685,7 @@ function drawScore() {
 function checkClearByDifficulty() {
   switch (difficulty) {
   case 0:
+    return checkEasyClear();
   case 1:
       return checkNormalClear(); // 기존 checkClear 내용 그대로
     case 2:
@@ -1703,6 +1695,9 @@ function checkClearByDifficulty() {
     }
   }
 
+function checkEasyClear(){
+  return isDeleteAll;
+}
 //노말 클리어 체크
   function checkNormalClear() {
     for (let c = 0; c < brickColumnCount; c++) {
