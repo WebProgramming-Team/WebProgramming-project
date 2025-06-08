@@ -698,6 +698,7 @@ function checkGameClear(Mode){
 function showClearStory(mode) {
   switch (mode) {
   case 0:
+    allHide();
     $(".EasyClear-story").show();
     break;
   case 1:
@@ -913,7 +914,15 @@ function createElementsByDifficulty(level) {
 
 
   } else if (level === 1) {
-    elements = createNormalElements(); // 기존처럼 노말
+     const blockPlan = [
+    { type: "body", count: 3 },
+    { type: "main-menu", count: 2 },
+    { type: "lab", count: 2 },
+    {type:" table-border", count:1}
+  ]; //블럭 어떻게 넣을건지 확인
+
+
+    layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
   } else if (level === 2) {
     elements = createHardElements();   // 하드 요소들만 따로 준비
   }
@@ -921,25 +930,6 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
-// function createEasyElements() {
-//   let elements = [];
-//   // let newEmt = desEleEasy.find(element => element.selector === "#header");
-//   // elements.push(newEmt);
-//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
-//   // elements.push(newEmt);
-//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
-//   // elements.push(newEmt);
-//   // for (let i = 0; i < 2; i++) {
-//   //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
-//   //   elements.push(newEmt);
-//   // }
-//   // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
-//   // elements.push(newEmt);
-//   // let newEmt = desEleEasy.find(element => element.selector === "#footer");
-//   // elements.push(newEmt);
-
-//   return elements;
-// }
 
 
 function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
@@ -1385,6 +1375,9 @@ function checkTagCount(tag){
     console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
+  }else if(difficulty==1){
+    //노말 모드 계획
+    //
   }
 }
 
