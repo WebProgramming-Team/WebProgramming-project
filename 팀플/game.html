@@ -76,21 +76,21 @@
     <div id="options-menu-callout-area1-section1" class="optional-callout-ara1-sections">
       <img src="images\temp\backgroundOp1.jpg" alt="Background-Option 1" class="option-image" />
       <div class="radio-container">
-        <input type="radio" name="background-option" value="1" /> White Mode
+        <input type="radio" name="background-option" value="1" onchange="changeBackground(0)" /> White Mode
       </div>
     </div>
 
     <div id="options-menu-callout-area1-section2" class="optional-callout-ara1-sections">
       <img src="images\temp\backgroundOp2.jpg" alt="background-Option 2" class="option-image" />
       <div class="radio-container">
-        <input type="radio" name="background-option" value="2" /> Dark Mode
+        <input type="radio" name="background-option" value="2" onchange="changeBackground(1)" /> Dark Mode
       </div>
     </div>
 
     <div id="options-menu-callout-area1-section3" class="optional-callout-ara1-sections">
       <img src="images\temp\backgroundOp3.jpg" alt="background-Option 3" class="option-image" />
-      <div class="radio-container">
-        <input type="radio" name="background-option" value="3" /> ????????
+        <div class="radio-container">
+        <input type="radio" name="background-option" value="3" onchange="changeBackground(2)" /> ????????
       </div>
     </div>
 
@@ -200,9 +200,10 @@
 
 <div id="game-area">
   <!-- 벽돌깨기 게임 영역 -->
+
   <canvas id="gameCanvas" width="850" height="900"></canvas>  
   <!-- 게임 오버 메시지 -->
-  <img id = "backgroundImage" src = " ">
+  
 </div>
 
 <div id = "game-over-massage" class = "pop-up-massage">

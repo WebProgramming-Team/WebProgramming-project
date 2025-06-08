@@ -164,7 +164,23 @@ const canvasHeight = 900;
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
 
+//===배경 관련====
 
+let backgroundimg = [
+  new Image(),
+  new Image(),
+  new Image()
+];
+
+backgroundimg[0].src = "images/Game/whitebackground.PNG";
+backgroundimg[1].src = "images/Game/backgroundGame.PNG";
+backgroundimg[2].src = "images/Game/bonobono.jpg";
+
+let bgidx = 0;
+
+function changeBackground(index) {
+  bgidx = index;
+}
 
 //게임 관련 변수들
 
@@ -1275,7 +1291,7 @@ function startBrickMoveTimer(difficulty) {
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.drawImage(backgroundimg[bgidx], 0, 0, canvas.width, canvas.height);//배경 그리기
     drawBricks();
     drawBall();
     drawPaddle();

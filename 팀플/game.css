@@ -412,7 +412,11 @@ body {
 }
 
 
-
+#game-backgroundImage{
+  width: 100%;
+  height:100%;
+  display: ;
+}
 /* 전체 좌우 분할 */
 /* 전체 게임 화면 */
 #game-wrapper {
