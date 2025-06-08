@@ -32,7 +32,7 @@ let testFlag = true;
 //하드모드 시간제한 변수
 let hardModeTimer = null;
 let timerDisplay = null;
-let remainingTime = 60;
+let remainingTime = 90;
 
 //점수 용 전역변수
 let score = 0;
@@ -927,7 +927,7 @@ function createElementsByDifficulty(level) {
 
     layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
   } else if (level === 2) {
-    elements = createHardElementsRandom();   // 하드 요소들만 따로 준비
+    elements = createHardElementsFixed();   // 하드 요소들만 따로 준비
   }
 
   return shuffleEmt(elements);
@@ -1096,11 +1096,8 @@ function createHardElementsRandom() {
   // 개수 맞게 자르기
   return shuffleEmt(elements.slice(0, totalBrickCount));
 }
-
-//이건 벽돌 위치가 고정된것.
-function createHardElementsFixed() {
-  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
-
+  
+  //전역에 고정 배치 블럭 지정
   const uniqueTargets = [
     { selector: ".lab.calculator", effect: "breakCalculator", label: "계산기 파괴!" },
     { selector: ".lab.gugudan", effect: "breakGugudan", label: "구구단 폭파!" },
@@ -1115,6 +1112,10 @@ function createHardElementsFixed() {
     { selector: "#title", effect: "breakHeaderTitle", label: "제목 삭제!" },
     { selector: "footer", effect: "breakFooterWarning", label: "푸터 경고!" }
   ];
+
+//이건 벽돌 위치가 고정된것.
+function createHardElementsFixed() {
+  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
 
   // 나머지 빈 블럭은 effect: "none" 으로 채우기
   const elements = [...uniqueTargets];
@@ -1698,7 +1699,7 @@ function checkClearByDifficulty() {
 
 //하드 클리어 체크
   function checkHardClear() {
-    const targetSelectors = hardTargets.map(t => t.selector);
+    const targetSelectors = uniqueTargets.map(t => t.selector);
     return targetSelectors.every(sel => destroyedSelectors.has(sel));
   }
 
