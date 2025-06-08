@@ -513,27 +513,8 @@ $(window).ready(function() {
   //변수 초기화 -> 나중에 defienGameVarDefault 쪽으로 넘겨줄거. 
 
   ballImage.src = "images/temp-ball/GyosuYouCheatMeBall.png";
+  bindVolumeControl(); //볼륨 초기화
 
-
-//option 쪽으로 넘겨줄 것들
-  // $(".bs-radio").on("change", function() {
-  //   $(".bs-label").removeClass("selected");
-
-  //   $(this).parent(".bs-label").addClass("selected");
-  // });
-
-  // $(".volume-bar").on("input", function() {
-  //   let vol = $(this).val();
-
-  //   $(".volume-bar").val(vol);
-  //   $(".volume").html(vol);
-
-  //   setVolume(vol);
-  // });
-
-  // $("#music-select").on("input", function() {
-  //   igIdx = $(this).val();
-  // });
 });
 
 
@@ -1163,7 +1144,7 @@ function moveBricksDownForHard() {
       bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
     }
 
-    // 👇 숨겨진 블럭이 파괴된 태그라면 아예 skip!
+    //  숨겨진 블럭이 파괴된 태그라면 아예 skip!
     const b = bricks[c][hiddenRowNum];
     if (b && destroyedSelectors.has(b.targetSelector)) {
       b.status = 0;
@@ -1352,6 +1333,35 @@ function gameOver() {
     $(".pop-up-massage").fadeIn(200);
   }, 1000);
 }
+//////////////////////////////
+/*이 아래는 음악관련 설정들*/
+/////////////////////////////
+
+//슬라이드 바와 음악 볼륨 연결
+const volumeSlider = document.getElementById("pause-volume-slider");
+const volumeDisplay = document.getElementById("volume-value");
+
+volumeSlider.addEventListener("input", function () {
+  const volume = parseInt(volumeSlider.value);
+  setVolume(volume);
+  volumeDisplay.textContent = volume;
+});
+
+//페이지 로딩시 음량 초기화
+function bindVolumeControl() {
+  const defaultVolume = 50;
+  setVolume(defaultVolume);
+  $("#pause-volume-slider").val(defaultVolume);
+  $(".volume-value").text(defaultVolume);
+
+  //슬라이더 움직일 때 이벤트 처리
+  $("#pause-volume-slider").on("input", function () {
+    const vol = $(this).val();
+    setVolume(vol);
+    $(".volume-value").text(vol);
+  });
+}
+
 
 function stopMusic() {
 
@@ -1369,16 +1379,24 @@ function stopMusic() {
 }
 
 function setVolume(vol) {
-  vol = vol / 100 * 0.5;
-  gameOverMusic.forEach(function(audio) {
-    audio.volume = vol;
-  })
-  ingameMusic.forEach(function(audio) {
-    audio.volume = vol;
-  })
-  ingameMusic[1].volume = ingameMusic[1].volume * 0.8;
-  menuMusic.volume = vol;
+  const scaledVol = vol / 100; // 사용자가 직접 제어한 0~1 범위
+
+  // 인게임 음악 기본 볼륨은 scaledVol, 단 일부 트랙만 보정
+  ingameMusic.forEach((audio, idx) => {
+    if (idx === 1) {
+      audio.volume = scaledVol * 0.8; // 예외 처리
+    } else {
+      audio.volume = scaledVol;
+    }
+  });
+
+  // 메뉴 음악 & 게임오버 음악도 동일하게 적용
+  menuMusic.volume = scaledVol;
+  gameOverMusic.forEach(audio => {
+    audio.volume = scaledVol;
+  });
 }
+
 
 function drawBricks() {
   for (let c = 0; c < brickColumnCount; c++) {
@@ -1462,6 +1480,7 @@ function checkTagCount(tag){
     }else if(tag == "header"){
       console.log("헤더 하나 사라짐 하나 사라짐"); 
       easy_headerCount++;
+    }
 
   if (b.isBomb) {
     triggerBombChain(c, r);
@@ -2880,9 +2899,11 @@ function blackout(duration = 800) {
 function showHackingProgress() {
   const bar = document.getElementById("hackingBar");
   const fill = document.getElementById("hackingFill");
+  const text = document.getElementById("hackingText");
 
   bar.style.display = "block";
   fill.style.width = "0%";
+  text.style.display = "block";
 
   let percent = 0;
 
@@ -2894,6 +2915,7 @@ function showHackingProgress() {
       clearInterval(interval);
       setTimeout(() => {
         bar.style.display = "none";
+        text.style.display = "none"; // 텍스트도 같이 숨김
       }, 300); // 사라지는 시간도 더 짧게
     }
   }, 50); // 더 짧은 간격
