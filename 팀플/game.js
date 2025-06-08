@@ -1345,15 +1345,17 @@ function destroyBrick(c, r) {
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
-  b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
-
   if (b.tag != null) checkTagCount(b.tag);
-  if (b.isBomb) triggerBombChain(c, r);
-  if (handleSecureBlock(b)) return;
 
+  if (handleSecureBlock(b)) return;
+  if (b.isBomb){
+     b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
+     triggerBombChain(c, r);
+   } 
   handleScoreEffect(b);
   handleWarning(score);
   processIframeEffect(b, c, r);
+  b.status = 0;
 }
 //보조 5. 태그 지워지는거 실시간으로 확인 후 변경사항 
 function checkTagCount(tag){
@@ -1443,6 +1445,7 @@ function changeCssTagFromIframe(id, cssProperty, value) {
 //보조 1. 보안 벽돌(isSecure)일 경우 HP를 차감하고, 아직 안 부서졌으면 true 반환하여 파괴 중단
 function handleSecureBlock(b) {
   if (b.isSecure && typeof b.hp === "number") {
+    console.log(b.hp);
     b.hp--;
     return b.hp > 0;
   }

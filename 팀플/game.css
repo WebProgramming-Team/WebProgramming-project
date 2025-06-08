@@ -296,8 +296,8 @@ body {
 /*실제 공 이미지*/
 .ball-container-img {
   margin:8% auto 5% 9%;
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
   display: inline-block;
   overflow: hidden;
   object-fit: cover;
@@ -320,7 +320,7 @@ body {
 }
 
 .arrow {
-  font-size: 32px;
+  font-size: 3rem;
   font-weight: bold;
   margin: 0 2rem;
   cursor: pointer;
@@ -328,8 +328,8 @@ body {
 }
 
 #ball-select-button {
-  width: 50px;
-  height: 50px;
+  width: 5rem;
+  height: 5rem;
   background-color: yellow;
   border-radius: 50%;
   display: inline-block;
