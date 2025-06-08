@@ -136,6 +136,8 @@ const desEleHard = [
   { selector: "footer", effect: "breakFooterWarning" }
 ];
 
+//부숴진 태그들 저장
+const destroyedSelectors = new Set();
 
 //이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
 const effectHandlers = {
@@ -730,6 +732,7 @@ function init() {
 
 //게임 초기화
 function resetGameState() {
+  destroyedSelectors.clear();  //파괴된 요소 초기화
   testFlag = true;
   isGameOver = false; // 게임 오버 false
   isPaused = false; // 퍼즈 false
@@ -839,33 +842,13 @@ function generateBombPositions(totalCount) {
 function createBrickObject(c, r, element, isBomb) {
   //easy 모드일 때 임시 루틴
   if(difficulty == 0){
-     const bricks = [];
-        let tag = layout[r][c];
-        const isBomb = tag === "bomb";
-        const isTopRow = r < extraRow;
-        const isSecure = (difficulty !== 0 && Math.random() < 0.2);
-        const hp = isSecure ? 3 : null;
-        return {
-      x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-      y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
-      status: isTopRow ? 0 : 1,
-      isBomb: isBomb,
-      isHidden: isTopRow ? 1 : 0,
-      targetSelector: element?.selector,
-      effect: element?.effect,
-      color: element?.color,
-      isSecure: isSecure,
-      secureState: isSecure,
-      hp: hp,
-      tag:tag
-    };
-  }
-    
-  const isTopRow = r < extraRow;
-  const isSecure = (difficulty !== 0 && Math.random() < 0.2);
-  const hp = isSecure ? 3 : null;
-
-  return {
+   const bricks = [];
+   let tag = layout[r][c];
+   const isBomb = tag === "bomb";
+   const isTopRow = r < extraRow;
+   const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+   const hp = isSecure ? 3 : null;
+   return {
     x: c * (brickWidth + brickPadding) + brickOffsetLeft,
     y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
     status: isTopRow ? 0 : 1,
@@ -877,8 +860,28 @@ function createBrickObject(c, r, element, isBomb) {
     isSecure: isSecure,
     secureState: isSecure,
     hp: hp,
-    tag:null
+    tag:tag
   };
+}
+
+const isTopRow = r < extraRow;
+const isSecure = (difficulty !== 0 && Math.random() < 0.2);
+const hp = isSecure ? 3 : null;
+
+return {
+  x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+  y: (r - extraRow) * (brickHeight + brickPadding) + brickOffsetTop,
+  status: isTopRow ? 0 : 1,
+  isBomb: isBomb,
+  isHidden: isTopRow ? 1 : 0,
+  targetSelector: element?.selector,
+  effect: element?.effect,
+  color: element?.color,
+  isSecure: isSecure,
+  secureState: isSecure,
+  hp: hp,
+  tag:null
+};
 }
 
 
@@ -904,21 +907,21 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-    { type: "article", count: 4 },
-    { type: "footer", count: 2 },
-    { type: "header", count: 2 }
-    
+      { type: "article", count: 4 },
+      { type: "footer", count: 2 },
+      { type: "header", count: 2 }
+
   ]; //블럭 어떻게 넣을건지 확인
-    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
 
 
-    elements = createEasyElements();
+  elements = createEasyElements();
 
 
-  } else if (level === 1) {
+} else if (level === 1) {
     elements = createNormalElements(); // 기존처럼 노말
   } else if (level === 2) {
-    elements = createHardElements();   // 하드 요소들만 따로 준비
+    elements = createHardElementsRandom();   // 하드 요소들만 따로 준비
   }
 
   return shuffleEmt(elements);
@@ -974,14 +977,14 @@ function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
   shuffleArray(fillCells);
 
   // 4. 먼저 dummy와 bomb를 layout에 채움 (빈 공간만)
-let fillIndex = 0;
-for (let r = 0; r < rows; r++) {
-  for (let c = 0; c < cols; c++) {
-    if (fillIndex < fillCells.length) {
-      layout[r][c] = fillCells[fillIndex++];
+  let fillIndex = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (fillIndex < fillCells.length) {
+        layout[r][c] = fillCells[fillIndex++];
+      }
     }
   }
-}
 
 // 추가: layout 전체를 다시 셔플
 const flatLayout = layout.flat();  // 2차원 배열을 1차원으로
@@ -993,44 +996,44 @@ for (let i = 0; i < rows * cols; i++) {
 }
 
   // 5. blockPlan 순서대로 블럭 배치 (순서 유지를 위해)
-  const placedTagIndices = new Set();
+const placedTagIndices = new Set();
 
-  for (const type of blocks) {
-    const currentIdx = blockPlan.findIndex(p => p.type === type);
-    let placed = false;
+for (const type of blocks) {
+  const currentIdx = blockPlan.findIndex(p => p.type === type);
+  let placed = false;
 
-    for (let r = 0; r < rows && !placed; r++) {
-      for (let c = 0; c < cols && !placed; c++) {
-        if (layout[r][c] === null || layout[r][c] === "dummy") {
-          const isOrderValid = [...placedTagIndices].every(idx => idx <= currentIdx);
-          if (!isOrderValid) continue;
+  for (let r = 0; r < rows && !placed; r++) {
+    for (let c = 0; c < cols && !placed; c++) {
+      if (layout[r][c] === null || layout[r][c] === "dummy") {
+        const isOrderValid = [...placedTagIndices].every(idx => idx <= currentIdx);
+        if (!isOrderValid) continue;
 
-          layout[r][c] = type;
-          placed = true;
-          placedTagIndices.add(currentIdx);
-        }
+        layout[r][c] = type;
+        placed = true;
+        placedTagIndices.add(currentIdx);
       }
     }
   }
+}
 
   // 6. 남은 dummy 다시 채움 (혹시 null이 남아있을 경우)
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (layout[r][c] === null) layout[r][c] = "dummy";
-    }
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    if (layout[r][c] === null) layout[r][c] = "dummy";
   }
+}
 
   // 출력 디버깅
-  layout.forEach((row, rowIndex) => {
-    const rowStr = row.map(cell => {
-      if (cell === "bomb") return "💣";
-      else if (cell === "dummy") return "⬜";
-      else return `[${cell}]`;
-    }).join(" ");
-    console.log(`Row ${rowIndex}: ${rowStr}`);
-  });
+layout.forEach((row, rowIndex) => {
+  const rowStr = row.map(cell => {
+    if (cell === "bomb") return "💣";
+    else if (cell === "dummy") return "⬜";
+    else return `[${cell}]`;
+  }).join(" ");
+  console.log(`Row ${rowIndex}: ${rowStr}`);
+});
 
-  return layout;
+return layout;
 }
 
 // 셔플 함수
@@ -1061,23 +1064,40 @@ function createNormalElements() {
 
   return elements;
 }
+//전역에 태그 선언
+const hardTargets = [
+  { selector: ".lab.calculator", effect: "breakCalculator", label: "계산기" },
+  { selector: ".lab.gugudan", effect: "breakGugudan", label: "구구단" },
+  { selector: ".lab.numGame", effect: "breakNumGame", label: "숫자게임" },
+  { selector: ".lab.wordBook", effect: "breakWordBook", label: "단어장" },
+  { selector: ".lab.clickHere", effect: "breakClickHere", label: "innerText" },
+  { selector: ".lab.image-toggle", effect: "breakImageToggle", label: "이미지" },
+  { selector: ".lab.colorList", effect: "breakColorList", label: "색상표" },
+  { selector: ".lab.flashBox", effect: "breakFlashBox", label: "깜빡상자" },
+  { selector: ".lab.movingBox", effect: "breakMovingBox", label: "상자이동" },
+  { selector: "#hangman", effect: "breakHangman", label: "행맨" },
+  { selector: "#title", effect: "breakTitle", label: "제목 영역" },
+  { selector: "footer", effect: "breakFooter", label: "푸터" }
+];
 
-function createHardElements() {
+
+function createHardElementsRandom() {
   const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
-  const hardTargets = [
-    desEleHard.find(el => el.selector === ".lab.calculator"),
-    desEleHard.find(el => el.selector === ".lab.gugudan"),
-    desEleHard.find(el => el.selector === ".lab.numGame"),
-    desEleHard.find(el => el.selector === ".lab.wordBook"),
-    desEleHard.find(el => el.selector === ".lab.clickHere"),
-    desEleHard.find(el => el.selector === ".lab.image-toggle"),
-    desEleHard.find(el => el.selector === ".lab.colorList"),
-    desEleHard.find(el => el.selector === ".lab.flashBox"),
-    desEleHard.find(el => el.selector === ".lab.movingBox"),
-    desEleHard.find(el => el.selector === "#hangman"),
-    desEleHard.find(el => el.selector === "#title"),
-    desEleHard.find(el => el.selector === "footer")
-  ].filter(Boolean); // null 제거
+  // const hardTargets = [
+  //   desEleHard.find(el => el.selector === ".lab.calculator"),
+  //   desEleHard.find(el => el.selector === ".lab.gugudan"),
+  //   desEleHard.find(el => el.selector === ".lab.numGame"),
+  //   desEleHard.find(el => el.selector === ".lab.wordBook"),
+  //   desEleHard.find(el => el.selector === ".lab.clickHere"),
+  //   desEleHard.find(el => el.selector === ".lab.image-toggle"),
+  //   desEleHard.find(el => el.selector === ".lab.colorList"),
+  //   desEleHard.find(el => el.selector === ".lab.flashBox"),
+  //   desEleHard.find(el => el.selector === ".lab.movingBox"),
+  //   desEleHard.find(el => el.selector === "#hangman"),
+  //   desEleHard.find(el => el.selector === "#title"),
+  //   desEleHard.find(el => el.selector === "footer")
+  // ].filter(Boolean); // null 제거
+  hardTargets.filter(Boolean); 
 
   const elements = [];
 
@@ -1089,6 +1109,35 @@ function createHardElements() {
   // 개수 맞게 자르기
   return shuffleEmt(elements.slice(0, totalBrickCount));
 }
+
+//이건 벽돌 위치가 고정된것.
+function createHardElementsFixed() {
+  const totalBrickCount = (brickRowCount + extraRow) * brickColumnCount;
+
+  const uniqueTargets = [
+    { selector: ".lab.calculator", effect: "breakCalculator", label: "계산기 파괴!" },
+    { selector: ".lab.gugudan", effect: "breakGugudan", label: "구구단 폭파!" },
+    { selector: ".lab.numGame", effect: "breakNumGame", label: "숫자게임 고장!" },
+    { selector: ".lab.wordBook", effect: "breakWordBook", label: "단어장 삭제!" },
+    { selector: ".lab.clickHere", effect: "breakClickHere", label: "클릭 이벤트 삭제!" },
+    { selector: ".lab.image-toggle", effect: "breakImageToggle", label: "사진 기능 파괴!" },
+    { selector: ".lab.colorList", effect: "breakColorList", label: "색상표 제거!" },
+    { selector: ".lab.flashBox", effect: "breakFlashBox", label: "깜빡이 종료!" },
+    { selector: ".lab.movingBox", effect: "breakMovingBox", label: "상자 멈춤!" },
+    { selector: "#hangman", effect: "breakHangman", label: "행맨 파괴!" },
+    { selector: "#title", effect: "breakHeaderTitle", label: "제목 삭제!" },
+    { selector: "footer", effect: "breakFooterWarning", label: "푸터 경고!" }
+  ];
+
+  // 나머지 빈 블럭은 effect: "none" 으로 채우기
+  const elements = [...uniqueTargets];
+  while (elements.length < totalBrickCount) {
+    elements.push({ selector: "none", effect: "none", label: "" });
+  }
+
+  return elements.slice(0, totalBrickCount);
+}
+
 
 function moveBricksDown() {
   if (isGameOver || (hiddenRowNum <= 0)) {
@@ -1108,6 +1157,31 @@ function moveBricksDown() {
   console.log("벽돌 내려왔음, "+ extraRow +"번 중" + (extraRow - hiddenRowNum) + " 번");
   
 }
+
+//하드모드용 블록 내려오기
+function moveBricksDownForHard() {
+  if (isGameOver || hiddenRowNum <= 0) return;
+  hiddenRowNum--;
+
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount + extraRow; r++) {
+      bricks[c][r].y = (r - hiddenRowNum) * (brickHeight + brickPadding) + brickOffsetTop;
+    }
+
+    // 👇 숨겨진 블럭이 파괴된 태그라면 아예 skip!
+    const b = bricks[c][hiddenRowNum];
+    if (b && destroyedSelectors.has(b.targetSelector)) {
+      b.status = 0;
+      b.isHidden = 1;
+    } else {
+      b.status = 1;
+      b.isHidden = 0;
+    }
+  }
+
+  console.log(`벽돌 내려왔음: ${extraRow - hiddenRowNum}/${extraRow}`);
+}
+
 
 //난이도 별 벽돌 내려오는 속도 관리
 function startBrickMoveTimer(difficulty) {
@@ -1153,16 +1227,14 @@ function startBrickMoveTimer(difficulty) {
     if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 12;
     else if (leftPressed && paddleX > 0) paddleX -= 12;
 
-    if (checkClear()) {
+    if (checkClearByDifficulty()) {
       isGameOver = true;
-    // clearInterval(intervalId);
-
       testFlag = false;
       updateIframe();
       stopMusic();
       toTheNext();
       return;
-    } 
+    }
 
     requestAnimationFrame(draw);
   }
@@ -1378,12 +1450,12 @@ function checkTagCount(tag){
       console.log("푸터 태크 하나 사라짐");
       easy_footerCount++;
     }else{
-       console.log("뭐시여 무슨 태그여 이거");
-    }
-    console.log("\nTotal counts:");
-    console.log("Articles: " + easy_articleCount);
-    console.log("Headers: " + easy_headerCount);
-    console.log("Footers: " + easy_footerCount);
+     console.log("뭐시여 무슨 태그여 이거");
+   }
+   console.log("\nTotal counts:");
+   console.log("Articles: " + easy_articleCount);
+   console.log("Headers: " + easy_headerCount);
+   console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
   }
@@ -1409,8 +1481,8 @@ function EasyModeGameFun(){
   if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
     isDeletearticle1 && easy_headerCount >= 2){
     removeHtmlTagFromIframe("wrapper");
-    console.log("헤더컷!");
-  }
+  console.log("헤더컷!");
+}
 
 
 }
@@ -1488,6 +1560,11 @@ function processIframeEffect(b, c, r) {
 
   if (handler) {
     handler(target, b, iframeDoc);
+  }
+
+  //  selector 기억하기. 부숴진거 set 에 넣음
+  if (b.targetSelector && b.targetSelector !== "none") {
+    destroyedSelectors.add(b.targetSelector);
   }
 
   return true;
@@ -1601,18 +1678,38 @@ function drawScore() {
 }
 }
 
-function checkClear() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    if (bricks[c]) {
-      for (let r = 0; r < bricks[c].length; r++) {
-        if (bricks[c][r] && (bricks[c][r].status === 1 || bricks[c][r].isHidden === 1)) return false;
-      }
+//난이도에 따라 알맞은 클리어 함수
+function checkClearByDifficulty() {
+  switch (difficulty) {
+  case 0:
+  case 1:
+      return checkNormalClear(); // 기존 checkClear 내용 그대로
+    case 2:
+      return checkHardClear();   // 새로 만든 하드 클리어 기준
+    default:
+      return false;
     }
   }
-  return true;
-}
 
-function drawBall() {
+//노말 클리어 체크
+  function checkNormalClear() {
+    for (let c = 0; c < brickColumnCount; c++) {
+      if (bricks[c]) {
+        for (let r = 0; r < bricks[c].length; r++) {
+          if (bricks[c][r] && (bricks[c][r].status === 1 || bricks[c][r].isHidden === 1)) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+//하드 클리어 체크
+  function checkHardClear() {
+    const targetSelectors = hardTargets.map(t => t.selector);
+    return targetSelectors.every(sel => destroyedSelectors.has(sel));
+  }
+
+  function drawBall() {
    ctx.save(); // 현재 상태 저장
 
    ctx.beginPath();
