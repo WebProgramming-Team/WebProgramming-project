@@ -391,6 +391,17 @@ body {
 }
 
 
+/*스토리 화면 */ 
+#clear-panel{
+  width:100%;
+  height:100%;
+  background-color: white;
+  font-size:500px;
+  
+}
+
+
+
 /* 전체 좌우 분할 */
 /* 전체 게임 화면 */
 #game-wrapper {
