@@ -903,10 +903,12 @@ function createElementsByDifficulty(level) {
 
   } else if (level === 1) {
      const blockPlan = [
-    { type: "body", count: 3 },
-    { type: "main-menu", count: 2 },
-    { type: "lab", count: 2 },
-    {type:" table-border", count:1}
+    { type: "&lt;header&gt;", count: 2 },
+    { type: "&lt;body&gt;", count: 3 },
+    { type: "&lt;lab&gt;", count: 2 },
+    { type: "&lt;main-menu&gt;", count: 2 },
+    { type: "&lt;container&gt;", count: 4 },
+    {type:" &lt;footer&gt;", count:2}
   ]; //블럭 어떻게 넣을건지 확인
 
 
@@ -918,97 +920,6 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
-
-
-function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
-  const layout = Array.from({ length: rows }, () => Array(cols).fill(null));
-  const totalCells = rows * cols;
-
-  // 1. 필요한 블럭 수 계산
-  const blocks = [];
-  blockPlan.forEach(plan => {
-    for (let i = 0; i < plan.count; i++) {
-      blocks.push(plan.type);
-    }
-  });
-
-  const blockCount = blocks.length;
-  const fillableCount = totalCells - blockCount;
-
-  if (fillableCount < currentBomb) {
-    throw new Error("bomb 개수가 너무 많습니다. 블럭 배치 후 남는 공간보다 bomb가 많음.");
-  }
-
-  // 2. bomb + dummy 배치할 셀 준비
-  const fillCells = Array(fillableCount).fill("dummy");
-  for (let i = 0; i < currentBomb; i++) {
-    fillCells[i] = "bomb";
-  }
-
-  // 3. 무작위로 섞음
-  shuffleArray(fillCells);
-
-  // 4. 먼저 dummy와 bomb를 layout에 채움 (빈 공간만)
-  let fillIndex = 0;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (fillIndex < fillCells.length) {
-        layout[r][c] = fillCells[fillIndex++];
-      }
-    }
-  }
-
-// 추가: layout 전체를 다시 셔플
-const flatLayout = layout.flat();  // 2차원 배열을 1차원으로
-shuffleArray(flatLayout);         // 셔플
-for (let i = 0; i < rows * cols; i++) {
-  const r = Math.floor(i / cols);
-  const c = i % cols;
-  layout[r][c] = flatLayout[i];
-}
-
-  // 5. blockPlan 순서대로 블럭 배치 (순서 유지를 위해)
-const placedTagIndices = new Set();
-
-for (const type of blocks) {
-  const currentIdx = blockPlan.findIndex(p => p.type === type);
-  let placed = false;
-
-  for (let r = 0; r < rows && !placed; r++) {
-    for (let c = 0; c < cols && !placed; c++) {
-      if (layout[r][c] === null || layout[r][c] === "dummy") {
-        const isOrderValid = [...placedTagIndices].every(idx => idx <= currentIdx);
-        if (!isOrderValid) continue;
-
-        layout[r][c] = type;
-        placed = true;
-        placedTagIndices.add(currentIdx);
-      }
-    }
-  }
-}
-
-  // 6. 남은 dummy 다시 채움 (혹시 null이 남아있을 경우)
-for (let r = 0; r < rows; r++) {
-  for (let c = 0; c < cols; c++) {
-    if (layout[r][c] === null) layout[r][c] = "dummy";
-  }
-}
-
-  // 출력 디버깅
-layout.forEach((row, rowIndex) => {
-  const rowStr = row.map(cell => {
-    if (cell === "bomb") return "💣";
-    else if (cell === "dummy") return "⬜";
-    else return `[${cell}]`;
-  }).join(" ");
-  console.log(`Row ${rowIndex}: ${rowStr}`);
-});
-
-return layout;
-}
-
-// 셔플 함수
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1016,6 +927,48 @@ function shuffleArray(array) {
   }
 }
 
+function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
+  const totalCells = rows * cols;
+  const layoutFlat = [];
+
+  // 1. 블럭 추가
+  blockPlan.forEach(plan => {
+    for (let i = 0; i < plan.count; i++) {
+      layoutFlat.push(plan.type);
+    }
+  });
+
+  // 2. bomb 추가
+  for (let i = 0; i < currentBomb; i++) {
+    layoutFlat.push("bomb");
+  }
+
+  // 3. 나머지는 dummy로 채움
+  while (layoutFlat.length < totalCells) {
+    layoutFlat.push("dummy");
+  }
+
+  // 4. 전부 셔플
+  shuffleArray(layoutFlat);
+
+  // 5. 2차원 배열로 변환
+  const layout = [];
+  for (let r = 0; r < rows; r++) {
+    layout.push(layoutFlat.slice(r * cols, (r + 1) * cols));
+  }
+
+  // 6. 디버깅 출력
+  layout.forEach((row, rowIndex) => {
+    const rowStr = row.map(cell => {
+      if (cell === "bomb") return "💣";
+      else if (cell === "dummy") return "⬜";
+      else return `[${cell}]`;
+    }).join(" ");
+    console.log(`Row ${rowIndex}: ${rowStr}`);
+  });
+
+  return layout;
+}
 
 
 
@@ -1464,29 +1417,73 @@ function checkTagCount(tag){
 }
 
 
-function EasyModeGameFun(){
-
+function EasyModeGameFun() {
   if(!isDeletearticle1 && easy_articleCount >= 2){
     removeHtmlTagFromIframe("article1");
     console.log("아티클1컷!");
+
+    // 캔버스에 텍스트 표시용 효과 추가
+    destructionEffects.push({
+      x: canvas.width / 2, // 원하는 위치 조정 가능
+      y: 50,
+      label: "article1 파괴!",
+      opacity: 1.0
+    });
   }
 
   if(!isDeletearticle2 && easy_articleCount >= 4){
     removeHtmlTagFromIframe("article2");
     console.log("아티클2컷!");
+
+    destructionEffects.push({
+      x: canvas.width / 2,
+      y: 80,
+      label: "article2 파괴!",
+      opacity: 1.0
+    });
   }
 
   if(!isDeleteFooter && easy_footerCount >= 2){
     removeHtmlTagFromIframe("footer");
     console.log("푸터컷!");
+
+    destructionEffects.push({
+      x: canvas.width / 2,
+      y: 110,
+      label: "footer 파괴!",
+      opacity: 1.0
+    });
   }
+
   if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
     isDeletearticle1 && easy_headerCount >= 2){
     removeHtmlTagFromIframe("wrapper");
-  console.log("헤더컷!");
+    console.log("헤더컷!");
+
+    destructionEffects.push({
+      x: canvas.width / 2,
+      y: 140,
+      label: "wrapper 파괴!",
+      opacity: 1.0
+    });
+  }
 }
+function drawDestructionEffects(ctx) {
+  for (let i = destructionEffects.length - 1; i >= 0; i--) {
+    const effect = destructionEffects[i];
+    ctx.globalAlpha = effect.opacity;
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText(effect.label, effect.x, effect.y);
+    ctx.globalAlpha = 1.0;
 
-
+    // 서서히 사라지게
+    effect.opacity -= 0.02;
+    if (effect.opacity <= 0) {
+      destructionEffects.splice(i, 1);  // 완전히 사라지면 배열에서 제거
+    }
+  }
 }
 
 

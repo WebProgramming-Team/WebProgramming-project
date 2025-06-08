@@ -15,7 +15,10 @@ body {
   margin: 0 auto;
 }
 
-#story-panel{
+#clear-panel{
+  width:100%;
+  height:100%;
+  background-color: white;
   
 }
 
