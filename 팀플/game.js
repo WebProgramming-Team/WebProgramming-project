@@ -1083,6 +1083,8 @@ function destroyBrick(c, r) {
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
+  console.log(`[DEBUG] 벽돌 파괴: (${c}, ${r}) isBomb: ${b.isBomb}`);
+
   if (handleSecureBlock(b)) return;
 
   b.status = 0;
@@ -1093,6 +1095,7 @@ function destroyBrick(c, r) {
   if (!processIframeEffect(b, c, r)) return;
 
   if (b.isBomb) {
+    console.log("[DEBUG] 폭탄 감지! 연쇄 폭발 시작");
     triggerBombChain(c, r);
   }
 }
@@ -1147,6 +1150,7 @@ function processIframeEffect(b, c, r) {
 }
 //보조 5. 벽돌이 폭탄(isBomb)일 경우, 상하좌우 주변 벽돌을 연쇄적으로 destroyBrick 호출
 function triggerBombChain(c, r) {
+  console.log(`[DEBUG] triggerBombChain at (${c}, ${r})`);
   const directions = [
     [0, -1], [0, 1], [-1, 0], [1, 0],
   ];
@@ -1157,9 +1161,10 @@ function triggerBombChain(c, r) {
       nc >= 0 && nc < brickColumnCount &&
       nr >= 0 && nr < bricks[nc]?.length
       ) {
+      console.log(`[DEBUG] 인접 벽돌 제거 시도: (${nc}, ${nr})`);
       destroyBrick(nc, nr);
+    }
   }
-}
 }
 
 
