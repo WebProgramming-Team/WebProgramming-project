@@ -20,7 +20,7 @@ paddleImage.src = "images/paddle-asset/joystickVer2.png";
 
 //공 속도 관련
 const v_s_fast = 128;//빠름일때 공 속도
-const v_s_slow = 72;//느림일때 공 속도
+const v_s_slow = 10;//느림일때 공 속도
 let v_s = v_s_slow;//기본 속도 = 느림
 //난이도 관련
 let difficulty; //이건 난이도를 정함 -> Select-Mode에서 결정 후 넘겨받음
@@ -91,8 +91,8 @@ gameOverMusic[1].loop = true;
 
 
 // 캔버스 크기
-const canvasWidth = 900;  //우리 코드에서는 900px
-const canvasHeight = 900;
+let canvasWidth = 900;  //우리 코드에서는 900px
+let canvasHeight = 900;
 
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
@@ -448,11 +448,14 @@ let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
-const brickHeight = 60;
 const brickPadding = 2;
 const brickOffsetTop = 50;
 const brickOffsetLeft = 5;
-const brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
+
+let brickHeight = 10;
+let brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
+
+
 
 // 벽돌 전체 너비/높이 계산
 const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
@@ -472,6 +475,14 @@ $(window).ready(function() {
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
+
+  const $gameArea = $('#game-area');
+  canvasWidth = $gameArea.width();
+  canvasHeight = $gameArea.height();
+
+  console.log("Canvas Width:", canvasWidth);
+  console.log("Canvas Height:", canvasHeight);
+
   /*--------------*/ 
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
@@ -744,7 +755,7 @@ function resetGameState() {
   bricks = [];
   $("#pan").css({"background-color":"transparent"}); // ??
 
-  $("body").css("width", "100vw");
+  $("body").css("width", "100vw"); 
   initShowHide(); // 게임 화면 가리고
   stopMusic(); // 음악 멈추기
   ingameMusic[igIdx].play();//선택된 뮤직 시작.
@@ -755,13 +766,13 @@ function resetGameState() {
   ballX = canvas.width / 2;
   ballY = canvas.height - 80;
 
-  ballRadius = 30;
+  ballRadius = 5;
 
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
-  paddleHeight = 40;
-  paddleWidth = 240;
+  paddleHeight = 10;
+  paddleWidth = 60;
   paddleX = (canvas.width - paddleWidth) / 2;
 }
 

@@ -564,10 +564,6 @@ canvas {
   /*border-left: 2px solid #ccc;*/
 }
 
-#gameCanvas {
-  width: 50%;
-  height: 70%;
-}
 
 /* canvas 등은 그대로 유지 */
 canvas {
