@@ -1389,6 +1389,9 @@ function destroyBrick(c, r) {
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
+  if (handleSecureBlock(b)) return;
+  b.status = 0; // 먼저 비활성화 처리 (중복 방지)
+
   if (b.tag != null) checkTagCount(b.tag);
 
   if (handleSecureBlock(b)) return;
@@ -1429,6 +1432,8 @@ function checkTagCount(tag){
       console.log("헤더 하나 사라짐 하나 사라짐"); 
       easy_headerCount++;
 
+  if (b.isBomb) {
+    triggerBombChain(c, r);
     }else if(tag == "footer"){
       console.log("푸터 태크 하나 사라짐");
       easy_footerCount++;
@@ -1441,6 +1446,7 @@ function checkTagCount(tag){
    console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
+
   }else if(difficulty==1){
     //노말 모드 계획
   switch (tag) {
@@ -1672,6 +1678,7 @@ function processIframeEffect(b, c, r) {
 }
 //보조 5. 벽돌이 폭탄(isBomb)일 경우, 상하좌우 주변 벽돌을 연쇄적으로 destroyBrick 호출
 function triggerBombChain(c, r) {
+  console.log(`[DEBUG] triggerBombChain at (${c}, ${r})`);
   const directions = [
     [0, -1], [0, 1], [-1, 0], [1, 0],
   ];
@@ -1682,9 +1689,10 @@ function triggerBombChain(c, r) {
       nc >= 0 && nc < brickColumnCount &&
       nr >= 0 && nr < bricks[nc]?.length
       ) {
+      console.log(`[DEBUG] 인접 벽돌 제거 시도: (${nc}, ${nr})`);
       destroyBrick(nc, nr);
+    }
   }
-}
 }
 
 
@@ -2731,6 +2739,7 @@ doc.close();
 let secureToggleInterval = null;
 
 function startHardModeTimer() {
+  remainingTime = 60;
   if (hardModeTimer) {
     clearInterval(hardModeTimer);
   }
@@ -2890,6 +2899,8 @@ function triggerLabEffectOnTarget(target) {
   showLabEffect(x, y);
 }
 
+<<<<<<< HEAD
+=======
 //중복 제거용 이펙트
 function getEffectLabel(selector) {
   if (selector.includes("calculator")) return "덧셈 계산기 파괴!";
@@ -2921,9 +2932,3 @@ function drawDestructionEffects() {
   // 다 사라진건 제거
   destructionEffects = destructionEffects.filter(e => e.opacity > 0);
 }
-
-
-
-
-
-
