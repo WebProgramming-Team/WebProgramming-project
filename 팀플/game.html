@@ -16,20 +16,6 @@
 </head>
 <body>
 
-<!-- 오프닝 화면 -->
-
-<!-- <div id = "intro-page" class = "menu-page">
-  <h1>벽돌 부수기</h1>
-  <label>볼륨 설정: </label>
-  <input type = "range" min = "0" max = "100" class = "volume-bar" id = "intro-bar">
-  <div class = "volume">50</div>
-  <br>
-  <button id="menu-music-button">음악 재생</button>
-  <button id="intro-to-main" class = "back-button">메인 메뉴로</button>
-</div>
--->
-
-
 <!-- 메인 메뉴 -->
 <div id="main-menu" class = "menu-page start-page">
   <div id = "main-menu-background-area">
@@ -205,7 +191,7 @@
 
 <div id="game-area">
   <!-- 벽돌깨기 게임 영역 -->
-  <canvas id="gameCanvas"></canvas>  
+  <canvas id="gameCanvas" width="850" height="900"></canvas>  
   <!-- 게임 오버 메시지 -->
   <img id = "backgroundImage" src = " ">
 </div>
@@ -228,13 +214,11 @@
 
 
 <!-- 스테이지 클리어 후 클리어 메시지 메뉴 -->
-  <div id = "clear-panel" class = "menu-page story-page">
-    <div id = "story-panel">
-      <span>클리어텍스트</span>
-      <button>다음으로?</button> 
-      <!-- 다음 난이도로 넘어가게 코딩 -->
-    </div>
+<div id = "clear-panel" class = "menu-page story-page">
+  <div id = "story-panel">
+    <span>클리어텍스트<span>
   </div>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -20,7 +20,7 @@ paddleImage.src = "images/paddle-asset/joystickVer2.png";
 
 //공 속도 관련
 const v_s_fast = 128;//빠름일때 공 속도
-const v_s_slow = 10;//느림일때 공 속도
+const v_s_slow = 72;//느림일때 공 속도
 let v_s = v_s_slow;//기본 속도 = 느림
 //난이도 관련
 let difficulty; //이건 난이도를 정함 -> Select-Mode에서 결정 후 넘겨받음
@@ -91,8 +91,8 @@ gameOverMusic[1].loop = true;
 
 
 // 캔버스 크기
-let canvasWidth = 900;  //우리 코드에서는 900px
-let canvasHeight = 900;
+const canvasWidth = 900;  //우리 코드에서는 900px
+const canvasHeight = 900;
 
 
 let paddleHitEffect = 0; // 이펙트 강도 (0이면 없음)
@@ -451,14 +451,11 @@ let extraRow = 0;
 let hiddenRowNum;
 let brickRowCount = 2;
 let brickColumnCount = 4;
+const brickHeight = 60;
 const brickPadding = 2;
 const brickOffsetTop = 50;
 const brickOffsetLeft = 5;
-
-let brickHeight = 10;
-let brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
-
-
+const brickWidth = (850 -(brickPadding*(brickColumnCount-1) + 2*brickOffsetLeft)) / brickColumnCount;
 
 // 벽돌 전체 너비/높이 계산
 const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
@@ -478,14 +475,6 @@ $(window).ready(function() {
   /*캔버스 얻어오기*/
   canvas = $("#gameCanvas")[0];
   ctx = canvas.getContext("2d");
-
-  const $gameArea = $('#game-area');
-  canvasWidth = $gameArea.width();
-  canvasHeight = $gameArea.height();
-
-  console.log("Canvas Width:", canvasWidth);
-  console.log("Canvas Height:", canvasHeight);
-
   /*--------------*/ 
   defineGameVarDefault(); // 게임 변수 define으로 세팅함.
   SetUserControl(); // 유저의 mousemove, 키 클릭 등을 세팅함.
@@ -587,7 +576,6 @@ function allHide(){
   //전부 다 hide하는 함수
     $(".menu-page").hide();//메뉴 페이지 hide
     $("#game-wrapper").hide();//game hide
-    $("#clear-panel").hide();
   }
 
 //홈 화면 시작
@@ -697,6 +685,38 @@ function startHardPage() {
   init();
 }
 
+//클리어 조건 분기
+function checkGameClear(Mode){
+  //Mode(난이도) 별 게임 클리어 조건 확인
+  const cleared = isCleared(); // 예: 남은 벽돌이 없거나 조건 달성 시
+  if (!cleared) return;
+
+  showClearStory(mode);
+
+  if (mode === 0) startNormalPage();
+  else if (mode === 1) startHardPage();
+  else if (mode === 2) showGameCompletion();
+
+}
+
+//난이도 별 스토리 보여주기
+function showClearStory(mode) {
+  switch (mode) {
+  case 0:
+    allHide();
+    $(".EasyClear-story").show();
+    break;
+  case 1:
+    $(".NormalClear-story").show();
+    break;
+  case 2:
+    $(".GameClear-story").show();
+    break;
+  default:
+    console.warn("정의되지 않은 클리어모드:", mode);
+  }
+}
+
 //게임 초기화 함수
 function init() {
   if (!isGameOver) return;
@@ -727,7 +747,7 @@ function resetGameState() {
   bricks = [];
   $("#pan").css({"background-color":"transparent"}); // ??
 
-  $("body").css("width", "100vw"); 
+  $("body").css("width", "100vw");
   initShowHide(); // 게임 화면 가리고
   stopMusic(); // 음악 멈추기
   ingameMusic[igIdx].play();//선택된 뮤직 시작.
@@ -738,13 +758,13 @@ function resetGameState() {
   ballX = canvas.width / 2;
   ballY = canvas.height - 80;
 
-  ballRadius = 5;
+  ballRadius = 30;
 
   dx = Math.floor(Math.random() * 16 - 8) || 1;
   dy = -Math.sqrt(v_s - dx * dx);
 
-  paddleHeight = 10;
-  paddleWidth = 60;
+  paddleHeight = 40;
+  paddleWidth = 240;
   paddleX = (canvas.width - paddleWidth) / 2;
 }
 
@@ -903,12 +923,10 @@ function createElementsByDifficulty(level) {
 
   } else if (level === 1) {
      const blockPlan = [
-    { type: "&lt;header&gt;", count: 2 },
-    { type: "&lt;body&gt;", count: 3 },
-    { type: "&lt;lab&gt;", count: 2 },
-    { type: "&lt;main-menu&gt;", count: 2 },
-    { type: "&lt;container&gt;", count: 4 },
-    {type:" &lt;footer&gt;", count:2}
+    { type: "body", count: 3 },
+    { type: "main-menu", count: 2 },
+    { type: "lab", count: 2 },
+    {type:" table-border", count:1}
   ]; //블럭 어떻게 넣을건지 확인
 
 
@@ -920,6 +938,97 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
+
+
+function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
+  const layout = Array.from({ length: rows }, () => Array(cols).fill(null));
+  const totalCells = rows * cols;
+
+  // 1. 필요한 블럭 수 계산
+  const blocks = [];
+  blockPlan.forEach(plan => {
+    for (let i = 0; i < plan.count; i++) {
+      blocks.push(plan.type);
+    }
+  });
+
+  const blockCount = blocks.length;
+  const fillableCount = totalCells - blockCount;
+
+  if (fillableCount < currentBomb) {
+    throw new Error("bomb 개수가 너무 많습니다. 블럭 배치 후 남는 공간보다 bomb가 많음.");
+  }
+
+  // 2. bomb + dummy 배치할 셀 준비
+  const fillCells = Array(fillableCount).fill("dummy");
+  for (let i = 0; i < currentBomb; i++) {
+    fillCells[i] = "bomb";
+  }
+
+  // 3. 무작위로 섞음
+  shuffleArray(fillCells);
+
+  // 4. 먼저 dummy와 bomb를 layout에 채움 (빈 공간만)
+  let fillIndex = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (fillIndex < fillCells.length) {
+        layout[r][c] = fillCells[fillIndex++];
+      }
+    }
+  }
+
+// 추가: layout 전체를 다시 셔플
+const flatLayout = layout.flat();  // 2차원 배열을 1차원으로
+shuffleArray(flatLayout);         // 셔플
+for (let i = 0; i < rows * cols; i++) {
+  const r = Math.floor(i / cols);
+  const c = i % cols;
+  layout[r][c] = flatLayout[i];
+}
+
+  // 5. blockPlan 순서대로 블럭 배치 (순서 유지를 위해)
+const placedTagIndices = new Set();
+
+for (const type of blocks) {
+  const currentIdx = blockPlan.findIndex(p => p.type === type);
+  let placed = false;
+
+  for (let r = 0; r < rows && !placed; r++) {
+    for (let c = 0; c < cols && !placed; c++) {
+      if (layout[r][c] === null || layout[r][c] === "dummy") {
+        const isOrderValid = [...placedTagIndices].every(idx => idx <= currentIdx);
+        if (!isOrderValid) continue;
+
+        layout[r][c] = type;
+        placed = true;
+        placedTagIndices.add(currentIdx);
+      }
+    }
+  }
+}
+
+  // 6. 남은 dummy 다시 채움 (혹시 null이 남아있을 경우)
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    if (layout[r][c] === null) layout[r][c] = "dummy";
+  }
+}
+
+  // 출력 디버깅
+layout.forEach((row, rowIndex) => {
+  const rowStr = row.map(cell => {
+    if (cell === "bomb") return "💣";
+    else if (cell === "dummy") return "⬜";
+    else return `[${cell}]`;
+  }).join(" ");
+  console.log(`Row ${rowIndex}: ${rowStr}`);
+});
+
+return layout;
+}
+
+// 셔플 함수
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -927,48 +1036,6 @@ function shuffleArray(array) {
   }
 }
 
-function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
-  const totalCells = rows * cols;
-  const layoutFlat = [];
-
-  // 1. 블럭 추가
-  blockPlan.forEach(plan => {
-    for (let i = 0; i < plan.count; i++) {
-      layoutFlat.push(plan.type);
-    }
-  });
-
-  // 2. bomb 추가
-  for (let i = 0; i < currentBomb; i++) {
-    layoutFlat.push("bomb");
-  }
-
-  // 3. 나머지는 dummy로 채움
-  while (layoutFlat.length < totalCells) {
-    layoutFlat.push("dummy");
-  }
-
-  // 4. 전부 셔플
-  shuffleArray(layoutFlat);
-
-  // 5. 2차원 배열로 변환
-  const layout = [];
-  for (let r = 0; r < rows; r++) {
-    layout.push(layoutFlat.slice(r * cols, (r + 1) * cols));
-  }
-
-  // 6. 디버깅 출력
-  layout.forEach((row, rowIndex) => {
-    const rowStr = row.map(cell => {
-      if (cell === "bomb") return "💣";
-      else if (cell === "dummy") return "⬜";
-      else return `[${cell}]`;
-    }).join(" ");
-    console.log(`Row ${rowIndex}: ${rowStr}`);
-  });
-
-  return layout;
-}
 
 
 
@@ -1159,25 +1226,16 @@ function startBrickMoveTimer(difficulty) {
       testFlag = false;
       updateIframe();
       stopMusic();
-      showStory();
+      toTheNext();
       return;
     }
 
     requestAnimationFrame(draw);
   }
 
- 
-
-//다음 스토리로
-  function showStory(){
-    allHide();
-    $("clear-panel").show();
-
-    if(difficulty == 0){
-      //이지모드 
-    }
-
+  function toTheNext() {
     difficulty += 1;
+
     if (difficulty > 2) {
       isGameOver = true;
       showMainMenu();
@@ -1188,9 +1246,7 @@ function startBrickMoveTimer(difficulty) {
     setTimeout(function() {
       init();
     }, 3000);
-
   }
-
 
 //개선판
   function bounceBall() {
@@ -1412,81 +1468,34 @@ function checkTagCount(tag){
     return;
   }else if(difficulty==1){
     //노말 모드 계획
-  //   
-
+    //
   }
 }
 
 
-function EasyModeGameFun() {
+function EasyModeGameFun(){
+
   if(!isDeletearticle1 && easy_articleCount >= 2){
     removeHtmlTagFromIframe("article1");
     console.log("아티클1컷!");
-
-    // 캔버스에 텍스트 표시용 효과 추가
-    destructionEffects.push({
-      x: canvas.width / 2, // 원하는 위치 조정 가능
-      y: 50,
-      label: "article1 파괴!",
-      opacity: 1.0
-    });
   }
 
   if(!isDeletearticle2 && easy_articleCount >= 4){
     removeHtmlTagFromIframe("article2");
     console.log("아티클2컷!");
-
-    destructionEffects.push({
-      x: canvas.width / 2,
-      y: 80,
-      label: "article2 파괴!",
-      opacity: 1.0
-    });
   }
 
   if(!isDeleteFooter && easy_footerCount >= 2){
     removeHtmlTagFromIframe("footer");
     console.log("푸터컷!");
-
-    destructionEffects.push({
-      x: canvas.width / 2,
-      y: 110,
-      label: "footer 파괴!",
-      opacity: 1.0
-    });
   }
-
   if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
     isDeletearticle1 && easy_headerCount >= 2){
     removeHtmlTagFromIframe("wrapper");
-    console.log("헤더컷!");
-
-    destructionEffects.push({
-      x: canvas.width / 2,
-      y: 140,
-      label: "헤더 파괴!",
-      opacity: 1.0
-    });
-  }
+  console.log("헤더컷!");
 }
 
-//보조용 함수 
-function drawDestructionEffects(ctx) {
-  for (let i = destructionEffects.length - 1; i >= 0; i--) {
-    const effect = destructionEffects[i];
-    ctx.globalAlpha = effect.opacity;
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "red";
-    ctx.textAlign = "center";
-    ctx.fillText(effect.label, effect.x, effect.y);
-    ctx.globalAlpha = 1.0;
 
-    // 서서히 사라지게
-    effect.opacity -= 0.02;
-    if (effect.opacity <= 0) {
-      destructionEffects.splice(i, 1);  // 완전히 사라지면 배열에서 제거
-    }
-  }
 }
 
 
@@ -1685,7 +1694,6 @@ function drawScore() {
 function checkClearByDifficulty() {
   switch (difficulty) {
   case 0:
-    return checkEasyClear();
   case 1:
       return checkNormalClear(); // 기존 checkClear 내용 그대로
     case 2:
@@ -1695,9 +1703,6 @@ function checkClearByDifficulty() {
     }
   }
 
-function checkEasyClear(){
-  return isDeleteAll;
-}
 //노말 클리어 체크
   function checkNormalClear() {
     for (let c = 0; c < brickColumnCount; c++) {
@@ -2823,6 +2828,7 @@ function drawDestructionEffects() {
   // 다 사라진건 제거
   destructionEffects = destructionEffects.filter(e => e.opacity > 0);
 }
+
 
 
 
