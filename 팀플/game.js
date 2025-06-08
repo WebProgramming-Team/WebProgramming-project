@@ -743,6 +743,8 @@ function resetGameState() {
   hiddenRowNum = extraRow; 
   bricks = [];
   $("#pan").css({"background-color":"transparent"}); // ??
+
+  $("body").css("width", "100vw");
   initShowHide(); // 게임 화면 가리고
   stopMusic(); // 음악 멈추기
   ingameMusic[igIdx].play();//선택된 뮤직 시작.
