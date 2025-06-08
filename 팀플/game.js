@@ -751,7 +751,7 @@ function createBrickObject(c, r, element, isBomb) {
   //easy 모드일 때 임시 루틴
   if(difficulty == 0){
      const bricks = [];
-        let tag = layout[c][r];
+        let tag = layout[r][c];
         const isBomb = tag === "bomb";
         const isTopRow = r < extraRow;
         const isSecure = (difficulty !== 0 && Math.random() < 0.2);
@@ -1251,31 +1251,19 @@ function drawBricks() {
 
 //한 벽돌이 맞았을 때 처리 전체를 관리하는 중심 함수
 function destroyBrick(c, r) {
-  console.log("벽돌 파괴 함수 호출");
   const b = bricks[c][r];
-
   if (!b || b.status === 0) return;
 
-  console.log(b.tag);
-  if(b.tag != null){
-    checkTagCount(b.tag);
-  }
-  if (handleSecureBlock(b)) return;
+  b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
 
-  b.status = 0;
+  if (b.tag != null) checkTagCount(b.tag);
+  if (b.isBomb) triggerBombChain(c, r);
+  if (handleSecureBlock(b)) return;
 
   handleScoreEffect(b);
   handleWarning(score);
-
-  if (!processIframeEffect(b, c, r)) return;
-
-  if (b.isBomb) {
-    triggerBombChain(c, r);
-  }
- 
-  
+  processIframeEffect(b, c, r);
 }
-
 //보조 5. 태그 지워지는거 실시간으로 확인 후 변경사항 
 function checkTagCount(tag){
 
@@ -1299,9 +1287,9 @@ function checkTagCount(tag){
        console.log("뭐시여 무슨 태그여 이거");
     }
     console.log("\nTotal counts:");
-  console.log("Articles: " + easy_articleCount);
-  console.log("Headers: " + easy_headerCount);
-  console.log("Footers: " + easy_footerCount);
+    console.log("Articles: " + easy_articleCount);
+    console.log("Headers: " + easy_headerCount);
+    console.log("Footers: " + easy_footerCount);
     EasyModeGameFun(); // 이지 모드 게임 fun
     return;
   }
@@ -1324,12 +1312,11 @@ function EasyModeGameFun(){
     removeHtmlTagFromIframe("footer");
     console.log("푸터컷!");
   }
-  if(!isDeleteAll && easy_headerCount >= 2){
+  if(!isDeleteAll && isDeleteFooter && isDeletearticle2 && 
+    isDeletearticle1 && easy_headerCount >= 2){
     removeHtmlTagFromIframe("wrapper");
     console.log("헤더컷!");
   }
-
-
 
 
 }
@@ -1347,6 +1334,8 @@ function removeHtmlTagFromIframe(id) {
     console.warn(`Element with id '${id}' not found in iframe.`);
   }
 }
+
+
 
 function changeCssTagFromIframe(id, cssProperty, value) {
   const iframe = document.getElementById("labFrame");
