@@ -587,6 +587,7 @@ function allHide(){
   //전부 다 hide하는 함수
     $(".menu-page").hide();//메뉴 페이지 hide
     $("#game-wrapper").hide();//game hide
+    $("#clear-panel").hide();
   }
 
 //홈 화면 시작
@@ -694,38 +695,6 @@ function startNormalPage() {
 function startHardPage() {
   difficulty = 2;
   init();
-}
-
-//클리어 조건 분기
-function checkGameClear(Mode){
-  //Mode(난이도) 별 게임 클리어 조건 확인
-  const cleared = isCleared(); // 예: 남은 벽돌이 없거나 조건 달성 시
-  if (!cleared) return;
-
-  showClearStory(mode);
-
-  if (mode === 0) startNormalPage();
-  else if (mode === 1) startHardPage();
-  else if (mode === 2) showGameCompletion();
-
-}
-
-//난이도 별 스토리 보여주기
-function showClearStory(mode) {
-  switch (mode) {
-  case 0:
-    allHide();
-    $(".EasyClear-story").show();
-    break;
-  case 1:
-    $(".NormalClear-story").show();
-    break;
-  case 2:
-    $(".GameClear-story").show();
-    break;
-  default:
-    console.warn("정의되지 않은 클리어모드:", mode);
-  }
 }
 
 //게임 초기화 함수
@@ -1237,16 +1206,25 @@ function startBrickMoveTimer(difficulty) {
       testFlag = false;
       updateIframe();
       stopMusic();
-      toTheNext();
+      showStory();
       return;
     }
 
     requestAnimationFrame(draw);
   }
 
-  function toTheNext() {
-    difficulty += 1;
+ 
 
+//다음 스토리로
+  function showStory(){
+    allHide();
+    $("clear-panel").show();
+
+    if(difficulty == 0){
+      //이지모드 
+    }
+
+    difficulty += 1;
     if (difficulty > 2) {
       isGameOver = true;
       showMainMenu();
@@ -1257,7 +1235,9 @@ function startBrickMoveTimer(difficulty) {
     setTimeout(function() {
       init();
     }, 3000);
+
   }
+
 
 //개선판
   function bounceBall() {
@@ -1705,6 +1685,7 @@ function drawScore() {
 function checkClearByDifficulty() {
   switch (difficulty) {
   case 0:
+    return checkEasyClear();
   case 1:
       return checkNormalClear(); // 기존 checkClear 내용 그대로
     case 2:
@@ -1714,6 +1695,9 @@ function checkClearByDifficulty() {
     }
   }
 
+function checkEasyClear(){
+  return isDeleteAll;
+}
 //노말 클리어 체크
   function checkNormalClear() {
     for (let c = 0; c < brickColumnCount; c++) {
