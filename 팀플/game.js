@@ -820,20 +820,65 @@ function selectMusic(){
 
 //Easy 시작
 function startEasyPage() {
-  //$(#Game-start-stroy).show
   difficulty = 0;
-  init();
+  showIntroStory(); // Easy 전용 intro 먼저
 }
 
 function startNormalPage() {
   difficulty = 1;
-  init();
+  showStoryIntroOnly(); // 설명만
 }
 
 function startHardPage() {
   difficulty = 2;
-  init();
+  showStoryIntroOnly(); // 설명만
 }
+
+function showIntroStory() {
+  const introText = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
+하지만 웹 프로그래밍은 상대평가니까,
+다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+굉장히 기발한 아이디어다!
+
+나는 남의 과제를 망쳐서,
+내 평균을 끌어올리기로 결심한다.`;
+
+  showStoryPanel(introText, () => {
+    showStoryIntroOnly(); // Intro가 끝나면 설명 스토리로
+  });
+}
+
+function showStoryIntroOnly() {
+  const explainText = getStoryByDifficulty(difficulty); // 기존 설명 그대로 사용
+  showStoryPanel(explainText, () => {
+    init(); // 설명이 끝나면 게임 시작
+  });
+}
+
+function showStoryPanel(text, callback) {
+  allHide();
+  $("#clear-panel").show();
+
+  const lines = text.split("\n");
+  const container = $("#story-text");
+  container.text("");
+
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < lines.length) {
+      container.append(lines[index] + "\n");
+      index++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        $("#clear-panel").hide();
+        callback(); // 다음 흐름으로
+      }, 2000);
+    }
+  }, 1000);
+}
+
+
 
 
 //게임 초기화 함수
@@ -1325,24 +1370,17 @@ function startBrickMoveTimer(difficulty) {
     requestAnimationFrame(draw);
   }
 
-  //스토리 보여주는 함수
   function showStory() {
-    console.log('애니메이션 보여주는중');
-    allHide();
-    $("#clear-panel").show();
-
-    const storyText = getStoryByDifficulty(difficulty);
-    printStoryLines(storyText, function() {
-      $("#clear-panel").hide();
-
-      difficulty++;
-      if (difficulty > 2) {
-        showFinalMessage();
-      } else {
-      init(); // 다음 난이도 실행
-    }
-  });
+  console.log('스토리 보여주는 중');
+  const nextLevel = difficulty + 1;
+  if (nextLevel > 2) {
+    showFinalMessage(); // 최종 클리어
+    return;
   }
+  difficulty = nextLevel;
+  showStoryIntroOnly(); // 다음 단계 설명 후 → 게임 시작
+}
+
 
   function printStoryLines(text, onComplete) {
     const lines = text.split("\n");
@@ -1969,8 +2007,8 @@ function collisionDetection() {
 
 function drawScore() {
   // 캔버스 상단 점수 표시 (오른쪽 게임 화면용)
-  ctx.font = "16px 'Press Start 2P'";
-  ctx.fillStyle = "#fff";
+  ctx.font = "24px 'Press Start 2P'";
+  ctx.fillStyle = "#000000";
   ctx.fillText("SCORE: ", 15, 25);
   ctx.fillText(score, 140, 25);
 
