@@ -395,16 +395,13 @@ body {
 #game-wrapper {
   position: relative;
   display: flex;
-  /*width: 100%;
-  max-width: 1600px;
-  */
-  width: 1600px;
+  width:50%;
   margin: 0 auto;
   height: 900px;
 }
 
 #leftArea {
-  width: 750px;
+  width: 100%; 
 }
 
 #labArea {
@@ -470,8 +467,8 @@ body {
 
 /* 오른쪽: 게임 */
 #game-area {
-  width: 850px;
-  height: 900px;
+  width: 50%;
+  height: 70%;
   position: relative;
   background: #111;
   /*border-left: 2px solid #ccc;*/
