@@ -139,6 +139,9 @@ const desEleHard = [
 //부숴진 태그들 저장
 const destroyedSelectors = new Set();
 
+let destructionEffects = []; // 캔버스 위 텍스트 이펙트들
+
+
 //이 아래는 이팩트 관련 설정들입니다. (매핑객체, 함수를 값으로 가지는 테이블)
 const effectHandlers = {
   remove: (target) => {
@@ -1211,6 +1214,7 @@ function startBrickMoveTimer(difficulty) {
     collisionDetection();
     bounceBall();
 
+    drawDestructionEffects();
     ballX += dx;
     ballY += dy;
 
@@ -1414,12 +1418,24 @@ function destroyBrick(c, r) {
 
   if (handleSecureBlock(b)) return;
   if (b.isBomb){
-     b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
+     b.status = 0; // 먼저 비활성화 처리 (중복 방지)
      triggerBombChain(c, r);
    } 
   handleScoreEffect(b);
   handleWarning(score);
-  processIframeEffect(b, c, r);
+  const effectSuccess = processIframeEffect(b, c, r);
+
+  // 효과 적용 후 캔버스 위에 뜨는 파괴 메시지 이펙트
+  if (effectSuccess && b.targetSelector) {
+    const label = getEffectLabel(b.targetSelector);
+    destructionEffects.push({
+      x: b.x + brickWidth / 2,
+      y: b.y,
+      label: label,
+      opacity: 1.0
+    });
+  }  
+
   b.status = 0;
 }
 //보조 5. 태그 지워지는거 실시간으로 확인 후 변경사항 
@@ -2780,6 +2796,40 @@ function triggerLabEffectOnTarget(target) {
   const y = rect.top - iframeRect.top + rect.height / 2;
   showLabEffect(x, y);
 }
+
+//중복 제거용 이펙트
+function getEffectLabel(selector) {
+  if (selector.includes("calculator")) return "덧셈 계산기 파괴!";
+  if (selector.includes("gugudan")) return "구구단 파괴!";
+  if (selector.includes("numGame")) return "숫자 게임 파괴!";
+  if (selector.includes("wordBook")) return "단어장 파괴!";
+  if (selector.includes("clickHere")) return "내부 텍스트 파괴!";
+  if (selector.includes("image-toggle")) return "이미지 토글 파괴!";
+  if (selector.includes("colorList")) return "색상 테이블 파괴!";
+  if (selector.includes("flashBox")) return "깜빡 상자 파괴!";
+  if (selector.includes("movingBox")) return "상자 이동기 파괴!";
+  if (selector.includes("hangman")) return "행맨 파괴!";
+  if (selector.includes("title")) return "헤더 파괴!";
+  if (selector.includes("footer")) return "푸터 파괴!";
+  return "요소 파괴!";
+}
+
+//이펙트 그리는 함수
+function drawDestructionEffects() {
+  for (let i = 0; i < destructionEffects.length; i++) {
+    const effect = destructionEffects[i];
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = `rgba(255, 50, 50, ${effect.opacity})`;
+    ctx.fillText(effect.label, effect.x, effect.y);
+    effect.y -= 0.7;         // 위로 떠오르게
+    effect.opacity -= 0.02;  // 서서히 사라지게
+  }
+
+  // 다 사라진건 제거
+  destructionEffects = destructionEffects.filter(e => e.opacity > 0);
+}
+
+
 
 
 
