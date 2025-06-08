@@ -907,19 +907,24 @@ function createElementsByDifficulty(level) {
 
   if (level === 0) {
     const blockPlan = [
-      { type: "article", count: 4 },
-      { type: "footer", count: 2 },
-      { type: "header", count: 2 }
-
+    { type: "article", count: 4 },
+    { type: "footer", count: 2 },
+    { type: "header", count: 2 }
+    
   ]; //블럭 어떻게 넣을건지 확인
-  layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
+    layout = generateBlockLayoutWithRules(4, 4, blockPlan, 4);
 
 
-  elements = createEasyElements();
+  } else if (level === 1) {
+     const blockPlan = [
+    { type: "body", count: 3 },
+    { type: "main-menu", count: 2 },
+    { type: "lab", count: 2 },
+    {type:" table-border", count:1}
+  ]; //블럭 어떻게 넣을건지 확인
 
 
-} else if (level === 1) {
-    elements = createNormalElements(); // 기존처럼 노말
+    layout = generateBlockLayoutWithRules(12, 4, blockPlan, 4);
   } else if (level === 2) {
     elements = createHardElementsRandom();   // 하드 요소들만 따로 준비
   }
@@ -927,25 +932,25 @@ function createElementsByDifficulty(level) {
   return shuffleEmt(elements);
 }
 
-function createEasyElements() {
-  let elements = [];
-  // let newEmt = desEleEasy.find(element => element.selector === "#header");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
-  // elements.push(newEmt);
-  // for (let i = 0; i < 2; i++) {
-  //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
-  //   elements.push(newEmt);
-  // }
-  // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
-  // elements.push(newEmt);
-  // let newEmt = desEleEasy.find(element => element.selector === "#footer");
-  // elements.push(newEmt);
+// function createEasyElements() {
+//   let elements = [];
+//   // let newEmt = desEleEasy.find(element => element.selector === "#header");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-left");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === ".pull-right");
+//   // elements.push(newEmt);
+//   // for (let i = 0; i < 2; i++) {
+//   //   let newEmt = desEleNormal.find(element => element.selector === ".article-header");
+//   //   elements.push(newEmt);
+//   // }
+//   // let newEmt = desEleEasy.find(element => element.selector === "#main-aside");
+//   // elements.push(newEmt);
+//   // let newEmt = desEleEasy.find(element => element.selector === "#footer");
+//   // elements.push(newEmt);
 
-  return elements;
-}
+//   return elements;
+// }
 
 
 function generateBlockLayoutWithRules(rows, cols, blockPlan, currentBomb) {
@@ -1420,15 +1425,17 @@ function destroyBrick(c, r) {
   const b = bricks[c][r];
   if (!b || b.status === 0) return;
 
-  b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
-
   if (b.tag != null) checkTagCount(b.tag);
-  if (b.isBomb) triggerBombChain(c, r);
-  if (handleSecureBlock(b)) return;
 
+  if (handleSecureBlock(b)) return;
+  if (b.isBomb){
+     b.status = 0; // 💡 먼저 비활성화 처리 (중복 방지)
+     triggerBombChain(c, r);
+   } 
   handleScoreEffect(b);
   handleWarning(score);
   processIframeEffect(b, c, r);
+  b.status = 0;
 }
 //보조 5. 태그 지워지는거 실시간으로 확인 후 변경사항 
 function checkTagCount(tag){
@@ -1518,6 +1525,7 @@ function changeCssTagFromIframe(id, cssProperty, value) {
 //보조 1. 보안 벽돌(isSecure)일 경우 HP를 차감하고, 아직 안 부서졌으면 true 반환하여 파괴 중단
 function handleSecureBlock(b) {
   if (b.isSecure && typeof b.hp === "number") {
+    console.log(b.hp);
     b.hp--;
     return b.hp > 0;
   }

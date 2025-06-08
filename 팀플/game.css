@@ -2,14 +2,13 @@
 html{
   /*js 내부에서 font-size를 현재 console-width와 height 따라 변형. */
   /*window width, height 1521x799 기준 16px*/
-  font-size:62.5%;
+  font-size:100%;
  }
 
 /*전체 body 속성 */
 body {
-  width: 1640px;
-
-  height: 150vx;
+  width: 60vw;
+  height: 150vh;
   background: white;
   display: block;
   margin: 0 auto;
@@ -45,12 +44,11 @@ body {
 
 /*최상단 백그라운드 이미지 1*/
 #main-menu-background-area img{
-  width:1640px;
-  height:900px;/*사진 기본 크기*/
+  width:1640px * 2;
+  height:900px * 2;/*사진 기본 크기*/
 
   position:absolute;
-  top:-450px;
-  left:-400px;
+  left:0px;
   /*top, left값 향후 조정 예정*/
 
 }
@@ -298,8 +296,8 @@ body {
 /*실제 공 이미지*/
 .ball-container-img {
   margin:8% auto 5% 9%;
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
   display: inline-block;
   overflow: hidden;
   object-fit: cover;
@@ -322,7 +320,7 @@ body {
 }
 
 .arrow {
-  font-size: 32px;
+  font-size: 3rem;
   font-weight: bold;
   margin: 0 2rem;
   cursor: pointer;
@@ -330,8 +328,8 @@ body {
 }
 
 #ball-select-button {
-  width: 50px;
-  height: 50px;
+  width: 5rem;
+  height: 5rem;
   background-color: yellow;
   border-radius: 50%;
   display: inline-block;
