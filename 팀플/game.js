@@ -794,16 +794,24 @@ function showGuitar() {
 }
 
 function showMainMenu() {
-  //???
-  $("#ps").hide();
-  $("html").css({"cursor":"default"});
+  if (currentStoryInterval) {
+    clearInterval(currentStoryInterval);
+    currentStoryInterval = null;
+  }
+  $("#story-text").empty(); // 스토리 텍스트 제거
+  $("#clear-panel").hide(); // 혹시 열려 있던 패널 닫기
 
-  isGameOver = true; // 게임 오버 다시 true로 만들고
+  $("#ps").hide();
+  $("html").css({ "cursor": "default" });
+
+  isGameOver = true;
   isPaused = false;
   stopMusic();
   menuMusic.play();
+
   StartGameHome();
 }
+
 
 //옵션 관련 함수들 
 
@@ -838,103 +846,202 @@ function startHardPage() {
 function showIntroStory() {
   console.log('인트로 스토리 진행');
   const introText = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
-  하지만 웹 프로그래밍은 상대평가니까,
-  다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
-  굉장히 기발한 아이디어다!
 
-  나는 남의 과제를 망쳐서,
-  내 평균을 끌어올리기로 결심한다.`;
 
-    //콜백함수로 정의
-    showStoryPanel(introText, () => {
-    showStoryIntroOnly(); // Intro가 끝나면 설명 스토리로
+하지만 웹 프로그래밍은 상대평가니까,
+다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+
+
+굉장히 기발한 아이디어다!
+
+
+나는 남의 과제를 망쳐서,
+내 평균을 끌어올리기로 결심한다.`;
+
+  //   //콜백함수로 정의
+  // showStoryPanel(introText, () => {
+  //   showStoryIntroOnly(); // Intro가 끝나면 설명 스토리로
+  // });
+  allHide();
+  $("#clear-panel").css("display", "flex");
+  renderStoryLines(introText, () => {
+    showStoryIntroOnly(); // intro → 설명 → 게임
   });
 }
 
-//이건 기타 메뉴의 스토리
+//스토리
 function showStoryIntroOnly() {
   console.log('인트로 넘어가서 진행2');
   const explainText = getStoryByDifficulty(difficulty); // 기존 설명 그대로 사용
-  showStoryPanel(explainText, () => {
+  // showStoryPanel(explainText, () => {
+  //   init(); // 설명이 끝나면 게임 시작
+  // });
+    allHide();
+  $("#clear-panel").css("display", "flex");
+  renderStoryLines(explainText, () => {
+    $("#clear-panel").hide();
     init(); // 설명이 끝나면 게임 시작
   });
 }
 
+let isStoryPlaying = false; //스토리 중복 방어
+let storyIntervalId = null; //여러번 호출 방지
+
 function showStoryPanel(text, callback) {
-  allHide();
-  $("#clear-panel").show();
 
-  const lines = text.split("\n");
-  const container = $("#story-text");
-  container.text("");
+    if (isStoryPlaying) return; // 중복 실행 방지
+    isStoryPlaying = true;
+    allHide();
+    $("#clear-panel").show();
 
-  let index = 0;
-  const interval = setInterval(() => {
-    if (index < lines.length) {
-      container.append(lines[index] + "\n");
-      index++;
-    } else {
-      clearInterval(interval);
-      setTimeout(() => {
-        $("#clear-panel").hide();
-        callback(); // 다음 흐름으로
-      }, 2000);
+    const lines = text.split("\n");
+    const container = $("#story-text");
+    container.text("");
+
+    // 기존 interval 제거
+    if (storyIntervalId !== null) {
+      clearInterval(storyIntervalId);
+      storyIntervalId = null;
     }
-  }, 1000);
-}
 
-function goToStory(type) {
-  allHide(); // 다른 메뉴 숨기기
-  $("#clear-panel").show();
+    let index = 0;
+    storyIntervalId = setInterval(() => {
+      if (index < lines.length) {
+        const lineElem = $("<div>").addClass("story-line").text(lines[index]);
+        container.append(lineElem);
+        index++;
+      } else {
+        clearInterval(storyIntervalId);
+        storyIntervalId = null;
+
+        setTimeout(() => {
+          $("#clear-panel").hide();
+           isStoryPlaying = false;
+          callback?.();
+        }, 2000);
+      }
+    }, 800);
+  }
+
+
+/********************************/
+// 기타 화면에서의 스토리
+  function goToStory(type) {
+    allHide();
+  $("#clear-panel").css("display", "flex"); // 중앙 정렬 대비
 
   const container = $("#story-text");
-  container.text("");
+  container.text(""); // 초기화
 
   let text = "";
   switch (type) {
-    case "intro":
-      text = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
+  case "intro":
+    text = `과제와 시험을 전부 망친 나는 이제 남은 것이 없다...
+
+
 하지만 웹 프로그래밍은 상대평가니까,
 다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
+
+
 굉장히 기발한 아이디어다!
 
+
 나는 남의 과제를 망쳐서,
-내 평균을 끌어올리기로 결심한다.`;
-      break;
-    case "easy":
-      text = getStoryByDifficulty(0); // 기존 설명 재활용
-      break;
-    case "normal":
-      text = getStoryByDifficulty(1);
-      break;
-    case "hard":
-      text = getStoryByDifficulty(2);
-      break;
-    case "clear":
-      text = `🎉 모든 난이도 클리어!
+내 평균을 끌어올리기로 결심한다.
+  `;
+  break;
+case "easy":
+  text = getStoryByDifficulty(0);
+  break;
+case "normal":
+  text = getStoryByDifficulty(1);
+  break;
+case "hard":
+  text = getStoryByDifficulty(2);
+  break;
+case "clear":
+  text = `🎉 모든 난이도 클리어! 
+  
 
-웹프의 마스터가 된 당신에게 박수를 보냅니다.
-이제 다른 사람의 과제를 부수는 걸 넘어서...
+결국 모두의 실습을 망쳤다.
 
-진짜 개발자가 되어보세요.`;
-      break;
+
+하지만...
+내 공부에는 정작 신경을 쓰지 못한 결과,
+두 번의 시험에서 모두 0점을 맞아버렸다...
+
+
+싸늘한 F 학점의 시간표만이 나를 기다리고 있을 뿐이었다.
+
+
+당신은 이런 실수를 하지 말고,
+  열심히 공부하기를...`;
+  break;
+}
+
+renderStoryLines(text, () => {
+  $("#clear-panel").fadeOut(800, () => {
+      $("#guitar").fadeIn(); // 기타 메뉴로 복귀
+    });
+});
+}
+
+let currentStoryInterval = null;  //지금 인터벌을 추적
+
+//스토리 함수 리펙터링
+function renderStoryLines(text, onComplete) {
+  const container = $("#story-text");
+  container.empty(); // 기존 내용 제거
+
+  const lines = text.split("\n").filter(line => line.trim() !== "");
+  let lineIndex = 0;
+
+  // 이전 인터벌 제거
+  if (currentStoryInterval) {
+    clearInterval(currentStoryInterval);
+    currentStoryInterval = null;
   }
 
-  const lines = text.split("\n");
-  let index = 0;
-
-  const interval = setInterval(() => {
-    if (index < lines.length) {
-      container.append(lines[index] + "\n");
-      index++;
-    } else {
-      clearInterval(interval);
-      setTimeout(() => {
-        $("#clear-panel").hide();
-        $("#guitar").show(); // 기타 메뉴로 다시 돌아가기
-      }, 3000);
+  function typeLine() {
+    if (lineIndex >= lines.length) {
+      setTimeout(() => onComplete?.(), 2500);
+      return;
     }
-  }, 800); // 줄마다 0.8초씩 보여주기
+
+    const lineText = lines[lineIndex];
+    const lineElem = $("<div>").addClass("story-line");
+    container.append(lineElem);
+
+    // 강조 단어 치환
+    const words = lineText.split(/(\s+)/).map(w => {
+      if (/(망쳐|결심|클리어|기발한|0점|마우스|폭탄|빵점|여러 번|A+|제한|운)/.test(w)) {
+        return `<span class="emphasis">${w}</span>`;
+      }
+      return w;
+    });
+
+    const fullLine = words.join("");
+    let charIndex = 0;
+    let currentText = "";
+
+    // 타자기 효과
+    const charInterval = setInterval(() => {
+      if (charIndex < fullLine.length) {
+        currentText += fullLine[charIndex];
+        // 커서를 맨 뒤에 붙여주는 부분
+        lineElem.html(currentText + "<span class='cursor-blink'>_</span>");
+        charIndex++;
+      } else {
+        clearInterval(charInterval);
+        lineElem.html(currentText); // 다 끝났으니 커서 제거
+        lineIndex++;
+        setTimeout(typeLine, 300); // 다음 줄로
+      }
+    }, 35);
+    currentStoryInterval = charInterval; // 저장
+  }
+
+  typeLine();
 }
 
 
@@ -1429,9 +1536,9 @@ function startBrickMoveTimer(difficulty) {
   }
 
   function showStory() {
-  console.log('스토리 보여주는 중');
-  const nextLevel = difficulty + 1;
-  if (nextLevel > 2) {
+    console.log('스토리 보여주는 중');
+    const nextLevel = difficulty + 1;
+    if (nextLevel > 2) {
     showFinalMessage(); // 최종 클리어
     return;
   }
@@ -1440,9 +1547,9 @@ function startBrickMoveTimer(difficulty) {
 }
 
 
-  function printStoryLines(text, onComplete) {
-    const lines = text.split("\n");
-    const container = $("#story-text");
+function printStoryLines(text, onComplete) {
+  const lines = text.split("\n");
+  const container = $("#story-text");
   container.html(""); // 여기서 html로 초기화
 
   let index = 0;
@@ -1462,43 +1569,67 @@ function startBrickMoveTimer(difficulty) {
 //난이도 별로 스토리 출력
 function getStoryByDifficulty(level) {
   if (level === 0) {
-    return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
-하지만 웹 프로그래밍은 상대평가니까,
-다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
-굉장히 기발한 아이디어다!
+    return `쉬움 단계는 간단하다.
 
-나는 남의 과제를 망쳐서,
-내 평균을 끌어올리기로 결심한다.
+마우스로 바를 좌우로 움직이며,
+공을 튀겨 실습을 구성하는 태그(블럭)를 부숴나가면 된다.
 
-    우선, 쉬운 실습부터 파괴해보자.`;
-  } else if (level === 1) {
-    return `중간 실습은 한 번에 부숴지지 않는다.
-공을 여러 번 맞혀야 태그가 파괴된다.
+중간중간 등장하는 폭탄 블럭은
+주변의 태그들을 한 번에 날려버릴 수 있다.
 
-이제 점점 더 어려워지는 실습...
-    하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
-  } else {
-    return `시간이 없다...
-제한된 시간 속에서 모든 블록을 파괴하라!
+가장 먼저 만들었던 실습부터,
+천천히 부숴나가자.
+  `;
+} else if (level === 1) {
+  return `학기 초 과제부터 빵점을 맞겠구나...
 
-이건 실력이 아닌 운도 시험하는 도전이다.
-    하지만 나는 할 수 있다.`;
-  }
+미안하지만 어쩔 수 없다.
+나도 성적이 중요하니까!
+
+이번에는 한 번에 부숴지지 않는 블럭들이 등장한다.
+공을 여러 번 맞혀야 태그가 부서진다.
+
+이제 본격적으로 방해 작업을 시작할 시간이다.
+`;
+} else {
+  return `드디어 여기까지 왔다.
+
+한 번만 더 모두를 속이면
+내 점수를 많이 올릴 수 있을 거야.
+
+A+가 머지 않았다...!
+
+하지만 이번엔 제한 시간이 존재한다.
+기술, 판단력, 그리고 운까지 모두 시험받는다.
+
+상대방의 js code 를 마구마구 박살내보자.
+
+진짜 승부는 지금부터다!
+`;
+}
 }
 //축하 클리어 메세지
 function showFinalMessage() {
   $("#clear-panel").show();
-  const msg = `🎉 모든 난이도 클리어!
+  const msg = `🎉 모든 난이도 클리어! 
 
-웹프의 마스터가 된 당신에게 박수를 보냅니다.
-이제 다른 사람의 과제를 부수는 걸 넘어서...
+결국 모두의 실습을 망쳤다.
 
-진짜 개발자가 되어보세요.`;
+하지만...
+내 공부에는 정작 신경을 쓰지 못한 결과,
+두 번의 시험에서 모두 0점을 맞아버렸다...
 
-  printStoryLines(msg, function() {
-    $("#clear-panel").hide();
-    showMainMenu();
-  });
+싸늘한 F 학점의 시간표만이 나를 기다리고 있을 뿐이었다.
+
+당신은 이런 실수를 하지 말고,
+열심히 공부하기를...
+
+`;
+
+printStoryLines(msg, function() {
+  $("#clear-panel").hide();
+  showMainMenu();
+});
 }
 
 
