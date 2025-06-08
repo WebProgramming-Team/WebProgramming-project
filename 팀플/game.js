@@ -1044,9 +1044,11 @@ function createElementsByDifficulty(level) {
 } else if (level === 1) {
  const blockPlan = [
   { type: "body", count: 3 },
+  { type: "header", count: 2 },
   { type: "main-menu", count: 2 },
+  { type: "footer", count: 2 },
   { type: "lab", count: 2 },
-  {type:" table-border", count:1}
+  {type:"container", count:4}
   ]; //블럭 어떻게 넣을건지 확인
 
 
