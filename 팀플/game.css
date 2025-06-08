@@ -9,7 +9,7 @@ html{
 
 /*전체 body 속성 */
 body {
-  width: 65vw;
+  width: 60vw;
   height: 100vh;
   background: #222;
   display: block;
@@ -187,12 +187,12 @@ body {
 
 /*최상단 백그라운드 이미지 1*/
 #options-menu-background-area img{
-  width:1600px;
+  width:1900px;
   height:900px;/*사진 기본 크기*/
 
   position:absolute;
   top:-450px;
-  left:-400px;
+  left : 0px;
   /*top, left값 향후 조정 예정*/
 
 }
@@ -283,7 +283,7 @@ body {
 }
 .radio-container {
   margin-top: 10px;
-  font-size: 20px;
+  font-size: 30px;
   font-weight: bold;
 }
 
@@ -299,8 +299,8 @@ body {
 /*실제 공 이미지*/
 .ball-container-img {
   margin:8% auto 5% 9%;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   display: inline-block;
   overflow: hidden;
   object-fit: cover;
@@ -308,8 +308,7 @@ body {
 
 /*js용 선택됐을 때 코드*/
 .ball-selected {
-  border-color: blue;
-  border: 4px solid black;
+  border: 10px solid green;
   border-radius: 50%;
 }
 
@@ -318,6 +317,9 @@ body {
   border: none;
 }
 
+.ball-finalSelect {
+  border-color: yellow;
+}
 #ball-image-selector {
   text-align: center;
 }
@@ -718,7 +720,11 @@ inter-원하는 굵기 숫자(100~200)으로 이용 가능. */
   font-style: normal;
 }
 
-//난이도 선택 디자인
+/*레벨 선택*/
+
+.level-selction-page{
+  background-color: white;
+}
 #level-choice {
   font-size: 2em;
   text-align: center;

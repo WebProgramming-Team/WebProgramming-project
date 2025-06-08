@@ -632,7 +632,61 @@ function bindControlButtons() {
   $("#quit-btn").on("click", showMainMenu);
 }
 
+///==================================
+//설정 쪽 코드
+ // 모든 공 이미지 요소 선택
+  let ballImages;
+  let totalBalls;
 
+  // 선택 인덱스 초기값
+  let selectedIndex = 2;
+  let finalSelectIndex = -1;
+
+  // 선택 상태 갱신 함수
+  function updateBallSelection() {
+    ballImages.forEach((img, i) => {
+      if (i === selectedIndex) {
+        img.classList.add('ball-selected');
+        if(i === finalSelectIndex){
+          img.classList.add("ball-finalSelect");
+           ballImage.src = img.src;
+         }
+        img.classList.remove('ball-unselected');
+
+      } else {
+        img.classList.remove('ball-selected');
+        img.classList.add('ball-unselected');
+        img.classList.remove("ball-finalSelect");
+      }
+    });
+  }
+
+  // 왼쪽 회전
+  function rotateLeft() {
+    selectedIndex = (selectedIndex - 1 + totalBalls) % totalBalls;
+    updateBallSelection();
+  }
+
+  // 오른쪽 회전
+  function rotateRight() {
+    selectedIndex = (selectedIndex + 1) % totalBalls;
+    updateBallSelection();
+  }
+
+  // 선택한 이미지 src 출력 또는 활용
+  function showSelectedIndex() {
+    const selectedImg = ballImages[selectedIndex];
+    const selectedSrc = selectedImg.src;
+    finalSelectIndex = selectedIndex;
+    updateBallSelection();
+
+    ballImage.src = selectedSrc;
+
+    console.log("선택된 이미지 경로:", selectedSrc);
+  }
+
+
+  
 
 ///===========================================
 //[게임 시작 전 메인 화면 관련]
@@ -694,11 +748,16 @@ function showLevelSelectionPage() {
   $("#normal-button").on("click", startNormalPage);
   $("#hard-button").on("click", startHardPage);
   $(".level-selction-page").show(); 
+
 }
 
 function showOptions() {
   allHide();
   $(".option-page").show();
+  ballImages = document.querySelectorAll('.ball-container-img');
+  totalBalls = ballImages.length;
+  updateBallSelection(); // 설정 관련 업데이트
+  
   //옵션 관련 추가 
 }
 
