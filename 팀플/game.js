@@ -1039,7 +1039,7 @@ function createElementsByDifficulty(level) {
 
   ]; //블럭 어떻게 넣을건지 확인
 
-    layout = generateBlockLayoutWithRules(2, 4, blockPlan, 1);
+  layout = generateBlockLayoutWithRules(2, 4, blockPlan, 1);
 
 } else if (level === 1) {
  const blockPlan = [
@@ -1325,41 +1325,46 @@ function startBrickMoveTimer(difficulty) {
 
   //스토리 보여주는 함수
   function showStory() {
+    console.log('애니메이션 보여주는중');
     allHide();
     $("#clear-panel").show();
 
     const storyText = getStoryByDifficulty(difficulty);
-    const lines = storyText.split("\n");
-    const container = $("#story-text");
-    container.text("");
+    printStoryLines(storyText, function() {
+      $("#clear-panel").hide();
 
-    let index = 0;
-    const interval = setInterval(() => {
-      if (index < lines.length) {
-        container.append(lines[index] + "\n");
-        index++;
+      difficulty++;
+      if (difficulty > 2) {
+        showFinalMessage();
       } else {
-        clearInterval(interval);
-        setTimeout(() => {
-          $("#clear-panel").hide();
-
-          difficulty++;
-
-          if (difficulty > 2) {
-          showFinalMessage(); //  하드 클리어 축하 메세지
-        } else {
-          init(); // 다음 난이도 실행
-        }
-      }, 2000); // 대사 끝나고 2초 후
-      }
-    }, 1000);
+      init(); // 다음 난이도 실행
+    }
+  });
   }
+
+  function printStoryLines(text, onComplete) {
+    const lines = text.split("\n");
+    const container = $("#story-text");
+  container.html(""); // 여기서 html로 초기화
+
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < lines.length) {
+      const p = $("<p>").text(lines[index]);
+      container.append(p); // <p>로 감싸서 줄 출력
+      index++;
+    } else {
+      clearInterval(interval);
+      setTimeout(onComplete, 2000);
+    }
+  }, 1000);
+}
 
 
 //난이도 별로 스토리 출력
-  function getStoryByDifficulty(level) {
-    if (level === 0) {
-      return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
+function getStoryByDifficulty(level) {
+  if (level === 0) {
+    return `과제와 시험을 전부 망친 나는 이제 남은 것이 없다..
 하지만 웹 프로그래밍은 상대평가니까,
 다른 사람의 과제를 망치면 내 점수가 오르는 것이 아닐까?
 굉장히 기발한 아이디어다!
@@ -1367,21 +1372,21 @@ function startBrickMoveTimer(difficulty) {
 나는 남의 과제를 망쳐서,
 내 평균을 끌어올리기로 결심한다.
 
-      우선, 쉬운 실습부터 파괴해보자.`;
-    } else if (level === 1) {
-      return `중간 실습은 한 번에 부숴지지 않는다.
+    우선, 쉬운 실습부터 파괴해보자.`;
+  } else if (level === 1) {
+    return `중간 실습은 한 번에 부숴지지 않는다.
 공을 여러 번 맞혀야 태그가 파괴된다.
 
 이제 점점 더 어려워지는 실습...
-      하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
-    } else {
-      return `시간이 없다...
+    하지만 내가 살아남기 위해선 이 정도쯤은 감수해야 한다.`;
+  } else {
+    return `시간이 없다...
 제한된 시간 속에서 모든 블록을 파괴하라!
 
 이건 실력이 아닌 운도 시험하는 도전이다.
-      하지만 나는 할 수 있다.`;
-    }
+    하지만 나는 할 수 있다.`;
   }
+}
 //축하 클리어 메세지
 function showFinalMessage() {
   $("#clear-panel").show();
@@ -1392,43 +1397,31 @@ function showFinalMessage() {
 
 진짜 개발자가 되어보세요.`;
 
-  const container = $("#story-text");
-  container.text("");
-  const lines = msg.split("\n");
-
-  let index = 0;
-  const interval = setInterval(() => {
-    if (index < lines.length) {
-      container.append(lines[index] + "\n");
-      index++;
-    } else {
-      clearInterval(interval);
-      setTimeout(() => {
-        $("#clear-panel").hide();
-        showMainMenu();
-      }, 4000);
-    }
-  }, 1000);
+  printStoryLines(msg, function() {
+    $("#clear-panel").hide();
+    showMainMenu();
+  });
 }
 
 
 
+
 //개선판
-  function bounceBall() {
+function bounceBall() {
   //  1. 좌우 벽에 부딪히면 반사
-    if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
-      dx = -dx;
-    }
+  if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+    dx = -dx;
+  }
 
   //  2. 위쪽 벽에 부딪히면 반사
-    if (ballY + dy < ballRadius) {
-      dy = -dy;
-    }
+  if (ballY + dy < ballRadius) {
+    dy = -dy;
+  }
 
   //  3. 아래쪽 - 패들과 충돌 체크
-    else if (ballY + dy > canvas.height - ballRadius) {
-      const paddleTop = canvas.height - paddleHeight;
-      const paddleBottom = canvas.height;
+  else if (ballY + dy > canvas.height - ballRadius) {
+    const paddleTop = canvas.height - paddleHeight;
+    const paddleBottom = canvas.height;
     const buffer = 10; // 약간 여유를 줌
 
     const hitTopSurface =
