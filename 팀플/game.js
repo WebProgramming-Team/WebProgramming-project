@@ -2693,5 +2693,3 @@ function triggerLabEffectOnTarget(target) {
   showLabEffect(x, y);
 }
 
-
-
