@@ -45,11 +45,11 @@
     <div class = "callout-area2-subarea">
       <p id = "options-button" class = "callout-area2-subarea-titleText">⚙️ 게임 설정</p>
       <!-- 스크롤시 게임 설정으로 바뀜! -->
-      <p id = "guitar-button" class = "callout-area2-subarea-contentText">게임의 설정을 바꿉니다.</p>
+      <p class = "callout-area2-subarea-contentText">게임의 설정을 바꿉니다.</p>
     </div>
 
     <div class = "callout-area2-subarea">
-      <p class = "callout-area2-subarea-titleText">🎸 기타</p>
+      <p id="guitar-button" class = "callout-area2-subarea-titleText">🎸 기타</p>
       <p class = "callout-area2-subarea-contentText">기타를 칩니다</p>
     </div>
   </div>
@@ -159,10 +159,18 @@
   <button id="level-to-main" class = "back-button inter-900 retro-btn">Back</button>
 </div>
 
-<div id = "guitar" class = "menu-page">
+<div id="guitar" class="menu-page guitar-menu-page">
   <h1>기타</h1>
-  <button id="option-to-main" class = "back-button">뒤로</button>
+
+  <button class="story-button" onclick="goToStory('intro')">인트로 보기</button>
+  <button class="story-button" onclick="goToStory('easy')">쉬움 스토리 보기</button>
+  <button class="story-button" onclick="goToStory('normal')">노말 스토리 보기</button>
+  <button class="story-button" onclick="goToStory('hard')">하드 스토리 보기</button>
+  <button class="story-button" onclick="goToStory('clear')">클리어 보기</button>
+
+  <button id="option-to-main" class="back-button">뒤로</button>
 </div>
+
 
 <div id="game-wrapper">
   <!-- 실습 내용 (playjs.html) -->
@@ -230,18 +238,18 @@
     <div class="volume-value">50</div>
   </div>
 </div>
-
+</div>
 
 
 
 <!-- 스테이지 클리어 후 클리어 메시지 메뉴 -->
-<div id="clear-panel" class="menu-page story-page">
+<div id="clear-panel" class="story-page">
   <div id="story-panel">
-    <div id="story-text" class="story-line"></div>
+    <div id="story-text" class="story-line">여기엔 스토리가 적힙니다.</div>
   </div>
 </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="game.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
