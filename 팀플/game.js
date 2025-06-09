@@ -49,9 +49,58 @@ let intervalId;
 let lastMouseX = -1;
 
 //설정에서 바꿀 수 있는 것들
+///==================================
+//설정 쪽 코드
+ // 모든 공 이미지 요소 선택
+  let ballImages;
+  let totalBalls;
 
+  // 선택 인덱스 초기값
+  let selectedIndex = 2;
+  let finalSelectIndex = -1;
 //공 이미지
 var ballImage = new Image();
+ // 선택 상태 갱신 함수
+  function updateBallSelection() {
+    ballImages.forEach((img, i) => {
+      if (i === selectedIndex) {
+        img.classList.add('ball-selected');
+        if(i === finalSelectIndex){
+          img.classList.add("ball-finalSelect");
+           ballImage.src = img.src;
+         }
+        img.classList.remove('ball-unselected');
+
+      } else {
+        img.classList.remove('ball-selected');
+        img.classList.add('ball-unselected');
+        img.classList.remove("ball-finalSelect");
+      }
+    });
+  }
+  // 왼쪽 회전
+  function rotateLeft() {
+    selectedIndex = (selectedIndex - 1 + totalBalls) % totalBalls;
+    updateBallSelection();
+  }
+
+  // 오른쪽 회전
+  function rotateRight() {
+    selectedIndex = (selectedIndex + 1) % totalBalls;
+    updateBallSelection();
+  }
+
+  // 선택한 이미지 src 출력 또는 활용
+  function showSelectedIndex() {
+    const selectedImg = ballImages[selectedIndex];
+    const selectedSrc = selectedImg.src;
+    finalSelectIndex = selectedIndex;
+    updateBallSelection();
+
+    ballImage.src = selectedSrc;
+
+    console.log("선택된 이미지 경로:", selectedSrc);
+  }
 
 // 음악용
 const gameOverMusicPath = ["musics/gameover/cd-stop.mp3", "musics/gameover/u-died.mp3"];
@@ -70,73 +119,69 @@ const menuMusic = new Audio("musics/etc/main.mp3");
 let igIdx = 0;//인게임 뮤직 변수에서 어떤 값을 플레이할 것인가? -> setting 쪽에서 넘겨받음
 
 
-
-
-//인게임 음악 관련
 let currentMusicIndex = 0;
-let previewAudio = null;
+  let previewAudio = null;
 
-let artElement;
-let mainInfo;
-let titleElement;
-let frontBtn;
-let nextBtn;
-let selectBtn;;
+  let artElement;
+  let mainInfo;
+  let titleElement;
+  let frontBtn;
+  let nextBtn;
+  let selectBtn;;
 
-function updateMusicDisplay() {
-  const musicInfo = ingameMusicTitleAndSummary[currentMusicIndex];
-  const artPath = ingameMusicAlbumArtpath[currentMusicIndex];
-  animateArtChange();
-  artElement.src = artPath;
-  mainInfo.innerHTML = musicInfo.summary;
-  titleElement.textContent = musicInfo.title;
+  function updateMusicDisplay() {
+    const musicInfo = ingameMusicTitleAndSummary[currentMusicIndex];
+    const artPath = ingameMusicAlbumArtpath[currentMusicIndex];
+    animateArtChange();
+    artElement.src = artPath;
+    mainInfo.innerHTML = musicInfo.summary;
+    titleElement.textContent = musicInfo.title;
 
-}
-
-function playPreviewThenReturn() {
-  if (previewAudio) {
-    previewAudio.pause();
   }
 
-  menuMusic.pause();
+  function playPreviewThenReturn() {
+    if (previewAudio) {
+      previewAudio.pause();
+    }
 
-  const previewSrc = ingameMusicPath[currentMusicIndex];
-  previewAudio = new Audio(previewSrc);
-  previewAudio.play();
+    menuMusic.pause();
+
+    const previewSrc = ingameMusicPath[currentMusicIndex];
+    previewAudio = new Audio(previewSrc);
+    previewAudio.play();
 
     // 일정 시간 후 메뉴 음악 다시 재생
-  setTimeout(() => {
-    previewAudio.pause();
-    menuMusic.play();
+    setTimeout(() => {
+      previewAudio.pause();
+      menuMusic.play();
     }, 8000); // 4초 미리듣기
-}
+  }
 
-function goToPreviousMusic() {
-  currentMusicIndex = (currentMusicIndex - 1 + ingameMusicPath.length) % ingameMusicPath.length;
-  updateMusicDisplay();
-  playPreviewThenReturn();
-}
+  function goToPreviousMusic() {
+    currentMusicIndex = (currentMusicIndex - 1 + ingameMusicPath.length) % ingameMusicPath.length;
+    updateMusicDisplay();
+    playPreviewThenReturn();
+  }
 
-function goToNextMusic() {
-  currentMusicIndex = (currentMusicIndex + 1) % ingameMusicPath.length;
-  updateMusicDisplay();
-  playPreviewThenReturn();
-}
+  function goToNextMusic() {
+    currentMusicIndex = (currentMusicIndex + 1) % ingameMusicPath.length;
+    updateMusicDisplay();
+    playPreviewThenReturn();
+  }
 
-function selectThisMusic() {
-  const selected = currentMusicIndex;
-  igIdx = selected;
-  console.log("선택된 음악:", selected);
-}
+  function selectThisMusic() {
+    const selected = currentMusicIndex;
+    igIdx = selected;
+    console.log("선택된 음악:", selected);
+  }
 
-function animateArtChange() {
+ function animateArtChange() {
   artElement.style.opacity = 0;
   setTimeout(() => {
     updateMusicDisplay();
     artElement.style.opacity = 1;
   }, 200);
 }
-
 //게임오버 뮤직 바인딩
 
 for (let i = 0; i < gameOverMusicPath.length; i++) {
